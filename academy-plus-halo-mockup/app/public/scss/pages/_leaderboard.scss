@@ -1,0 +1,194 @@
+@use '../abstracts' as *;
+
+* {
+  font-family: $font-family-text;
+  color: $color-black;
+}
+
+.ranking-table-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 500px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: toRem(5);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  padding: 32px 20px;
+  justify-content: center;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 22px;
+    font-size: 1.7em;
+    color: #222;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+  }
+
+  .ranking-table {
+    width: auto;
+    /* border-collapse: separate; */
+    border-spacing: 0;
+    font-family: inherit;
+    font-size: 1.08em;
+    background: #fff;
+    border-radius: toRem(5);
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+   /*  table-layout: fixed; */
+
+    th,
+    td {
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    th {
+      background: #a51c30; // Use your app's main red
+      color: #fff;
+      font-weight: 700;
+      border-bottom: 2px solid #a51c30;
+      font-size: 1.08em;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      vertical-align: middle; // Added vertical alignment
+    }
+
+    tr {
+      transition: background 0.18s;
+    }
+
+    tr:nth-child(even) td {
+      background: #f8f6f7;
+    }
+
+    tr:hover td {
+      background: #ffe5e9;
+    }
+
+    td {
+      border-bottom: 1px solid #ececec;
+      font-size: 1.05em;
+      color: #222;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .avatar-cell {     // Center horizontally if needed
+
+      img {
+        width: 28px;
+        height: 28px;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+        margin: 0;
+        background: transparent; // Ensure no background on image
+      }
+    }
+
+    
+    td.username-cell { 
+      
+      
+      text-align: left;
+      align-content: center;
+    }
+    th.username-cell {
+      text-align: left;
+      
+    }
+
+    // Added min-width for specific columns
+    th.sortable-col,
+    td.sortable-col {
+      min-width: 90px;
+    }
+  }
+
+  td, th {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  @keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ranking-table tbody tr {
+  opacity: 0;
+}
+
+.ranking-table tbody tr.fade-in {
+  animation: fadeInUp 0.5s forwards;
+}
+
+}
+
+.th-active-indicator {
+  display: inline-block;
+  width: 100%;
+  border-radius: toRem(5);
+  text-align: center;
+  // Remove background, color, and border here!
+  background: transparent;
+  color: inherit;
+  border-bottom: none;
+  transition: background 0.2s, color 0.2s, border-bottom 0.2s;
+}
+
+.th-active-indicator.active {
+  background: #fff3f5;
+  color: #a51c30;
+  font-size: 1.1em; 
+}
+
+.user-position-message {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 1.1em;
+  color: #a51c30;
+  font-weight: 600;
+}
+
+.rank-badge {
+  margin-left: 6px;
+  font-size: 1.1em;
+  vertical-align: middle;
+  font-weight: bold;
+}
+.rank-badge.gold {
+  color: #FFD700;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 1px #bfa100,
+    0 0 3px #bfa100;
+}
+.rank-badge.silver {
+  color: #C0C0C0;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 1px #888,
+    0 0 3px #888;
+}
+.rank-badge.bronze {
+  color: #cd7f32;
+  text-shadow:
+    0 0 2px #fff,
+    0 0 1px #a05a2c,
+    0 0 3px #a05a2c;
+}
+
+.current-user-row td {
+  background: #ffe9b3 !important; // Soft yellow, or choose your app's accent
+  font-weight: 600;
+}

@@ -1,0 +1,30 @@
+<div class="register-header-icons">
+  <img src="/img/favicon.png" alt="Circle Logo" class="logo-circle" />
+  <img src="/img/logos/isep_logo.png" alt="Rectangular Logo" class="logo-rect" />
+</div>
+
+<div class="auth-container">
+  <div class="register-card">
+    <h2>{{ t 'welcome_to_urisolve_academy' }}</h2>
+    <form id="register-form">
+      <label>Email</label>
+      <input class="input-field" type="email" name="email" placeholder="{{ t 'email' }}" required/>
+
+      <label>{{ t 'user_name' }}</label>
+      <input class="input-field" type="text" name="username" placeholder="{{ t 'user_name' }}" required/>
+
+      <label>{{ t 'password' }}</label>
+      <input class="input-field" type="password" name="password" placeholder="{{ t 'enter_password' }}" required/>
+
+
+      <div id="register-message" class="register-message"></div>
+      <button class="red-button register-button" id="register-button" type="submit">{{ t 'register' }}</button>
+    </form>
+    <div class="register-link">
+      {{ t 'have_an_account?' }} <a href="/login">Login</a>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/js/pages/auth.js"></script>
+<script type="module" src="/js/pages/register.js"></script>

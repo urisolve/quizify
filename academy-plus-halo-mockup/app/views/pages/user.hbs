@@ -1,0 +1,120 @@
+<div class="user-container">
+  <div class="user-account-tool-row">
+    <div class="user-menu">
+      <!-- Left column content here -->
+      <ul>
+        <li class="user-menu-category" data-section="profile">
+          <span class="text">{{ t 'profile' }}</span>
+        </li>
+        <li class="user-menu-category" data-section="personal_data">
+          <span class="text">{{ t 'personal_data' }}</span>
+        </li>
+        <li class="user-menu-category" data-section="change_password">
+          <span class="text">{{ t 'change_password' }}</span>
+        </li>
+        <li class="user-menu-category" data-section="privacy">
+          <span class="text">{{ t 'privacy' }}</span>
+        </li>
+        <li class="user-menu-category" data-section="settings">
+          <span class="text">{{ t 'settings' }}</span>
+        </li>
+      </ul>
+
+    </div>
+    <div class="user-menu-separator"></div>
+    <div class="user-menu-content">
+
+      <!-- Profile Section -->
+      <div id="section-profile" class="user-section">
+        <h3>{{ t 'profile' }}</h3>
+        <form id="profile-form" class="update-user-form">
+          <div class="avatar-dropdown">
+            <label for="avatar">Avatar</label>
+            <div class="avatar-trigger" tabindex="-1" style="pointer-events: none; cursor: not-allowed;">
+              <img src="{{#if user.avatar_url}}{{user.avatar_url}}{{else}}/img/logos/default-avatar.png{{/if}}" 
+                   alt="Avatar" 
+                   class="avatar-img"
+                   style="filter: grayscale(1); opacity: 0.5;" />
+              <span class="avatar-caret" style="display: none;">&#9662;</span>
+            </div>
+            <div class="avatar-menu" style="display: none;">
+              <input type="file" id="avatar" name="avatar" accept="image/*" disabled />
+              <button type="button" id="remove-avatar" disabled>Remove Avatar</button>
+            </div>
+          </div>
+          <label for="profile-name">{{ t 'profile_name' }}</label>
+          <input type="text" id="profile-name" name="profile-name" placeholder="{{user.username}}"/>
+          <button class="red-button update-button" type="submit" disabled>{{ t 'update' }}</button>
+        </form>
+        <div id="profile-data-message"></div>
+      </div>
+
+      <!-- Personal Data Section -->
+      <div id="section-personal_data" class="user-section">
+        <h3>{{ t 'personal_data' }}</h3>
+        <form id="personal-data-form" class="update-user-form">
+          <label for="email">{{ t 'email_address' }}</label>
+          <input type="email" id="email" name="email" placeholder="{{user.email}}" />
+
+          <label for="name">{{ t 'name' }}</label>
+          <input type="text" id="name" name="name" placeholder="{{user.name}}" />
+
+          <label for="date_of_birth">{{ t 'date_of_birth' }}</label>
+          <input type="date" id="date_of_birth" name="date_of_birth" placeholder="{{user.date_of_birth}}" />
+
+          <button class="red-button update-button" type="submit" disabled>{{ t 'update' }}</button>
+        </form>
+        <div id="personal-data-message"></div>
+      </div>
+
+      <!-- Change Password Section -->
+      <div id="section-change_password" class="user-section">
+        <h3>{{ t 'change_password' }}</h3>
+        <form id="change-password-form" class="update-user-form">
+          <label for="current-password">{{ t 'current_password' }}</label>
+          <input type="password" id="current-password" name="currentPassword" required />
+
+          <label for="new-password">{{ t 'new_password' }}</label>
+          <input type="password" id="new-password" name="newPassword" required />
+
+          <label for="confirm-password">{{ t 'confirm_new_password' }}</label>
+          <input type="password" id="confirm-password" name="confirmPassword" required />
+
+          <button class="red-button update-button" type="submit" disabled>{{ t 'change_password' }}</button>
+        </form>
+        <div id="change-password-message"></div>
+      </div>
+
+      <!-- Privacy Section -->
+      <div id="section-privacy" class="user-section">
+        <h3>{{ t 'privacy' }}</h3>
+        <form id="privacy-form" class="update-user-form">
+          <div class="privacy-option">
+            <label>
+              <input type="checkbox" name="private_account" {{#if user.private_account}}checked{{/if}}>
+              {{ t 'show_profile_publicly' }}
+            </label>
+          </div>
+          <div class="privacy-option">
+            <label>
+              <input type="checkbox" name="hide_name" {{#if user.hide_name}}checked{{/if}}>
+              {{ t 'show_name_to_others' }}
+            </label>
+          </div>
+          <button class="red-button update-button" type="submit" disabled>{{ t 'update' }}</button>
+        </form>
+        <div id="privacy-message"></div>
+      </div>
+
+      <!-- Settings Section -->
+      <div id="section-settings" class="user-section">
+        <h3>{{ t 'settings' }}</h3>
+        <p>{{ t 'settings_placeholder' }}</p>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script type="module" src="/js/pages/user.js"></script>

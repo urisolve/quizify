@@ -1,0 +1,100 @@
+{{!-- TODO: Reestruturar e simplificar --}}
+<div class="card-body w-100 h-100">
+    <div class="container-fluid globalContainer">
+        <!--  Row 1 -->
+        <div class="row w-100 h-100 justify-content-center">
+            <span class="title">Área de treino</span>
+            <span class="sub-title">Pratica e ultrapassa todas as tuas dificuldades</span>
+        </div>
+        <!--  Row 2 -->
+        <div class="row w-100 h-100 justify-content-center d-flex">
+            <div class="w-100 align-items-center practiceContainer">
+                <div class="card practiceCard1">
+                    <div class="card-title w-100 practiceCardHeader">
+                        Treino específico
+                    </div>
+                    <div class="card-title w-100 practiceCardText">
+                        Utiliza este Quiz se pretendes praticar temas em específico. Seleciona o <b>tema</b> e clica em <b>Iniciar Quiz</b>.
+                    </div>
+                    <div class="card-body w-100 h-100 p-0">
+                        <div class="container-fluid w-100 p-0">
+                            <!--  Row 1 -->
+                            <div class="row w-100 justify-content-center p-0 m-0 mb-4 mt-4">
+                                <div class="row justify-content-center buttonParent p-0">
+                                    <div class="radioWrap">
+                                        <div class="form-check">
+                                            <input class="form-check-input radioBtns" type="checkbox" value="" id="flexCheckDefault">
+                                            <label class="form-check-label" for="flexCheckDefault">
+                                                CC
+                                            </label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input radioBtns" type="checkbox" value="" id="flexCheckChecked" checked>
+                                            <label class="form-check-label" for="flexCheckChecked">
+                                                CA
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="w-100 p-0 m-0 align-items-center justify-content-between selectWrap">
+                                        <select id="themeSelect" class="form-select form-select inputSelect">
+                                            <option selected hidden>Selecionar tema</option>
+                                            <option value="knots">Nós</option>
+                                            <option value="branches">Ramos</option>
+                                            <option value="meshes">Malhas</option>
+                                            <option value="equations">Equações</option>
+                                            <option value="currentvoltage">Correntes e tensões</option>
+                                            <option value="methods">Métodos de análise</option>
+                                        </select>
+                                        <select id="methods" class="form-select form-select inputSelect pl-50" style="display: none;">
+                                            <option value='null' selected hidden>Selecionar método</option>
+                                            <option value="mtn">Método das Tensões nos Nós</option>
+                                            <option value="mcr">Método das Correntes nos Ramos</option>
+                                            <option value="mcm">Método das Correntes nas Malhas</option>
+                                            <option value="tsp">Teorema da Sobreposição</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="divider"></div>
+                            <!--  Row 2 -->
+                            <div class="row w-100 h-100 justify-content-center p-0 m-0">
+                                <div class="row justify-content-center p-0">
+                                    <button id="isolated" class="btn-primary simButton" disabled>Iniciar Quiz</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card practiceCard2">
+                    <div class="card-title w-100 practiceCardHeader">
+                        Treino Aleatório
+                    </div>
+                    <div class="card-title w-100 practiceCardText">
+                        Queres testar todo o teu conhecimento? Aqui tens um Quiz gerado que engloba <b>todas as matérias</b>.
+                    </div>
+                    <div class="card-body w-100 h-100 simCardBody">
+                        <div class="container-fluid w-100 p-0">
+                            <!--  Row 1 -->
+                            <div class="row w-100 justify-content-center p-0 m-0 mb-4">
+                                <div class="row justify-content-center p-0">
+                                    <i class="ti ti-question-mark questionMark"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            <!--  Row 2 -->
+                            <div class="row w-100 h-100 justify-content-center p-0 m-0">
+                                <div class="row justify-content-center p-0">
+                                    <button class="btn-primary simButton" onclick="analyseCircuit('MTN')">Iniciar Quiz</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="module" src="/js/pages/practice.js"></script>

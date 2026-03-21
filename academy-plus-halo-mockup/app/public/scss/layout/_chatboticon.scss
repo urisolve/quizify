@@ -1,0 +1,26 @@
+@use '../abstracts' as *;
+
+.chatbot-icon{
+    position: absolute; // Always on the bottom left part of the screen
+    bottom: toRem(40);
+    right: toRem(40);
+    width: $chatbot-icon-size;
+    height: $chatbot-icon-size;
+    background-color: $color-chatbot-icon;
+    border: toRem(1) solid $color-black;
+    border-radius: 50%;
+
+    &:hover{
+        transition-duration: 1s; // Fade-in animation
+        transform: translateY(toRem(-10));
+        cursor: pointer;
+    }
+    transition-duration: 1s; // Fade-out animation
+}
+
+.chatbot-icon-img{
+    position: relative;
+    padding: $chatbot-icon-img-padding;
+    width: $chatbot-icon-img-size;
+    height: $chatbot-icon-img-size;
+}

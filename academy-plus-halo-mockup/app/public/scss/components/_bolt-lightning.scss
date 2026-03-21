@@ -1,0 +1,59 @@
+// Staggered delays for up to 5 bolts
+.bolt-lightning:nth-child(1) { animation-delay: 0s; }
+.bolt-lightning:nth-child(2) { animation-delay: 0.1s; }
+.bolt-lightning:nth-child(3) { animation-delay: 0.3s; }
+.bolt-lightning:nth-child(4) { animation-delay: 0.45s; }
+.bolt-lightning:nth-child(5) { animation-delay: 0.6s; }
+// Lightning bolt animation utility
+
+@keyframes bolt-lightning {
+  0%, 20%, 100% {
+    filter: drop-shadow(0 0 0px #fff) brightness(1);
+    transform: scale(1);
+  }
+  20% {
+    filter: drop-shadow(0 0 18px #fff) brightness(2.5);
+    transform: scale(1.25) rotate(-8deg);
+  }
+  21% {
+    filter: drop-shadow(0 0 8px #ffe066) brightness(1.7);
+    transform: scale(1.1) rotate(6deg);
+  }
+  22% {
+    filter: drop-shadow(0 0 18px #fff) brightness(2.5);
+    transform: scale(1.25) rotate(-8deg);
+  }
+}
+
+  @keyframes bolt-lightning {
+    0%, 92%, 100% {
+      filter: drop-shadow(0 0 0px #fff) brightness(1);
+      transform: scale(1);
+    }
+    93% {
+      filter: drop-shadow(0 0 18px #fff) brightness(2.5);
+      transform: scale(1.25) rotate(-8deg);
+    }
+    95% {
+      filter: drop-shadow(0 0 8px #ffe066) brightness(1.7);
+      transform: scale(1.1) rotate(6deg);
+    }
+    97% {
+      filter: drop-shadow(0 0 18px #fff) brightness(2.5);
+      transform: scale(1.25) rotate(-8deg);
+    }
+  }
+
+
+.bolt-lightning {
+  animation: bolt-lightning 2.5s infinite;
+  animation-delay: var(--bolt-delay, 0s);
+  animation-iteration-count: infinite;
+  animation-direction: normal;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+// Example usage:
+// <i class="bi bi-lightning-charge-fill bolt-lightning"></i>
+// Add custom delays for staggered effects as needed.

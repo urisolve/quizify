@@ -1,0 +1,32 @@
+<div class="login-header-icons">
+  <img src="/img/favicon.png" alt="Circle Logo" class="logo-circle" />
+  <img src="/img/logos/isep_logo.png" alt="Rectangular Logo" class="logo-rect" />
+</div>
+
+<div class="auth-container">
+  <div class="login-card">
+    <h2>{{ t 'welcome_back' }}</h2>
+    <form id="login-form">
+      <label>Email</label>
+      <input class="input-field" type="email" name="email" placeholder="{{ t 'email' }}" required/>
+
+      <label>{{ t 'password' }}</label>
+      <input class="input-field" type="password" name="password" placeholder="{{ t 'enter_password' }}" required/>
+
+      <div class="login-options">
+        <label><input type="checkbox" disabled/> {{ t 'remember_me' }}</label>
+        <a href="/password-recovery">{{ t 'forgot_password?' }}</a>
+      </div>
+
+      <button class="red-button login-button" id="login-button" type="submit">{{ t 'login' }}</button>
+
+      <div id="login-message" class="login-message"></div>
+    </form>
+    <div class="register-link">
+      {{ t 'dont_have_an_account?' }} <a href="/register"> {{ t 'register' }}</a>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="/js/pages/auth.js"></script>
+<script type="module" src="/js/pages/login.js"></script>

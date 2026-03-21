@@ -1,0 +1,517 @@
+{
+  "dataset_name": "Fundamentos de circuitos elétricos",
+  "language": "pt",
+  "description": "Comprehensive educational content about electrical circuit fundamentals",
+  "database_schema": {
+    "topics": {
+      "columns": ["id", "name", "description", "badge"],
+      "badge_format": {"name": "string", "svg": "base64_string"}
+    },
+    "subtopics": {
+      "columns": ["id", "topic_id", "title", "content", "num_questions", "weight", "image"]
+    }
+  },
+  "topics": [
+    {
+      "id": 1,
+      "name": "Sistemas de Unidades",
+      "description": "Conceitos fundamentais sobre sistemas de unidades de medição",
+      "badge": {"name": "Units Master", "svg": ""},
+      "subtopics": [
+        {
+          "id": 1,
+          "title": "Unidades SI",
+          "content": "Sistema Internacional de Unidades e suas 7 unidades elementais",
+          "num_questions": 5,
+          "weight": 1.0,
+          "image": null,
+          "keywords": ["SI", "unidades", "medição", "segundo", "metro", "quilograma", "ampere", "kelvin", "mole", "candela"]
+        },
+        {
+          "id": 2,
+          "title": "Múltiplos e submúltiplos",
+          "content": "Prefixos padronizados do SI para diferentes escalas de medição",
+          "num_questions": 4,
+          "weight": 1.0,
+          "image": null,
+          "keywords": ["múltiplos", "submúltiplos", "prefixos", "quilo", "mega", "micro", "nano", "potências de 10"]
+        },
+        {
+          "id": 3,
+          "title": "Algarismos significativos",
+          "content": "Conceitos sobre precisão e significado dos dígitos em medições",
+          "num_questions": 4,
+          "weight": 1.0,
+          "image": null,
+          "keywords": ["algarismos significativos", "precisão", "arredondamento", "incerteza", "medições"]
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Terminologia de Circuitos Elétricos",
+      "description": "Conceitos básicos e terminologia fundamental dos circuitos elétricos",
+      "subtopics": [
+        {
+          "id": 4,
+          "title": "Carga elétrica",
+          "description": "Origem dos fenómenos elétricos e tipos de cargas",
+          "keywords": ["carga elétrica", "coulomb", "forças elétricas", "atração", "repulsão"]
+        },
+        {
+          "id": 5,
+          "title": "Tensão elétrica",
+          "description": "Diferença de potencial e energia elétrica transferida",
+          "keywords": ["tensão", "diferença de potencial", "volt", "energia elétrica", "ddp"]
+        },
+        {
+          "id": 6,
+          "title": "Corrente elétrica",
+          "description": "Movimento ordenado de cargas elétricas e intensidade da corrente",
+          "keywords": ["corrente elétrica", "ampere", "eletrões", "carga", "condutores"]
+        },
+        {
+          "id": 7,
+          "title": "Resistência elétrica e resistividade",
+          "description": "Oposição à passagem da corrente e propriedades dos materiais",
+          "keywords": ["resistência", "resistividade", "ohm", "Lei de Ohm", "efeito de Joule"]
+        },
+        {
+          "id": 8,
+          "title": "Tipos de materiais condutores",
+          "description": "Classificação dos materiais elétricos por condutividade",
+          "keywords": ["condutores", "isoladores", "semicondutores", "supercondutores", "resistividade"]
+        },
+        {
+          "id": 9,
+          "title": "Potência elétrica",
+          "description": "Energia elétrica transferida por unidade de tempo",
+          "keywords": ["potência", "watt", "energia", "corrente contínua", "dissipação"]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Componentes e Interligação de Circuitos Elétricos",
+      "description": "Componentes básicos e métodos de conexão em circuitos elétricos",
+      "subtopics": [
+        {
+          "id": 10,
+          "title": "Resistências",
+          "description": "Componentes resistivos e código de cores",
+          "keywords": ["resistências", "código de cores", "tolerância", "potenciómetros", "trimmers"]
+        },
+        {
+          "id": 11,
+          "title": "Bobinas (indutâncias)",
+          "description": "Componentes indutivos e armazenamento de energia magnética",
+          "keywords": ["bobinas", "indutância", "henry", "campo magnético", "autoindução", "espiras"]
+        },
+        {
+          "id": 12,
+          "title": "Condensadores (capacitâncias)",
+          "description": "Componentes capacitivos e armazenamento de energia elétrica",
+          "keywords": ["condensadores", "capacitância", "farad", "campo elétrico", "dielétrico", "armaduras"]
+        },
+        {
+          "id": 13,
+          "title": "Fontes de alimentação em corrente contínua",
+          "description": "Fontes de tensão e corrente contínua",
+          "keywords": ["fontes", "corrente contínua", "tensão", "resistência interna", "circuito aberto", "curto-circuito"]
+        },
+        {
+          "id": 14,
+          "title": "Baterias",
+          "description": "Dispositivos de armazenamento de energia química",
+          "keywords": ["baterias", "capacidade", "ampere-hora", "energia", "reações químicas"]
+        },
+        {
+          "id": 15,
+          "title": "Breadboard",
+          "description": "Placas de montagem para prototipagem de circuitos",
+          "keywords": ["breadboard", "prototipagem", "ligações", "barramentos", "terminais"]
+        },
+        {
+          "id": 16,
+          "title": "Acessórios de ligação",
+          "description": "Cabos e conectores para interligação de componentes",
+          "keywords": ["cabos", "conectores", "banana", "crocodilo", "pontas de prova", "BNC"]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Equipamentos de Teste e Medição",
+      "description": "Instrumentos e métodos para medição de grandezas elétricas",
+      "subtopics": [
+        {
+          "id": 17,
+          "title": "Classificação dos instrumentos de medição",
+          "description": "Tipos e características dos instrumentos de medição",
+          "keywords": ["instrumentos", "analógicos", "digitais", "medição", "grandezas elétricas"]
+        },
+        {
+          "id": 18,
+          "title": "Simbologia dos Instrumentos de medição",
+          "description": "Símbolos utilizados para representar instrumentos",
+          "keywords": ["simbologia", "símbolos", "esquemas", "representação"]
+        },
+        {
+          "id": 19,
+          "title": "Método de medição por comparação - Ponte de Wheatstone",
+          "description": "Método de medição por equilíbrio e ponte de Wheatstone",
+          "keywords": ["ponte de Wheatstone", "comparação", "equilíbrio", "resistência", "galvanômetro"]
+        },
+        {
+          "id": 20,
+          "title": "Ohmímetro",
+          "description": "Instrumento para medição direta de resistência",
+          "keywords": ["ohmímetro", "resistência", "medição direta", "componentes"]
+        },
+        {
+          "id": 21,
+          "title": "Voltímetro",
+          "description": "Instrumento para medição de tensão elétrica",
+          "keywords": ["voltímetro", "tensão", "paralelo", "resistência interna", "gamas"]
+        },
+        {
+          "id": 22,
+          "title": "Amperímetro",
+          "description": "Instrumento para medição de corrente elétrica",
+          "keywords": ["amperímetro", "corrente", "série", "shunt", "resistência baixa"]
+        },
+        {
+          "id": 23,
+          "title": "Efeito de carga de voltímetros e amperímetros",
+          "description": "Influência dos instrumentos nos circuitos medidos",
+          "keywords": ["efeito de carga", "influência", "medição", "erro", "resistência interna"]
+        },
+        {
+          "id": 24,
+          "title": "Wattímetro",
+          "description": "Instrumento para medição de potência elétrica",
+          "keywords": ["wattímetro", "potência", "tensão", "corrente", "multiplicação"]
+        },
+        {
+          "id": 25,
+          "title": "Multímetro",
+          "description": "Instrumento multifuncional para medições elétricas",
+          "keywords": ["multímetro", "múltiplas grandezas", "corrente alternada", "corrente contínua"]
+        },
+        {
+          "id": 26,
+          "title": "Incertezas de medição",
+          "description": "Conceitos sobre precisão e erro em medições",
+          "keywords": ["incertezas", "erro", "precisão", "medição", "exatidão"]
+        },
+        {
+          "id": 27,
+          "title": "Gerador de sinais",
+          "description": "Equipamentos para geração de sinais elétricos",
+          "keywords": ["gerador", "sinais", "funções", "osciladores", "frequência"]
+        },
+        {
+          "id": 28,
+          "title": "Osciloscópio",
+          "description": "Instrumento para visualização de sinais no tempo",
+          "keywords": ["osciloscópio", "formas de onda", "trigger", "digital", "analógico", "frequência"]
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Conceitos Fundamentais de Circuitos Elétricos",
+      "description": "Elementos estruturais e conceitos básicos de circuitos",
+      "subtopics": [
+        {
+          "id": 29,
+          "title": "Circuito elétrico",
+          "description": "Definição e componentes básicos de um circuito",
+          "keywords": ["circuito", "componentes", "ligações", "esquema elétrico"]
+        },
+        {
+          "id": 30,
+          "title": "Ramos",
+          "description": "Segmentos de circuito entre dois nós",
+          "keywords": ["ramos", "nós", "componentes", "ligação"]
+        },
+        {
+          "id": 31,
+          "title": "Malhas",
+          "description": "Caminhos fechados em circuitos elétricos",
+          "keywords": ["malhas", "caminhos fechados", "circuitos", "análise"]
+        },
+        {
+          "id": 32,
+          "title": "Nós",
+          "description": "Pontos de conexão entre componentes",
+          "keywords": ["nós", "conexões", "pontos", "junções"]
+        },
+        {
+          "id": 33,
+          "title": "Associação de componentes",
+          "description": "Conexões em série e paralelo de componentes",
+          "keywords": ["associação", "série", "paralelo", "equivalente", "resistências"]
+        },
+        {
+          "id": 34,
+          "title": "Associações triângulo-estrela e estrela-triângulo",
+          "description": "Transformações entre configurações de componentes",
+          "keywords": ["triângulo", "estrela", "transformação", "equivalência", "delta", "Y"]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Leis Fundamentais dos Circuitos Elétricos",
+      "description": "Leis básicas que governam o comportamento dos circuitos",
+      "subtopics": [
+        {
+          "id": 35,
+          "title": "Lei de Ohm",
+          "description": "Relação fundamental entre tensão, corrente e resistência",
+          "keywords": ["Lei de Ohm", "tensão", "corrente", "resistência", "proporcionalidade"]
+        },
+        {
+          "id": 36,
+          "title": "Lei de Kirchhoff dos nós",
+          "description": "Conservação da corrente elétrica nos nós",
+          "keywords": ["Kirchhoff", "nós", "corrente", "conservação", "soma"]
+        },
+        {
+          "id": 37,
+          "title": "Lei de Kirchhoff das malhas",
+          "description": "Conservação da tensão nas malhas fechadas",
+          "keywords": ["Kirchhoff", "malhas", "tensão", "conservação", "soma"]
+        },
+        {
+          "id": 38,
+          "title": "Teorema de Tellegen",
+          "description": "Conservação da potência em circuitos elétricos",
+          "keywords": ["Tellegen", "potência", "conservação", "energia"]
+        },
+        {
+          "id": 39,
+          "title": "Divisores de tensão",
+          "description": "Distribuição proporcional de tensão em resistências",
+          "keywords": ["divisor de tensão", "proporcional", "resistências", "distribuição"]
+        },
+        {
+          "id": 40,
+          "title": "Divisores de corrente",
+          "description": "Distribuição proporcional de corrente em resistências",
+          "keywords": ["divisor de corrente", "proporcional", "resistências", "distribuição"]
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Métodos de Análise de Circuitos Elétricos",
+      "description": "Técnicas para análise e solução de circuitos complexos",
+      "subtopics": [
+        {
+          "id": 41,
+          "title": "Método da resistência equivalente",
+          "description": "Simplificação de circuitos através de resistências equivalentes",
+          "keywords": ["resistência equivalente", "simplificação", "série", "paralelo"]
+        },
+        {
+          "id": 42,
+          "title": "Teorema da sobreposição",
+          "description": "Análise de circuitos com múltiplas fontes",
+          "keywords": ["sobreposição", "múltiplas fontes", "linearidade", "superposição"]
+        },
+        {
+          "id": 43,
+          "title": "Método da corrente nos ramos",
+          "description": "Análise baseada nas correntes dos ramos",
+          "keywords": ["corrente nos ramos", "sistemas de equações", "Kirchhoff"]
+        },
+        {
+          "id": 44,
+          "title": "Método da corrente nas malhas",
+          "description": "Análise baseada em correntes fictícias nas malhas",
+          "keywords": ["corrente nas malhas", "malhas", "correntes fictícias", "sistemas"]
+        },
+        {
+          "id": 45,
+          "title": "Método das tensões nodais",
+          "description": "Análise baseada nas tensões dos nós",
+          "keywords": ["tensões nodais", "nós", "potencial", "sistemas de equações"]
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Teoremas de Simplificação de Circuitos Elétricos",
+      "description": "Teoremas para simplificar a análise de circuitos complexos",
+      "subtopics": [
+        {
+          "id": 46,
+          "title": "Teorema de Thévenin",
+          "description": "Equivalente de circuito com fonte de tensão",
+          "keywords": ["Thévenin", "equivalente", "fonte de tensão", "resistência interna"]
+        },
+        {
+          "id": 47,
+          "title": "Teorema de Norton",
+          "description": "Equivalente de circuito com fonte de corrente",
+          "keywords": ["Norton", "equivalente", "fonte de corrente", "resistência paralela"]
+        },
+        {
+          "id": 48,
+          "title": "Teorema da máxima transferência de potência",
+          "description": "Condições para máxima transferência de potência",
+          "keywords": ["máxima transferência", "potência", "casamento de impedâncias", "resistência"]
+        },
+        {
+          "id": 49,
+          "title": "Teorema de Millman",
+          "description": "Análise de circuitos com fontes em paralelo",
+          "keywords": ["Millman", "fontes paralelas", "tensão equivalente"]
+        },
+        {
+          "id": 50,
+          "title": "Teorema da Substituição",
+          "description": "Substituição de ramos por fontes equivalentes",
+          "keywords": ["substituição", "ramos", "fontes equivalentes"]
+        },
+        {
+          "id": 51,
+          "title": "Teorema da Reciprocidade",
+          "description": "Propriedade de reciprocidade em circuitos lineares",
+          "keywords": ["reciprocidade", "circuitos lineares", "equivalência"]
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Conceitos Fundamentais de Grandezas Alternadas Sinusoidais",
+      "description": "Fundamentos matemáticos e conceituais de corrente alternada",
+      "subtopics": [
+        {
+          "id": 52,
+          "title": "Corrente alternada sinusoidal",
+          "description": "Características e propriedades da corrente alternada",
+          "keywords": ["corrente alternada", "sinusoidal", "frequência", "amplitude", "período"]
+        },
+        {
+          "id": 53,
+          "title": "Valor médio",
+          "description": "Cálculo e significado do valor médio em sinais alternados",
+          "keywords": ["valor médio", "integral", "período", "sinais alternados"]
+        },
+        {
+          "id": 54,
+          "title": "Valor eficaz",
+          "description": "Valor RMS e sua importância prática",
+          "keywords": ["valor eficaz", "RMS", "potência", "aquecimento"]
+        },
+        {
+          "id": 55,
+          "title": "Números complexos",
+          "description": "Matemática dos números complexos aplicada a circuitos",
+          "keywords": ["números complexos", "fasores", "impedância", "matemática"]
+        },
+        {
+          "id": 56,
+          "title": "Transformada de Steinmetz",
+          "description": "Transformação para análise fasorial",
+          "keywords": ["Steinmetz", "fasores", "transformada", "análise fasorial"]
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Circuitos de Corrente Alternada Monofásica",
+      "description": "Análise detalhada de circuitos em corrente alternada",
+      "subtopics": [
+        {
+          "id": 57,
+          "title": "Leis e métodos dos circuitos em corrente alternada",
+          "description": "Aplicação das leis fundamentais em CA",
+          "keywords": ["corrente alternada", "leis", "métodos", "análise CA"]
+        },
+        {
+          "id": 58,
+          "title": "Componentes em corrente alternada",
+          "description": "Comportamento de R, L e C em corrente alternada",
+          "keywords": ["resistência", "indutância", "capacitância", "impedância", "reatância"]
+        },
+        {
+          "id": 59,
+          "title": "Regime de magnetização e desmagnetização de uma bobina",
+          "description": "Transitórios em circuitos indutivos",
+          "keywords": ["bobina", "magnetização", "transitórios", "constante de tempo"]
+        },
+        {
+          "id": 60,
+          "title": "Regime de carga e descarga de um condensador",
+          "description": "Transitórios em circuitos capacitivos",
+          "keywords": ["condensador", "carga", "descarga", "transitórios", "constante de tempo"]
+        },
+        {
+          "id": 61,
+          "title": "Circuitos RLC série",
+          "description": "Análise de circuitos com R, L e C em série",
+          "keywords": ["RLC série", "impedância", "ressonância", "fator de qualidade"]
+        },
+        {
+          "id": 62,
+          "title": "Circuitos RLC paralelo",
+          "description": "Análise de circuitos com R, L e C em paralelo",
+          "keywords": ["RLC paralelo", "admitância", "ressonância", "fator de qualidade"]
+        },
+        {
+          "id": 63,
+          "title": "Predominância indutiva e capacitiva",
+          "description": "Análise do caráter reativo dos circuitos",
+          "keywords": ["indutivo", "capacitivo", "reatância", "fator de potência"]
+        },
+        {
+          "id": 64,
+          "title": "Ressonância",
+          "description": "Fenômeno de ressonância em circuitos RLC",
+          "keywords": ["ressonância", "frequência natural", "fator de qualidade", "largura de banda"]
+        },
+        {
+          "id": 65,
+          "title": "Filtros passivos de primeira ordem",
+          "description": "Filtros passa-baixo e passa-alto básicos",
+          "keywords": ["filtros", "passa-baixo", "passa-alto", "frequência de corte", "primeira ordem"]
+        },
+        {
+          "id": 66,
+          "title": "Potência em corrente alternada",
+          "description": "Conceitos de potência ativa, reativa e aparente",
+          "keywords": ["potência ativa", "potência reativa", "potência aparente", "fator de potência"]
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Circuitos de Corrente Alternada Trifásica",
+      "description": "Sistemas trifásicos e suas aplicações",
+      "subtopics": [
+        {
+          "id": 67,
+          "title": "Sistemas trifásicos",
+          "description": "Fundamentos dos sistemas de três fases",
+          "keywords": ["trifásico", "três fases", "sistemas", "desfasamento"]
+        },
+        {
+          "id": 68,
+          "title": "Ligações estrela e triângulo em trifásico",
+          "description": "Configurações de ligação em sistemas trifásicos",
+          "keywords": ["estrela", "triângulo", "delta", "Y", "ligações trifásicas"]
+        },
+        {
+          "id": 69,
+          "title": "Potência em circuitos trifásicos",
+          "description": "Cálculo de potência em sistemas trifásicos",
+          "keywords": ["potência trifásica", "linha", "fase", "balanceado", "desequilibrado"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+<header class="app-header position-sticky top-0 w-100">
+  <nav class="navbar navbar-expand-lg navbar-light px-3 px-lg-4">
+    <ul class="navbar-nav">
+      <li class="nav-item d-block d-xl-none">
+        <a class="nav-link sidebartoggler nav-icon-hover" id="headerCollapse" href="javascript:void(0)">
+          <i class="ti ti-menu-2"></i>
+        </a>
+      </li>
+    </ul>
+
+    <div class="navbar-collapse justify-content-end px-0">
+      <div class="d-flex align-items-center gap-3 ms-auto">
+
+        <!-- LANGUAGE -->
+        <div class="nav-item dropdown">
+          <a
+            class="nav-link nav-icon-hover d-flex align-items-center gap-2 px-2"
+            href="javascript:void(0)"
+            id="languageDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <img
+              src="/assets/images/flags/pt.png"
+              alt="Portuguese"
+              width="22"
+              height="16"
+              class="rounded-1 border"
+            >
+            <span class="d-none d-md-inline text-dark fw-medium">PT</span>
+            <i class="ti ti-chevron-down fs-4"></i>
+          </a>
+
+          <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up shadow-sm border-0 rounded-3"
+            aria-labelledby="languageDropdown">
+            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <img
+                src="/assets/images/flags/pt.png"
+                alt="Portuguese"
+                width="22"
+                height="16"
+                class="rounded-1 border"
+              >
+              <span>Portuguese</span>
+            </a>
+            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <img
+                src="/assets/images/flags/gb.png"
+                alt="English"
+                width="22"
+                height="16"
+                class="rounded-1 border"
+              >
+              <span>English</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- USER -->
+        <div class="nav-item dropdown">
+          <a
+            class="nav-link d-flex align-items-center gap-2 px-2"
+            href="javascript:void(0)"
+            id="userDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <img
+              src="/assets/images/profile/avatar.png"
+              alt="User avatar"
+              width="38"
+              height="38"
+              class="rounded-circle border"
+              style="object-fit: cover;"
+            >
+            <span class="d-none d-md-inline text-dark fw-medium">User</span>
+            <i class="ti ti-chevron-down fs-4"></i>
+          </a>
+
+          <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up shadow-sm border-0 rounded-3"
+            aria-labelledby="userDropdown">
+            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <i class="ti ti-logout fs-5 text-danger"></i>
+              <span>Logout</span>
+            </a>
+            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <i class="ti ti-settings fs-5 text-primary"></i>
+              <span>Settings</span>
+            </a>
+            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <i class="ti ti-badge fs-5 text-warning"></i>
+              <span>Level</span>
+            </a>
+            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <i class="ti ti-star fs-5 text-warning"></i>
+              <span>Stars</span>
+            </a>
+            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <i class="ti ti-chart-bar fs-5 text-info"></i>
+              <span>Statistics</span>
+            </a>
+          </div>
+        </div>
+
+        <!-- ISEP LOGO -->
+        <a
+          href="https://www.isep.ipp.pt/"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="d-flex align-items-center ps-1"
+        >
+          <img
+            src="/assets/images/logos/isep.png"
+            alt="ISEP logo"
+            class="img-fluid"
+            style="max-height: 34px; width: auto;"
+          >
+        </a>
+
+      </div>
+    </div>
+  </nav>
+</header>

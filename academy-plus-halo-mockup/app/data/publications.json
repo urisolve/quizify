@@ -1,0 +1,100 @@
+[
+  {
+    "year": "2026",
+    "publications": [
+      {
+        "title": "Fine-Tuning Lightweight LLMs With Human-Curated Data on Electrical Circuit Fundamentals for E-Learning",
+        "authors": "A. Rocha, J. Ferreira, P. Oliveira, M. Alves, and A. Sousa",
+        "journal": "Computer Applications in Engineering Education, Wiley",
+        "url": "https://onlinelibrary.wiley.com/doi/10.1002/cae.70176",
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "year": "2025",
+    "publications": [
+      {
+        "title": "On a Web-Based Oscilloscope Interface App for E-learning: Software Architecture, Practical Applications and User Experience",
+        "authors": "JPC Ferreira, A. Rocha, M. Alves, P. Oliveira",
+        "journal": "Sci, MDPI",
+        "url": "https://www.mdpi.com/2413-4155/7/1/19",
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "year": "2024",
+    "publications": [
+      {
+        "title": "The underlying potential of NLP for microcontroller programming education",
+        "authors": "A. Rocha, L. Sousa, M. Alves, A. Sousa",
+        "journal": "Computer Applications in Engineering Education, Wiley",
+        "url": "https://onlinelibrary.wiley.com/doi/full/10.1002/cae.22778",
+        "notes": ""
+      },
+      {
+        "title": "Outlook of a web-based oscilloscope clone for E-learning",
+        "authors": "JPC Ferreira, A. Rocha, M. Alves, P. Oliveira",
+        "journal": "PRATICA-Revista Multimédia de Investigação em Inovação Pedagógica e Práticas de E-Learning",
+        "url": "https://parc.ipp.pt/index.php/elearning/article/download/5824/3270",
+        "notes": "P'PIC 2024 - Porto Pedagogical Innovation Conference"
+      }
+    ]
+  },
+  {
+    "year": "2023",
+    "publications": [
+      {
+        "title": "A snapshot of the U=RIsolve framework: self-learning electric circuit fundamentals made easier",
+        "authors": "A. Rocha, L. Sousa, M. Alves, F. Pereira",
+        "journal": "PRATICA-Revista Multimédia de Investigação em Inovação Pedagógica e Práticas de E-Learning",
+        "url": "https://parc.ipp.pt/index.php/elearning/article/download/5229/2984",
+        "notes": "P'PIC 2023 - Porto Pedagogical Innovation Conference"
+      }
+    ]
+  },
+  {
+    "year": "2021",
+    "publications": [
+      {
+        "title": "U=RIsolve: a web-based application for learning electrical circuit analysis",
+        "authors": "L. Sousa, A. Rocha, M. Alves, F. Pereira",
+        "journal": "IEEE Circuits and Systems Magazine",
+        "url": "https://ieeexplore.ieee.org/xpl/RecentIssue.jsp?punumber=7384",
+        "notes": ""
+      },
+      {
+        "title": "Revisiting the nodal voltage method for both human comprehension and software implementation",
+        "authors": "L. Sousa, A. Rocha, M. Alves, F. Pereira",
+        "journal": "Computer Applications in Engineering Education, Wiley",
+        "url": "https://doi.org/10.1002/cae.22414",
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "year": "2020",
+    "publications": [
+      {
+        "title": "U=RIsolve: a web-based tool for teaching & self-learning the nodal voltage method",
+        "authors": "L. Sousa",
+        "journal": "Master’s thesis, Politécnico do Porto (ISEP/IPP), TID: 202550532",
+        "url": "http://hdl.handle.net/10400.22/16940",
+        "notes": ""
+      }
+    ]
+  },
+  {
+    "year": "2019",
+    "publications": [
+      {
+        "title": "U=RIsolve: Teaching & self-learning the nodal analysis method the easy way",
+        "authors": "L. Sousa, M. Alves, F. Pereira",
+        "journal": "CASHE – Conference on Academic Success in Higher Education, Politécnico do Porto (ISEP/IPP)",
+        "url": "https://www.isep.ipp.pt/files/CASHE_Talk11.pdf",
+        "notes": ""
+      }
+    ]
+  }
+]

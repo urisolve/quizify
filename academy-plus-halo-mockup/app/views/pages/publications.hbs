@@ -1,0 +1,72 @@
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-4 p-lg-5">
+          <span class="badge rounded-pill bg-secondary-subtle text-primary mb-3">HALO Research</span>
+          <h1 class="display-6 fw-semibold mb-3">Publications</h1>
+          <p class="fs-4 text-dark mb-0 halo-lead">
+            A selection of our research: explore our work and learn with us along the way.
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <div class="col-12">
+      <section class="card">
+        <div class="card-body p-4">
+          <h4 class="card-title">Publications</h4>
+          <hr>
+
+          <div class="accordion" id="publicationsAccordion">
+            {{#each years}}
+              <div class="accordion-item">
+                <h2 class="accordion-header" id="heading{{year}}">
+                  <button
+                    class="accordion-button"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#collapse{{year}}"
+                    aria-expanded="true"
+                    aria-controls="collapse{{year}}"
+                  >
+                    {{year}}
+                  </button>
+                </h2>
+
+                <div
+                  id="collapse{{year}}"
+                  class="accordion-collapse collapse show"
+                  aria-labelledby="heading{{year}}"
+                  data-bs-parent="#publicationsAccordion"
+                >
+                  <div class="accordion-body">
+                    {{#each this.publications}}
+                      <p>
+                        <strong>{{this.title}}</strong><br>
+                        {{this.authors}}<br>
+                        <em>{{this.journal}}</em>
+
+                        {{#if this.url}}
+                          <br>
+                          <a href="{{this.url}}" target="_blank" rel="noopener noreferrer">
+                            <i class="ti ti-hand-click"></i> {{this.url}}
+                          </a>
+                        {{/if}}
+
+                        {{#if this.notes}}
+                          <br>
+                          <small><strong>Notes:</strong> {{this.notes}}</small>
+                        {{/if}}
+                      </p>
+                    {{/each}}
+                  </div>
+                </div>
+              </div>
+            {{/each}}
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,129 @@
+@use '../abstracts' as *;
+
+.globalContainer {
+    padding: 0
+}
+
+.practiceContainer {
+    display: flex;
+}
+
+.practiceCardHeader {
+    color: $ur_white;
+    font-size: $ur_lg;
+}
+
+.practiceCardBody{
+    padding: 0;
+}
+
+.practiceCard1 {
+    width: 60%;
+    background-color: $ur_black;
+    color: $ur_white;
+    padding: $ur_md;
+    margin: 0;
+    margin-right: 5%;
+    flex:auto;
+}
+
+.practiceCard2 {
+    width: 35%;
+    background-color: $ur_black;
+    color: $ur_white;
+    padding: $ur_md;
+    margin: 0;
+    flex: auto;
+}
+
+.practiceCardText{
+    color: $ur_white;
+    font-size: $ur_xs;
+    margin: 0;
+}
+
+.questionMark {
+    color: $ur_red;
+    font-size: 10em;
+    width: 100%;
+    text-align: center;
+    padding: 0;
+}
+
+.inputSelect{
+    margin: 0;
+    border-radius: 3px;
+    border: none;
+    color: $ur_black;
+    background-color: $ur_white;
+    height: fit-content;
+    width: 45%;
+}
+
+
+.inputSelect option:checked {
+    background-color: $ur_black;
+    color: $ur_white;
+}
+
+.radioWrap{
+    display: flex;
+    justify-content: space-evenly;
+    margin-left: 50%;
+    width: 50%;
+    margin-bottom: $ur_md;
+}
+
+.radioBtns {
+    outline: none;
+    margin: none;
+    padding: none;
+    border: none;
+    background-color: $ur_white;
+}
+
+.radioBtns:checked {
+    background-color: $ur_red;
+    color: $ur_white;
+}
+
+.selectWrap{
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+}
+
+
+// @include media-breakpoint-down(lg) {
+//     .practiceCard1 {
+//         width: 100%;
+//         margin-right: 0;
+//     }
+
+//     .practiceCard2 {
+//         width: 100%;
+//         margin-top: $ur_md;
+//     }
+
+//     .practiceContainer {
+//         display: block;
+//     }
+
+//   }
+
+// @include media-breakpoint-down(sm) {
+//     .inputSelect {
+//         width: 100%;
+//         margin-bottom: $ur_xs;
+//     }
+
+//     .selectWrap {
+//         flex-direction: column;
+//     }
+
+//     .radioWrap {
+//         margin-left: 0;
+//         width: 100%;
+//     }
+
+// }

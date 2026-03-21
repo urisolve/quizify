@@ -1,0 +1,26 @@
+<div class="ranking-table-container">
+  <h2>{{t 'leaderboard.leaderboard'}}</h2>
+  <div id="user-position-message" class="user-position-message">
+    {{t 'leaderboard.your_position'}}: <span id="user-position-number"></span>
+  </div>
+  <table class="ranking-table" id="ranking-table">
+    <thead>
+      <tr>
+        <th>{{t 'leaderboard.rank'}}</th>
+        <th></th>
+        <th class="username-cell">{{t 'leaderboard.user'}}</th>
+        <!-- Sorting columns -->
+        <th class="sortable-col"><span class="th-active-indicator">{{t 'leaderboard.level'}}</span></th>
+        <th class="sortable-col"><span class="th-active-indicator">{{t 'leaderboard.weekly_score'}}</span></th>
+        <!-- Add to any new sortable columns -->
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows will be inserted here -->
+    </tbody>
+  </table>
+</div>
+<script>
+  window.currentUsername = "{{user.username}}";
+</script>
+<script src="/js/pages/leaderboard.js"></script>

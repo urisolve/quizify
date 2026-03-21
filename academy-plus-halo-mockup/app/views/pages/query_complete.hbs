@@ -1,0 +1,51 @@
+
+
+<div class="completion-container">
+  <h2>{{t 'query_complete.congratulations'}}</h2>
+  <div class="performance-row" id="performance-row">
+    <span class="performance-bolts">
+      {{#each (range filledBolts)}}
+        <i class="bi bi-lightning-charge-fill bolt-lightning"></i>
+      {{/each}}
+      {{#each (range outlineBolts)}}
+        <i class="bi bi-lightning-charge bolt-outline"></i>
+      {{/each}}
+    </span>
+  </div>
+  <div class="completion-message">
+    {{#if leveledUp}}
+    🎉 <strong>{{t 'query_complete.level_up'}}</strong> 🎉
+    {{else}}
+      {{#if (eq performanceMessageKey 'query_complete.perfect')}}
+      ⚡ <strong>{{t 'query_complete.perfect'}}</strong> ⚡
+      {{else if (eq performanceMessageKey 'query_complete.excellent')}}
+      🌟 <strong>{{t 'query_complete.excellent'}}</strong> 🌟
+      {{else if (eq performanceMessageKey 'query_complete.great_job')}}
+      🎯 <strong>{{t 'query_complete.great_job'}}</strong> 🎯
+      {{else if (eq performanceMessageKey 'query_complete.good_work')}}
+      👍 <strong>{{t 'query_complete.good_work'}}</strong> 👍
+      {{else if (eq performanceMessageKey 'query_complete.nice_try')}}
+      💪 <strong>{{t 'query_complete.nice_try'}}</strong> 💪
+      {{else}}
+      🔥 <strong>{{t 'query_complete.keep_going'}}</strong> 🔥
+      {{/if}}
+    {{/if}}
+  </div>
+  <div class="points-earned">
+    <span>{{t 'query_complete.weekly_points'}}: <strong>{{weeklyScore}}</strong> <span class="points-gain">+{{score}}</span></span>
+  </div>
+  <div class="points-bar-container" 
+       data-percent="{{expBarPercent}}" 
+       data-percent-prev="{{expBarPercentPrev}}"
+       data-leveled-up="{{leveledUp}}">
+    <div class="points-bar-bg">
+      <div class="points-bar-fill points-bar-fill-prev" id="points-bar-fill-prev"></div>
+      <div class="points-bar-fill points-bar-fill-new" id="points-bar-fill-new"></div>
+    </div>
+  </div>
+  <a href="/practice-plus" class="red-button-inverse btn">{{t 'query_complete.continue_btn'}}</a>
+</div>
+<audio id="completion-jingle" src="/sounds/complete-jingle.mp3"></audio>
+<audio id="level-up-sound" src="/sounds/level-up.mp3"></audio>
+<script src="/js/utils/fireworks.js"></script>
+<script src="/js/pages/query_complete.js"></script>

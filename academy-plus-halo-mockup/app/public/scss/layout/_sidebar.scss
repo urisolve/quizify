@@ -1,0 +1,130 @@
+@use '../abstracts' as *;
+
+
+.sidebar{
+    background-color: $color-red;
+    position: fixed; 
+    top: 0px; 
+    left: 0px;
+    width: $sidebar-width;
+    height: 100%;
+}
+    .sidebar-isep{
+        padding-top: 1.5em;
+        text-align: center;
+        width: 100%;
+        height: auto;
+    }
+
+    .sidebar-list{
+        ul{
+            padding-left: 10px;
+            list-style: none;
+        }
+        a{
+            text-decoration: none;
+        }
+
+        .horizontal-divider{
+            height: 1px;
+            background-color: rgba($color-gray-100, 0.5);
+            margin: 10px 0;
+        }
+    }
+
+    .sidebar-category{
+        padding: 10px;
+
+        .text{
+            color: $color-white;
+            font-size: $font-size-text;
+            font-family: $font-family-title;
+            font-weight: $font-weight-bold;
+        }
+    }
+
+    .sidebar-topic{
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        margin-left: toRem(5);
+        margin-right: toRem(15);
+        gap: toRem(15);
+        
+        .text{
+            color: $color-white;
+            font-size: $font-size-text;
+            font-family: $font-family-text;
+            font-weight: $font-weight-bold;
+        }
+        &:hover{
+            background-color: rgba($color-gray-100, 0.2);
+            color: $color-gray-100;
+            border-radius: toRem(15);
+            transition: 0.3s;
+        }
+        &.active{
+            background-color: $color-white;
+            .text {
+                color: $color-red;
+            }
+            border-radius: toRem(15);
+        }
+    }
+
+    .sidebar-subtopic{
+        padding: 10px;
+        padding-left: toRem(5);
+        margin-left: toRem(5);
+        margin-right: toRem(15);
+        display: flex;
+        align-items: center;
+        gap: toRem(15);
+        
+        .text{
+            color: $color-light-text;
+            font-size: $font-size-text;
+            font-family: $font-family-text;
+            font-weight: $font-weight-medium;
+        }
+        &:hover{
+            background-color: rgba($color-gray-100, 0.3);
+            border-radius: toRem(15);
+            transition: 0.2s;
+        }
+        &.active{
+            background-color: $color-white;
+            .text {
+                color: $color-red;
+                font-weight: $font-weight-bold;
+            }
+            border-radius: toRem(15);
+        }
+    }
+
+    .not-implemented{
+        padding: 10px;
+        padding-left: toRem(5);
+        cursor: not-allowed;
+        display: flex;
+        align-items: center;
+        margin-left: toRem(5);
+        margin-right: toRem(15);
+        gap: toRem(15);
+
+        .text{
+            color: $color-black;
+            font-size: $font-size-text-small;
+            font-family: $font-family-text;
+            font-weight: $font-weight-light;
+            font-style: italic;
+        }
+    }
+    
+    // .active{
+    //     background-color: rgba($color-gray-100, 1);
+    //     .text{
+    //         color: $color-black;
+    //     }
+    //     border-radius: toRem(15);
+    // }

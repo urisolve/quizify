@@ -1,0 +1,14 @@
+<div class="profile-dropdown">
+    <ul>
+        <li class="profile-item-header">
+            <span class="profile-name">{{ user.username }}</span>
+        </li>
+        <div class="profile-divider"></div>
+        <li>
+          <a href="/user" id="profile-link" class="profile-item">{{ t 'account' }}</a>
+        </li>       
+        <li class="profile-item" id="profile-settings">{{ t 'settings' }}</li>
+        <li class="profile-item" id="profile-logout">{{ t 'logout' }}</li>
+    </ul>
+</div>
+<script type="module" src="/js/ui/profileUI.js"></script>

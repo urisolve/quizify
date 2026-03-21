@@ -1,0 +1,78 @@
+<div class="practice-plus">
+
+    <!-- Main content -->
+    <div class="practice-topic-container">
+        <div class="practive-topic-selector">
+            <ul>
+                {{#each topics}}
+                <li class="{{#if @first}}active{{/if}}">
+                    <div class="selector-card">
+                        <span>{{t name}}</span>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: {{progress}}%;"></div>
+                        </div>
+                    </div>
+                </li>
+                {{/each}}
+            </ul>
+        </div>
+
+        <div class="practice-topic-content">
+          {{#each topics}}
+            <div class="topic-content-block" data-topic-id="{{id}}" style="{{#unless @first}}display:none;{{/unless}}">
+              <div class="topic-intro">
+                <h2 class="topic-title">{{t name}}: {{ t 'introduction' }}</h2>
+                <form method="GET" action="/start-topic" style="display:inline;">
+                  <input type="hidden" name="topicId" value="{{id}}">
+                  <button class="red-button-inverse topic-test-btn" type="submit">{{ t 'practice_plus.topic_start' }}</button>
+                </form>
+                <p>{{t description}}</p>
+                
+              </div>
+              <div class="topic-subtopics">
+                {{#each subtopics}}
+                  <div class="subtopic{{#if (eq progress 100)}} subtopic-complete{{/if}}" data-subtopic-id="{{id}}" data-title="{{t title}}">
+                    {{!-- Show image if it exists --}}
+                    {{#if image}}
+                      <img class="subtopic-img" src="{{image}}" alt="{{t title}}" />
+                    {{/if}}
+                    <p>{{t content}}</p>
+                    {{#unless (eq progress 100)}}
+                    <div class="subtopic-progress-bar-bg">
+                      <div class="subtopic-progress-bar-fill" style="width: {{progress}}%;">
+                        <div class="subtopic-progress-bar-inner"></div>
+                      </div>
+                    </div>
+                    {{/unless}}
+                    <form class="subtopic-action-form" method="POST" action="/start-subtopic">
+                      <input type="hidden" name="subtopicId" value="{{id}}">
+                      <button class="red-button-inverse subtopic-action-btn" type="submit">{{ t 'practice_plus.start' }}</button>
+                    </form>
+                  </div>
+                  {{#unless @last}}
+                    <div class="horizontal-divider"></div>
+                  {{/unless}}
+                {{/each}}
+              </div>
+            </div>
+          {{/each}}
+        </div>
+    </div>
+
+    <!-- Progress bar and button at the bottom -->
+    <div class="practice-general-container">
+      <div class="general-progress-bar-bg">
+        <div class="general-progress-bar-fill" style="width: {{generalProgress}}%;"></div>
+        <span class="general-progress-label">{{generalProgress}}%</span>
+      </div>
+      <div class="general-button">
+        <div class="general-button-prompt" style="margin-bottom: 0.5rem;">
+          {{ t 'practice_plus.test_skills_prompt' }}
+        </div>
+        <button class="general-action-btn">{{ t 'practice_plus.continue_btn' }}</button>
+      </div>
+    </div>
+    <script id="topics-data" type="application/json">
+  {{{topicsJson}}}
+</script>
+    <script src="/js/pages/practice-plus.js"></script>

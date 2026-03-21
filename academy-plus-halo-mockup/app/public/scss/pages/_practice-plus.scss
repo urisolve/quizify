@@ -1,0 +1,481 @@
+@use '../abstracts' as *;
+
+* {
+  font-family: $font-family-text;
+}
+
+.subtopic-complete {
+  border-color: #43a047 !important;
+  box-shadow: 0 2px 8px rgba(67, 160, 71, 0.10);
+}
+.subtopic-progress-bar-bg {
+  position: relative;
+  width: 10%;
+  height: 0.6rem;
+  background: #eee;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  margin-top: toRem(5);
+  display: flex;
+  align-items: center;
+}
+
+.subtopic-progress-bar-fill {
+  position: relative;
+  height: 100%;
+  background: transparent;
+  width: 100%;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subtopic-progress-bar-inner {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  background: $color-red;
+  border-radius: 0.3rem;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+}
+
+.practice-plus {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  height: 100%;
+  /* padding: 2rem; */
+  background: $color-white;
+  box-sizing: border-box;
+}
+.practice-topic-container {
+  margin-top: toRem(20);
+}
+.practice-general-container,
+.practice-topic-container {
+  margin-bottom: 1rem; // Reduced from 2rem to 1rem for less space between containers
+  flex-shrink: 0;
+}
+
+.practice-topic-container {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0; // Allow children to shrink
+  max-height: 60%;
+  background: $color-white;
+  border-radius: toRem(5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+}
+
+.practive-topic-selector {
+  min-width: toRem(220);
+  background: $color-white;
+  padding: 2rem 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  max-height: 100%;
+  overflow-y: auto;
+  flex-shrink: 0;
+
+  ul {
+    position: relative;
+    padding: 0;
+    margin: 0;
+    list-style: none;
+    overflow: visible;
+  }
+
+  li {
+    position: relative;
+    z-index: 1;
+    margin-bottom: toRem(25);
+    height: toRem(60); // Fixed height for each li
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    // No visual/animation styles here!
+  }
+}
+
+.selector-card {
+  width: 100%;
+  max-width: toRem(200); // Set a reasonable max width for the card
+  height: 100%;
+  border-radius: toRem(5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: toRem(5);
+  background: $color-gray-100;
+  box-shadow: 0 0 0 0 $color-red;
+  border: 2px solid transparent;
+  transition:
+    background 0.2s,
+    color 0.2s,
+    box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.2s;
+  will-change: transform;
+  cursor: pointer;
+  
+  span {
+    font-weight: 500;
+    color: $color-black;
+    margin-bottom: 0.3rem;
+    transition: color 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 90%;
+    white-space: normal; // Allow text to wrap
+    word-break: break-word; // Break long words if needed
+    text-align: center;
+    /* margin-top: 2px; */
+  }
+}
+
+.practive-topic-selector li:hover .selector-card,
+.practive-topic-selector li.active .selector-card {
+  background: $color-white;
+  color: $color-red;
+  border: 2px solid $color-red;
+  transform: scale(1.06);
+  box-shadow: 0 0 0 4px rgba(154, 26, 36, 0.15);
+  z-index: 2;
+
+  span {
+    color: $color-red;
+  }
+}
+
+.practice-topic-content {
+  flex: 1 1 0;
+  min-width: 0;
+  min-height: 0;
+  padding: 2rem;
+  background: #fff;
+  overflow-y: auto;
+  margin-right: 0.5rem;
+  box-sizing: border-box;
+
+  .topic-intro {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 1.2rem;
+    flex-wrap: wrap;
+
+    .topic-title {
+      margin: 0;
+      flex: 1 1 auto;
+    }
+
+    .topic-test-btn {
+      flex: 0 0 auto;
+      padding: 0.5rem 1.5rem;
+      border: none;
+      border-radius: toRem(5);
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-size: 1rem;
+      margin-left: 1.5rem;
+      box-shadow: 0 2px 8px rgba(154, 26, 36, 0.08);
+    }
+  }
+
+  .topic-intro p {
+    width: 100%;
+    margin-top: 1rem;
+  }
+
+  .topic-subtopics {
+    display: flex;
+    flex-direction: column;
+    gap: 0; // Remove gap, spacing will be handled by the divider
+    max-height: 40vh;         // Increased from 40vh to 60vh
+           // enables vertical scrolling
+    padding-right: 0.1rem;    // space for scrollbar
+    /* scrollbar-width: thin; // For Firefox
+    scrollbar-color: $color-red #f5f5f5; */ // For Firefox
+  }
+  .subtopic {
+    border: 2px solid $color-gray-100;
+    border-radius: toRem(2);
+    background: $color-white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    padding: 1.5rem 2rem;
+    margin-bottom: 2rem;
+    position: relative;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+
+    &::before {
+      content: attr(data-title);
+      position: absolute;
+      top: -1.2rem;
+      left: 1.2rem;
+      background: $color-white;
+      color: $color-red;
+      font-size: 0.95rem;
+      font-weight: 600;
+      padding: 0 0.5rem;
+      border-radius: 0.5rem;
+      letter-spacing: 0.05em;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+    }
+
+    /* &:hover {
+      border-color: $color-red;
+      box-shadow: 0 4px 16px rgba(154,26,36,0.08);
+      background: $color-gray-100;
+    } */
+  }
+  .horizontal-divider {
+    width: 100%;
+    height: 2px;
+    background: $color-red;
+    margin: 1rem 0;
+    border-radius: 1px;
+    display: block;
+  }
+
+  // Hide vertical divider if still present
+  .vertical-divider {
+    display: none;
+  }
+}
+
+.practice-general-container {
+  display: flex;
+  flex-direction: row;
+  background: $color-white;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  padding: 2rem;
+  /* min-height: 120px; */
+  margin-bottom: 2rem;
+  flex-shrink: 0;
+}
+
+.general-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.badge {
+  font-size: 1.3rem;
+}
+
+.general-progress {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 1rem;
+  min-width: 220px;
+}
+
+.practice-topic-progress {
+  width: 100%;
+  margin: 2rem 0 1rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+}
+
+.progress-bar-bg {
+  width: 80%;
+  height: 0.6rem;
+  background: #eee;
+  border-radius: 0.3rem;
+  overflow: hidden;
+  margin-top: toRem(5);
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: $color-red;
+  width: 0;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-bar-label {
+  font-size: 1rem;
+  color: $color-red;
+  font-weight: 600;
+}
+
+.general-progress-bar-bg {
+  position: relative;
+  width: 40%;
+  height: 1rem;
+  background: #eee;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.general-progress-bar-fill {
+  height: 100%;
+  background: $color-red;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.general-progress-label {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: $color-red;
+  background: #fff;
+  padding: 0 0.4rem;
+  border-radius: 0.3rem;
+  pointer-events: none;
+}
+.general-button {
+  display: flex;
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto; // Align button to the right
+  // Ensure the button is visible and not overflowing
+  min-width: toRem(150);
+}
+
+.general-action-btn {
+  width: 100%; // Fill the .general-button container
+  max-width: toRem(200); // Optional: limit max width
+  height: toRem(40);
+  padding: 0.7rem 2rem;
+  background: $color-red;
+  color: $color-white;
+  border: none;
+  border-radius: 0.4rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+  &:hover {
+    background: darken($color-red, 10%);
+  }
+}
+
+.general-button-prompt {
+  font-size: 1rem;
+  font-weight: 500;
+  color: $color-black;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  width: 100%;
+}
+
+/* Add to your CSS file or in a <style> block */
+.badge-tooltip {
+  position: relative;
+  display: inline-block;
+  cursor: default;
+  user-select: none;
+}
+.badge-tooltip .tooltip-text {
+  visibility: hidden;
+  width: max-content;
+  background-color: #222;
+  color: #fff;
+  text-align: center;
+  border-radius: 4px;
+  padding: 2px 8px;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%; /* Show above the badge */
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  transition: opacity 0.2s;
+  font-size: 0.9em;
+  white-space: nowrap;
+}
+.badge-tooltip:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+// Optional: Custom scrollbar for Webkit browsers
+.practive-topic-selector::-webkit-scrollbar {
+  /* display: none; */
+  width: 4px;
+}
+
+.practive-topic-selector::-webkit-scrollbar-thumb {
+  /* display: none; */
+  background: $color-red;
+  border-radius: 4px;
+}
+
+/* .practive-topic-selector::-webkit-scrollbar-track {
+  background: #f5f5f5;
+} */
+.practive-topic-selector::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+.practive-topic-selector::-webkit-scrollbar-button:increment,
+.practive-topic-selector::-webkit-scrollbar-button:decrement {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.practice-topic-content::-webkit-scrollbar {
+  width: 4px;
+}
+
+.practice-topic-content::-webkit-scrollbar-thumb {
+  background: $color-red;
+  border-radius: 4px;
+}
+
+/* .practice-topic-content .topic-subtopics::-webkit-scrollbar-track {
+  background: #f5f5f5;
+} */
+
+.practice-topic-content::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+.practice-topic-content::-webkit-scrollbar-button:increment,
+.practice-topic-content::-webkit-scrollbar-button:decrement {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+.subtopic-action-btn {
+  margin-top: 1rem;
+  padding: 0.5rem 1.5rem;
+  border: none;
+  border-radius: toRem(5);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.subtopic-img {
+  display: block;
+  max-width: 100%;
+  max-height: toRem(200);
+  margin-bottom: 1rem;
+  border-radius: toRem(5);
+}

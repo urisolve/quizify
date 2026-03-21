@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<svg width="300" height="300" xmlns="http://www.w3.org/2000/svg">
+ <!-- Created with SVG-edit - http://svg-edit.googlecode.com/ -->
+ <title>Ohm's law</title>
+ <g>
+  <title>Layer 1</title>
+  <text id="svg_12" font-style="normal" xml:space="preserve" text-anchor="middle" font-family="Sans-serif" font-size="43" y="220" x="155.95082" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#000000" fill="#000000">&#215;</text>
+  <path id="svg_9" d="m16.82107,262.649231l134.000082,-234.499311l133.999924,234.499311l-268.000006,0z" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#000000" fill="none"/>
+  <text font-style="italic" xml:space="preserve" text-anchor="middle" font-family="Sans-serif" font-size="43" id="svg_10" y="220" x="112.95082" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#000000" fill="#000000">R</text>
+  <line id="svg_7" y2="176.14752" x2="207.48971" y1="176.14752" x1="94.95082" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="5" stroke="#000000" fill="none"/>
+  <text font-style="italic" xml:space="preserve" text-anchor="middle" font-family="Sans-serif" font-size="43" id="svg_8" y="157.14752" x="147.95082" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#000000" fill="#000000">U</text>
+  <text id="svg_11" font-style="italic" xml:space="preserve" text-anchor="middle" font-family="Sans-serif" font-size="43" y="220" x="184.95082" stroke-linecap="null" stroke-linejoin="null" stroke-dasharray="null" stroke-width="0" stroke="#000000" fill="#000000">I</text>
+ </g>
+</svg>

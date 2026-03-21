@@ -1,0 +1,360 @@
+//? All variables used in U=RIsolve Academy are defined here.
+@use '../abstracts/functions' as *;
+@use '../abstracts/mixins' as *;
+//* URL imports
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+//? -----------------------------------------
+//? Colors
+//? -----------------------------------------
+
+//* Basic Colors
+$color-white: rgb(255, 255, 255);
+$color-black: rgb(0, 0, 0);
+$color-red-light: rgb(220, 49, 65);
+$color-red: rgb(154, 26, 36);
+$color-blue: rgb(50, 95, 219);
+$color-green: rgb(19, 222, 36);
+$color-dark-green: rgb(21, 80, 21);
+$color-gray-100: rgb(232, 232, 232); //* Defined as 10% darker than white
+$color-gray-200: rgb(209, 209, 209);
+
+
+//* Personalized Colors (most used in U=RIsolve Academy)
+$color-body-background: rgb(248, 248, 244);
+$color-chatbot-icon: rgb(240, 240, 236);
+$color-dark-title: rgb(30,46,53);
+$color-dark-text: rgb(50,66,83);
+$color-light-text: rgb(241, 239, 245);
+$color-button-background: rgb(31, 33, 36);
+$color-button-background-hover: rgb(60, 66, 71);
+
+$color-card-shadow: rgba(0, 0, 0, 0.15); // Shadow color for cards
+$color-card-background: rgb(245, 245, 245); // Background color for cards
+//? -----------------------------------------
+//? Fonts
+//? -----------------------------------------
+
+//* Font family
+$font-family-text: "Montserrat", sans-serif !default;
+$font-family-text2: monospace !default;
+$font-family-title: "Inter", sans-serif !default;
+
+//* Font Sizes
+$font-size-text: toRem(16) !default;
+$font-size-text-small: toRem(14) !default;
+$font-size-text-large: toRem(18) !default;
+$font-size-h1: toRem(32) !default;
+$font-size-h2: toRem(28) !default;
+$font-size-h3: toRem(24) !default;
+$font-size-h4: toRem(20) !default;
+
+//* Font Weights
+$font-weight-light: 300 !default;
+$font-weight-normal: 400 !default;
+$font-weight-medium: 500 !default;
+$font-weight-bold: 600 !default;
+
+//? -----------------------------------------
+//? Layout
+//? --- Variables regarding: Widths, Heights, Margins, Paddings and sizes (when width and height are the same); ---
+//? -----------------------------------------
+
+//* Basic Layout
+  //* Border radius
+  $border-radius-circle: 50%; // Circular elements, mainly icons
+  $border-radius-rounded: toRem(20); // Cards, buttons and other elements with rounded corners
+  $border-radius-rounded-extra: toRem(50);  // Used in bigger cards
+
+//* Personalized sizes
+  //* Sidebar
+  $sidebar-width-full: toRem(260);
+  $sidebar-width-mini: toRem(87);
+  $sidebar-state: 'open'; // Initially 'open' but can be 'close', depends on the state of the sidebar
+  $sidebar-width: if($sidebar-state == 'open', $sidebar-width-full, $sidebar-width-mini); //TODO: Ao modificar o tamanho da sidebar, mudar o state da sidebar para 'open' ou 'close'.
+  $sidebar-width-iconbar: toRem(180);
+
+  //* Header
+  $header-width: calc(100vw - $sidebar-width);
+  $header-height: toRem(70);
+
+  //* Content card
+  $content-margin: toRem(15);
+  $content-padding: toRem(20);
+
+  $content-width: calc(100vw - $sidebar-width - $content-margin*2 - $content-padding*2);
+  $content-height: calc(100vh - $header-height - $content-margin*2 - $content-padding*2);
+
+  //* Chatbot icon
+  $chatbot-icon-size: toRem(80);
+
+  $chatbot-icon-img-padding: toRem(8);
+  $chatbot-icon-img-size: $chatbot-icon-size - $chatbot-icon-img-padding * 2;
+
+  //* Chat window
+
+   //* Input box
+  $chat-input-box-width: calc(0.7 * $content-width); // 70% of the content width
+  $chat-input-box-icon-size: toRem(36);
+
+  //* Settings Menu
+  $setting-menu-width: toRem(850);
+  $setting-menu-height: toRem(550);
+
+    //* Header
+    $setting-menu-header-border: toRem(1);
+    $setting-menu-header-width: $setting-menu-width;
+    $setting-menu-header-height: toRem(50);
+    $setting-menu-header-margin: calc(($setting-menu-height * 0.2 - $setting-menu-header-height)/2);
+    $setting-menu-header-padding-bottom: calc($setting-menu-header-margin / 2 - $setting-menu-header-border);
+
+    //* Body
+    $setting-menu-body-width: $setting-menu-width;
+    $setting-menu-body-height: calc($setting-menu-height * 0.8);
+
+      //* Sidebar
+      $setting-menu-body-sidebar-padding: toRem(20);
+      $setting-menu-body-sidebar-width: calc($setting-menu-width * 0.25 - $setting-menu-body-sidebar-padding * 2);
+      $setting-menu-body-sidebar-height: calc($setting-menu-body-height - $setting-menu-body-sidebar-padding * 2);
+
+      //* Content
+      $setting-menu-content-width: calc($setting-menu-width * 0.75);
+      $setting-menu-content-height: $setting-menu-body-height;
+
+        //* Header
+        $setting-menu-content-header-height: calc($setting-menu-content-height * 0.15);
+
+        //* Content
+        $setting-menu-content-body-height: calc($setting-menu-content-height * 0.85);
+
+  //* Authentication
+
+  //* Login
+  $login-padding: toRem(30) toRem(60) toRem(30) toRem(60); // top right bottom left
+  $login-width: toRem(350);
+  $login-height: toRem(500);
+
+  $login-body-padding: toRem(30);
+
+  $login-header-height: calc($login-height * 0.1);
+  $login-body-height: calc($login-height * 0.8 - $login-body-padding * 2);
+    $login-body-form-height: calc($login-body-height * 0.4);
+    $login-body-options-height: calc(login-body-height * 0.2);
+    $login-body-button-height: calc(login-body-height * 0.3);
+  $login-footer-height: calc($login-height - $login-header-height - $login-body-height);
+
+  $login-body-form-padding: toRem(12);
+  $login-body-options-padding: toRem(20);
+  $login-body-form-width: calc($login-width - $login-body-form-padding * 2);
+
+  $login-body-button-margin: toRem(20);
+
+
+  //* Register
+  $register-padding: toRem(30) toRem(60) toRem(30) toRem(60); // top right bottom left
+  $register-width: toRem(350);
+  $register-height: toRem(500);
+
+  $register-body-padding: toRem(30);
+
+  $register-header-height: calc($register-height * 0.1);
+  $register-body-height: calc($register-height * 0.8 - $register-body-padding * 2);
+    $register-body-form-height: calc($register-body-height * 0.75);
+    $register-body-button-height: calc(register-body-height * 0.25);
+  $register-footer-height: calc($register-height - $register-header-height - $register-body-height);
+
+  $register-body-form-padding: toRem(12);
+  $register-body-form-width: calc($register-width - $register-body-form-padding * 2);
+
+  $register-body-button-margin: toRem(20);
+  
+
+
+//? -----------------------------------------
+//? Breakpoints
+//? -----------------------------------------
+
+//TODO: As variáveis daqui para baixo não estão a ser utilizadas no momento mas é necessário adaptar para a lógica atual.
+// --- Spacing ---
+$spacer: 1rem !default;
+$spacers: (
+  0: 0,
+  1: $spacer * 0.25,
+  2: $spacer * 0.5,
+  3: $spacer,
+  4: $spacer * 1.5,
+  5: $spacer * 3,
+  6: 12px,
+  7: 30px,
+  8: 10px,
+  9: 20px,
+  ) !default;
+// --- END Spacing ---
+
+// Common
+$min-contrast-ratio: 1.7 !default;
+
+// Margins
+$enable-negative-margins: true !default;
+$enable-shadows: true !default;
+
+// Global
+// $text-muted: $muted !default;
+$grid-gutter-width: 24px !default;
+
+
+// Buttons
+$btn-padding-y: 7px !default;
+$btn-padding-x: 16px !default;
+$btn-font-weight: 500 !default;
+$btn-border-radius: 7px !default;
+$btn-box-shadow: unset !default;
+$btn-font-size: 14 !default;
+$btn-border-radius-lg: 9px !default;
+
+// Line Heght
+$line-height-base: 1.5 !default;
+$line-height-sm: 1.25 !default;
+$line-height-lg: 2 !default;
+
+// Body
+// $body-bg: $white !default;
+$body-color: #5a6a85 !default;
+
+// Heading
+// $headings-color: $dark !default;
+$headings-font-weight: 500 !default;
+
+// Border Color
+$border-color: #ebf1f6 !default;
+
+// Card
+// $card-title-color: $dark !default;
+// $card-subtitle-color: $dark !default;
+$card-spacer-y: 30px !default;
+$card-spacer-x: 30px !default;
+$card-border-width: 0px !default;
+$card-border-color: #ebf1f6 !default;
+$card-border-radius: 7px;
+$card-box-shadow: rgb(145 158 171 / 20%) 0px 0px 2px 0px,
+  rgb(145 158 171 / 12%) 0px 12px 24px -4px !default;
+
+// Border Radius
+$border-radius: 7px !default;
+$border-radius-sm: 5px !default;
+$border-radius-lg: 15px !default;
+$border-radius-xl: 12px !default;
+
+// Badges
+$badge-font-size: 14px !default;
+$badge-font-weight: $font-weight-normal !default;
+$badge-padding-y: 5px !default;
+$badge-padding-x: 10px !default;
+$badge-border-radius: 4px;
+
+
+// Table
+$table-cell-padding-y: 16px !default;
+$table-cell-padding-x: 16px !default;
+$table-th-font-weight: 600 !default;
+// $table-striped-bg: $gray-200 !default;
+// $table-hover-bg: $gray-100 !default;
+$table-border-color: $border-color !default;
+
+
+// Input
+// $form-label-color: $gray-600;
+$form-label-font-weight: 600;
+$form-select-indicator-padding: 38px;
+$form-select-border-radius: 7px !default;
+$form-select-box-shadow: unset !default;
+$input-border-radius: 7px !default;
+// $input-group-addon-bg: $gray-200 !default;
+// $input-group-addon-border-color: $light !default;
+$input-border-color: #DFE5EF !default;
+$input-bg: transparent !default;
+// $input-color: $gray-500 !default;
+$input-padding-y: 8px;
+$input-padding-x: 16px;
+$form-check-input-width: 1.188em;
+$form-check-min-height: 1.188em;
+$form-check-input-border: 1.25px solid #dfe5ef;
+
+// Dropdown
+$dropdown-width: 360px !default;
+$dropdown-border-color: transparent !default;
+$dropdown-item-padding-y: 10px !default;
+// $dropdown-link-hover-bg: $gray-100 !default;
+// $dropdown-link-active-bg: $gray-100;
+// $dropdown-link-active-color: $dark;
+$dropdown-box-shadow: rgb(145 158 171 / 20%) 0px 0px 2px 0px,
+  rgb(145 158 171 / 12%) 0px 12px 24px -4px;
+
+// Modal
+$modal-content-border-width: 0 !default;
+
+// navbar
+// $navbar-light-color: rgba($gray-600, 1) !default;
+// $navbar-light-hover-color: rgba($primary, 1) !default;
+// $navbar-dark-color: rgba($gray-300, 1) !default;
+// $navbar-dark-hover-color: rgba($primary, 1) !default;
+
+// ----------------------------------------------
+// Theme Variables Style
+// ----------------------------------------------
+
+
+// ----------------------------------------------
+// Header
+// ----------------------------------------------
+
+$navlink-padding: 8px 16px;
+$header-shadow: 1px 0px 20px 0px rgb(0 0 0 / 12%);
+
+// ----------------------------------------------
+// Sidebar
+// ---------------------------------------------- 
+$custom-gray : #7C8FAC;
+// $sidebar-text: $dark;
+
+$sidebar-link-padding: 12px 15px;
+$sidebar-icon-size: 23px;
+$sidebar-first-level-padding: 0 0 10px 0;
+$sidebar-first-level-link-padding: 10px 15px;
+$sidebar-first-level-icon-size: 14px;
+
+$sidebar-spacing-x: 0 24px;
+$link-disabled: 0.38;
+
+$boxed-width: 1200px; // boxed layout width
+
+// sidebar
+$sidebar-height: 65px;
+$sidebar-li-width: 240px;
+$sidebar-first-level-width: 400px;
+
+
+$icon_size: 25px;
+// URISOLVE COLOR VARIABLES
+
+$ur_red: #dc3141 !default;
+$ur_black: #232323 !default;
+$ur_blue: #278ff7 !default;
+$ur_white: #ffffff !default;
+$ur_gray: #707070 !default;
+$ur_light_gray: #f7f6f6 !default;
+$ur_transparent: transparent !default;
+
+
+// URISOLVE FONT SIZES
+
+$ur_xxs: 13px !default;
+$ur_xs: 15px !default;
+$ur_sm: 18px !default;
+$ur_md: 20px !default;
+$ur_lg: 24px !default;
+$ur_xl: 30px !default;
+
+
+$accordion-icon-active-color: $ur_white !default;

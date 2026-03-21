@@ -1,0 +1,14 @@
+@use '../abstracts' as *;
+
+.content{
+    position: fixed;
+    top: $header-height;
+    left: $sidebar-width-full;
+    width: $content-width;
+    height: $content-height;
+    margin: $content-margin;
+    padding: $content-padding;
+    border-radius: toRem(5);
+    background-color: $color-white;
+    box-shadow: 0px 0px 10px 2px rgb(233, 230, 230);
+}

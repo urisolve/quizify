@@ -1,0 +1,116 @@
+<div class="topic-log-container"> 
+  <div class="topic-log-table-wrapper">
+    <div class="table-scroll">
+      <table class="topic-log-table">
+        <thead>
+          <tr>
+            <th>{{ t 'topic_log.subtopic' }}</th>
+            <th>{{ t 'topic_log.total_tries' }}</th>
+            <th>{{ t 'topic_log.total_correct' }}</th>
+            <th>{{ t 'topic_log.total_points' }}</th>
+            <th>{{ t 'topic_log.performance' }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each subtopics}}
+          <tr class="subtopic-row" data-subtopic-id="{{this.id}}">
+            <td>
+              <span class="subtopic-name clickable" data-subtopic-id="{{this.id}}">{{this.title}}</span>
+            </td>
+            <td>
+              {{#each ../subtopicStats}}
+                {{#if (eq this.subtopic_id ../this.id)}}
+                  {{this.tries}}
+                {{/if}}
+              {{else}}
+                0
+              {{/each}}
+            </td>
+            <td>
+              {{#each ../subtopicStats}}
+                {{#if (eq this.subtopic_id ../this.id)}}
+                  {{this.correct}}
+                {{/if}}
+              {{else}}
+                0
+              {{/each}}
+            </td>
+            <td>
+              {{#each ../subtopicStats}}
+                {{#if (eq this.subtopic_id ../this.id)}}
+                  {{this.totalPoints}}
+                {{/if}}
+              {{else}}
+                0
+              {{/each}}
+            </td>
+            <td>
+              <span class="performance-bolts">
+                {{#each ../subtopicStats}}
+                  {{#if (eq this.subtopic_id ../this.id)}}
+                    {{#each (range this.performanceBolts)}}
+                      <i class="bi bi-lightning-charge-fill bolt-lightning"></i>
+                    {{/each}}
+                    {{#each (range this.outlineBolts)}}
+                      <i class="bi bi-lightning-charge bolt-outline"></i>
+                    {{/each}}
+                  {{/if}}
+                {{/each}}
+              </span>
+            </td>
+          </tr>
+          <tr class="subtopic-log-details hidden" id="details-{{this.id}}">
+            <td colspan="5">
+              <table class="weekly-log-table">
+                <thead>
+                  <tr>
+                    <th>{{ t 'topic_log.week' }}</th>
+                    <th>{{ t 'topic_log.tentatives' }}</th>
+                    <th>{{ t 'topic_log.correct' }}</th>
+                    <th>{{ t 'topic_log.points' }}</th>
+                    <th>{{ t 'topic_log.performance' }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each ../subtopicStats}}
+                    {{#if (eq this.subtopic_id ../this.id)}}
+                      {{#each this.weeklyStats}}
+                        <tr>
+                          <td>{{week_display}}</td>
+                          <td>{{tries}}</td>
+                          <td>{{correct}}</td>
+                          <td>{{score}}</td>
+                          <td>
+                            <span class="performance-bolts">
+                              {{#each (range this.performanceBolts)}}
+                                <i class="bi bi-lightning-charge-fill bolt-lightning"></i>
+                              {{/each}}
+                              {{#each (range this.outlineBolts)}}
+                                <i class="bi bi-lightning-charge bolt-outline"></i>
+                              {{/each}}
+                            </span>
+                          </td>
+                        </tr>
+                      {{else}}
+                        <tr class="empty-row">
+                          <td colspan="5">{{ t 'topic_log.no_weekly_stats' }}</td>
+                        </tr>
+                      {{/each}}
+                    {{/if}}
+                  {{/each}}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+          {{else}}
+          <tr class="empty-row">
+            <td colspan="5">{{ t 'topic_log.no_subtopics' }}</td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script src="/js/pages/topic_log.js"></script>

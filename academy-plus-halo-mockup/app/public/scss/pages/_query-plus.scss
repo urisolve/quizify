@@ -1,0 +1,428 @@
+@use '../abstracts' as *;
+
+.practice-question-container {
+    max-width: 900px;
+    margin: -20px auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+
+    h2 {
+        margin-bottom: 2rem;
+        color: #a51c30;
+        font-weight: 700;
+        text-align: center;
+    }
+
+    .qa-flex {
+        display: flex;
+        gap: 2rem;
+        justify-content: center;
+        align-items: flex-start; // vertical alignment
+        flex-wrap: nowrap;
+    }
+
+    .qa-row {
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        justify-content: center;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+    }
+
+    .question-card {
+        width: 70%;
+        min-width: 260px;
+        /* max-width: 400px; */
+        background: #fff;
+        border-radius: toRem(5);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        padding: toRem(32) toRem(24);
+        box-sizing: border-box;
+        text-align: center;
+        position: relative;
+
+        .floating-feedback {
+            position: absolute;
+            bottom: 1rem;
+            right: 1rem;
+            z-index: 10;
+            align-items: flex-end;
+        }
+
+        #question-img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 1rem;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: toRem(5);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+            object-fit: cover;
+            border: 3px solid #FFA726;
+        }
+
+        #question-text {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #222;
+            margin-bottom: 1rem;
+        }
+    }
+
+    .feedback-panel {
+        width: 30%;
+        min-width: 180px;
+        max-width: 260px;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 2rem;
+    }
+
+    .answers-card {
+        width: 70%;
+        min-width: 260px;
+        max-width: 700px;
+        background: #fff;
+        border-radius: toRem(5);
+        box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        padding: toRem(32) toRem(24);
+        box-sizing: border-box;
+        text-align: left;
+        margin: 0 auto;
+    }
+
+
+
+    #answers-area {
+        margin-bottom: 1.2rem;
+        text-align: left;
+    }
+
+    #feedback-area {
+        width: 100%;
+    }
+
+    .btn {
+        margin-top: 1rem;
+        min-width: 120px;
+        border: none;
+        border-radius: toRem(5);
+        padding: 0.5em 1.2em;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: block;
+        max-width: 370px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .answers-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: toRem(12);
+        max-width: 100%;
+    }
+
+    .answers-row {
+        display: flex;
+        gap: toRem(16);
+        justify-content: space-between;
+    }
+
+    .answers-row label {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        background: #f6f6f8;
+        border-radius: toRem(3);
+        padding: toRem(5) toRem(8);
+        cursor: pointer;
+    }
+
+    .answer-option {
+        cursor: pointer;
+        background: #f6f6f8;
+        border-radius: toRem(5);
+        padding: toRem(8) toRem(10);
+        margin: 0;
+        transition: background 0.2s, color 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-weight: 500;
+        border: 2px solid transparent;
+        min-height: 40px;
+        word-wrap: break-word;
+    }
+
+    .answer-option input[type="radio"] {
+        display: none;
+    }
+
+    .answer-option:has(input[type="radio"]:checked),
+    .answer-option.selected {
+        background: #a51c30;
+        color: #fff;
+        border-color: #a51c30;
+    }
+
+    .feedback-message {
+        display: flex;
+        align-items: center;
+        gap: 0.5em;
+        background: #ffe0b2; // light orange
+        color: #a05100;
+        border-radius: toRem(5);
+        padding: toRem(10) toRem(16);
+        margin: toRem(8) 0;
+        font-weight: 500;
+        font-size: 1em;
+        box-shadow: 0 1px 4px rgba(255, 167, 38, 0.08);
+
+        &.correct {
+            background: #c8e6c9;
+            color: #256029;
+
+            .feedback-icon svg circle {
+                fill: #66bb6a;
+            }
+        }
+
+        &.incorrect {
+            background: #ffcdd2;
+            color: #b71c1c;
+
+            .feedback-icon svg circle {
+                fill: #e57373;
+            }
+        }
+
+        &.info {
+            background: #ffe0b2;
+            color: #a05100;
+
+            .feedback-icon svg circle {
+                fill: #FFA726;
+            }
+        }
+    }
+
+    .feedback-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .floating-feedback {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+
+        .feedback-fab {
+            cursor: pointer;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: none; // Remove border/shadow
+            border-radius: 50%;
+            width: 32px; // Smaller size
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0; // Remove extra space
+
+            svg {
+                width: 24px;
+                height: 24px;
+                display: block;
+            }
+
+            &:hover,
+            .floating-feedback:hover & {
+                transform: scale(1.18) rotate(-12deg);
+                box-shadow: none;
+            }
+        }
+
+        .floating-feedback-message {
+            display: none;
+            background: #ffe0b2;
+            color: #a05100;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+            padding: 1rem 1.5rem;
+            margin-bottom: 0.5rem;
+            max-width: 320px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: left;
+
+            &.show {
+                display: block;
+                animation: feedbackFadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            &.hide {
+                display: block;
+                animation: feedbackFadeOut 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+
+        .feedback-fab-tooltip {
+            position: absolute;
+            right: 44px;
+            bottom: 0;
+            background: #fff3cd;
+            color: #a05100;
+            border: 1px solid #ffe082;
+            border-radius: 6px;
+            padding: 0.4em 0.8em;
+            font-size: 0.95em;
+            box-shadow: 0 2px 8px rgba(255, 167, 38, 0.10);
+            z-index: 20;
+            white-space: nowrap;
+            animation: feedbackFadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+
+            &.show {
+                display: block;
+                animation: feedbackFadeIn 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+
+            &.hide {
+                display: block;
+                animation: feedbackFadeOut 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+        }
+
+        /*  &:hover .floating-feedback-message,
+        .feedback-fab:focus+.floating-feedback-message {
+            display: block;
+            } */
+    }
+
+    // Responsive: stack vertically on small screens
+    @media (max-width: 900px) {
+        .practice-question-container .qa-row {
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .practice-question-container .answers-grid {
+            grid-template-columns: 1fr;
+            grid-template-rows: repeat(4, 1fr);
+        }
+
+        .practice-question-container .feedback-panel {
+            width: 90%;
+            max-width: 600px;
+            min-width: unset;
+        }
+
+        .practice-question-container .feedback-panel {
+            padding-top: 0;
+            justify-content: flex-start;
+        }
+    }
+}
+
+// Visual feedback for selected answer
+.answer-option.answer-correct {
+    background-color: #d4edda !important;
+    border-color: #28a745 !important;
+    color: #155724 !important;
+    transition: background 0.2s, border 0.2s, color 0.2s;
+}
+
+.answer-option.answer-incorrect {
+    background-color: #f8d7da !important;
+    border-color: #dc3545 !important;
+    color: #721c24 !important;
+    transition: background 0.2s, border 0.2s, color 0.2s;
+}
+
+@keyframes feedbackFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+// Query progress bar styles
+.query-progress-container {
+    width: 20%;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 8px 14px;
+    //border-radius: 4px;
+    //box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    //border: 1px solid rgba(0, 0, 0, 0.05);
+    margin-bottom: 40px;
+    margin-left: auto;
+    margin-right: auto;
+    
+}
+
+.query-progress-bg {
+    width: 100%;
+    height: 6px;
+    background: #e0e0e0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.query-progress-fill {
+    height: 6px;
+    background: $color-red;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+// Responsive adjustments for query progress bar
+@media (max-width: 768px) {
+    .query-progress-container {
+        width: 180px;
+        padding: 4px 6px;
+        margin-top: 4px;
+    }
+
+    .query-progress-bg,
+    .query-progress-fill {
+        height: 4px;
+    }
+}
+
+@media (max-width: 480px) {
+    .query-progress-container {
+        width: 120px;
+        padding: 2px 3px;
+        margin-top: 2px;
+    }
+}
+
+@keyframes feedbackFadeOut {
+    from {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+}

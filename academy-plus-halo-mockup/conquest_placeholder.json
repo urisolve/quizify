@@ -1,0 +1,22 @@
+[
+  {
+    "name": "First Login",
+    "icon": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><circle cx=\"12\" cy=\"12\" r=\"10\" fill=\"#FFD700\"/><text x=\"12\" y=\"16\" text-anchor=\"middle\" font-size=\"10\" fill=\"#fff\">1st</text></svg>",
+    "style": {
+      "backgroundColor": "#FFD700",
+      "border": "2px solid #fff",
+      "borderRadius": "50%"
+    },
+    "date": "2024-07-01"
+  },
+  {
+    "name": "Profile Complete",
+    "icon": "<svg width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><rect width=\"24\" height=\"24\" rx=\"12\" fill=\"#4CAF50\"/><path d=\"M7 13l3 3 7-7\" stroke=\"#fff\" stroke-width=\"2\" fill=\"none\"/></svg>",
+    "style": {
+      "backgroundColor": "#4CAF50",
+      "border": "2px solid #fff",
+      "borderRadius": "50%"
+    },
+    "date": "2024-07-01"
+  }
+]

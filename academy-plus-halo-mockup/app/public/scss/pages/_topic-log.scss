@@ -1,0 +1,229 @@
+@use '../abstracts' as *;
+
+// Week row full width and centered
+* {
+  font-family: $font-family-text;
+}
+
+.week-row td {
+  width: 100%;
+  padding: 0;
+}
+
+.week-selector {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding: 1em 0;
+}
+
+
+.subtopic-details {
+  display: block;
+  width: 100%;
+}
+
+.empty-row {
+  text-align: center;
+  color: #999;
+  background: #f7f7fa;
+  font-style: italic;
+  border-bottom: none;
+}
+
+
+.topic-log-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 900px;
+  margin: 40px auto;
+  padding: 2rem;
+  background: #fff;
+  border-radius: toRem(7);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border: 2px solid #e0e0e0;
+
+  justify-content: center;
+  align-items: center;
+  transition: background 0.2s, box-shadow 0.2s;
+}
+
+
+
+.topic-log-table-wrapper {
+  border-radius: toRem(5);
+  border: 2px solid #e0e0e0;
+
+}
+
+/* Match width and center content for inner weekly log table */
+
+.weekly-log-table {
+  tbody>tr:not(.empty-row):nth-child(even) td {
+    background: #f8f6f7;
+  }
+
+  width: 98%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 1.08em;
+  background: #f7f7fa;
+  border-radius: toRem(7);
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+  border: 2px solid #e0e0e0;
+  margin: 18px auto 8px auto;
+
+  tr:hover td {
+    background: #ffe5e9;
+  }
+}
+
+.weekly-log-table>thead>tr>th {
+  padding: 12px 10px;
+  text-align: center;
+  background: #CC4C4C;
+  color: #fff;
+  font-weight: 700;
+  border-bottom: 2px solid #bdbdbd;
+  font-size: 1.07em;
+}
+
+.weekly-log-table td {
+  padding: 13px 12px;
+  text-align: center;
+  border-bottom: 1px solid #e3e3e3;
+  background: #fcfcff;
+}
+
+.weekly-log-table tbody tr {
+  transition: background 0.2s;
+}
+
+.weekly-log-table tbody tr:not(.empty-row):hover {
+  background: #f0f4ff;
+}
+
+.table-scroll {
+  overflow-x: auto;
+}
+
+.topic-log-table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-size: 1.08em;
+  background: #fff;
+  border-radius: toRem(5);
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+
+  /* tr:hover td {
+      background: #ffe5e9;
+    } */
+}
+
+.topic-log-table th,
+.topic-log-table td {
+  padding: 12px 10px;
+  text-align: center;
+  border-bottom: 1px solid #eee;
+}
+
+.topic-log-table th {
+  background: #a51c30;
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.07em;
+}
+
+.topic-log-table th:first-child {
+  border-top-left-radius: toRem(5);
+}
+
+.topic-log-table th:last-child {
+  border-top-right-radius: toRem(5);
+}
+
+.topic-log-table tbody>tr.subtopic-row:nth-child(4n+3) td {
+  background: #f8f6f7;
+}
+
+/* .topic-log-table > tbody > tr.subtopic-row:nth-child(even) td {
+  background: #f5e9c8;
+}
+ */
+.topic-log-table>tbody>tr.subtopic-log-details:nth-child(even)>td {
+  background: #f5e9c8;
+}
+
+/* .topic-log-table tbody > tr.subtopic-row:nth-child(4n+3) td {
+      background: #fff9f2;
+    } */
+
+.correct {
+  color: #43a047;
+
+}
+
+.incorrect {
+  color: #d81b60;
+
+}
+
+.performance-bolts .bi-lightning-charge-fill,
+.performance-bolts .bolt-lightning {
+  color: #fbc02d;
+}
+
+.performance-bolts .bi-lightning-charge,
+.performance-bolts .bolt-outline {
+  color: #ccc;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.anex-img-hover {
+  position: relative;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.anex-img-preview {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  transform: translateY(-50%);
+  width: toRem(300);
+  border: 2px solid #ffa726;
+  border-radius: toRem(5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  background: #fff;
+  z-index: 10;
+}
+
+.anex-img-hover:hover .anex-img-preview {
+  display: block;
+}
+
+.subtopic-name.clickable {
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.topic-log-table td:not(:first-child) {
+  cursor: default !important;
+}
+
+.topic-log-table tbody>tr.subtopic-row:hover td {
+  background: #ffe5e9;
+}
+
+.topic-log-table tbody>tr.subtopic-row.selected td {
+  background-color: #f5e9c8 !important;
+}

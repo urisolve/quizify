@@ -1,0 +1,139 @@
+@use '../abstracts' as *;
+
+
+/* ===== Global Reset & Base Styles ===== */
+* {
+ 
+  margin: 0;
+  padding: 0;
+  font-family: $font-family-text;
+}
+
+body {
+  background-color: #f9f9f9;
+  color: #333;
+}
+
+/* ===== Auth Container ===== */
+.auth-container {
+  /* height: 20vh; */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* ===== Login Card ===== */
+.login-card {
+  background-color: $color-white;
+  border-radius: toRem(5);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  padding: toRem(40);
+  width: toRem(360);
+  max-width: 90%;
+  display: flex;
+  flex-direction: column;
+  /* align-items: center; */
+  justify-content: center;
+  gap: toRem(20);
+}
+#login-form {
+  
+  max-width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: toRem(20);
+}
+
+/* ===== Header ===== */
+.login-card {
+  h2 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+
+  /* ===== Input Fields ===== */
+  label {
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 5px;
+    align-items: start;
+  }
+
+  input[type="email"],
+  input[type="password"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 14px;
+    border: 1px solid #ccc;
+    border-radius: toRem(5);
+    outline: none;
+    transition: border 0.3s;
+
+    &:focus {
+      border-color: $color-red; /* ISEP red tone */
+    }
+  }
+}
+
+/* ===== Checkbox + Link ===== */
+.login-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.85rem;
+
+  a {
+    color: #6b46c1;
+    text-decoration: none;
+    max-width: 50%;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+/* ===== Register Link ===== */
+.register-link {
+  text-align: center;
+  font-size: 0.9rem;
+
+  a {
+    color: #6b46c1;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+.login-header-icons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px; /* space between the two icons */
+  margin-bottom: 10px;
+  /* margin-top: 32px; */
+}
+
+.logo-circle {
+  width: toRem(64);
+  height: toRem(64);
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.logo-rect {
+  height: toRem(29);
+  width: toRem(150);
+  object-fit: contain;
+  background-color: $color-red;
+}
+
+.login-button {
+  width: 90%;
+}

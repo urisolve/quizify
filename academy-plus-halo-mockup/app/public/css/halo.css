@@ -1,0 +1,166 @@
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 110px;
+}
+
+body {
+  background-color: #f5f7fb;
+}
+
+.body-wrapper {
+  min-height: 100vh;
+}
+
+.page-content {
+  padding-top: 96px;
+  padding-bottom: 32px;
+}
+
+.app-header {
+  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.92);
+  border-bottom: 1px solid rgba(73, 86, 124, 0.12);
+  z-index: 20;
+}
+
+.sidebar-shell {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.halo-brand-link {
+  width: 100%;
+}
+
+.halo-brand-icon {
+  align-items: center;
+  background: rgba(93, 135, 255, 0.14);
+  border-radius: 18px;
+  color: #5d87ff;
+  display: inline-flex;
+  font-size: 28px;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.halo-brand-copy {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.halo-brand-title {
+  color: #2a3547;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.halo-brand-subtitle {
+  color: #5a6a85;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.sidebar-nav {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.sidebar-nav .simplebar-content {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.sidebar-nav ul#sidebarnav {
+  flex: 1 1 auto;
+}
+
+.halo-quote-card {
+  margin: 1rem 1rem 1.5rem;
+  padding: 1.25rem;
+}
+
+.halo-quote-icon-wrap {
+  align-items: center;
+  background: rgba(93, 135, 255, 0.14);
+  border-radius: 999px;
+  color: #5d87ff;
+  display: inline-flex;
+  font-size: 1.1rem;
+  height: 42px;
+  justify-content: center;
+  margin-bottom: 1rem;
+  width: 42px;
+}
+
+.halo-quote-text {
+  color: #2a3547;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.halo-quote-author {
+  color: #5a6a85;
+  font-size: 0.8rem;
+}
+
+.halo-hero-card {
+  background: linear-gradient(135deg, rgba(93, 135, 255, 0.16), rgba(73, 190, 255, 0.08));
+}
+
+.halo-lead {
+  max-width: 840px;
+}
+
+.halo-section-icon {
+  align-items: center;
+  border-radius: 14px;
+  display: inline-flex;
+  font-size: 1.4rem;
+  height: 52px;
+  justify-content: center;
+  min-width: 52px;
+}
+
+.halo-feature-item {
+  background: #f8f9fc;
+  border: 1px solid rgba(42, 53, 71, 0.08);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+.footer {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.footer-note {
+  padding-bottom: 20px;
+}
+
+@media (max-width: 1199.98px) {
+  .page-content {
+    padding-top: 88px;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .page-content {
+    padding-top: 80px;
+  }
+
+  .halo-brand-title {
+    font-size: 1.5rem;
+  }
+
+  .halo-brand-subtitle {
+    font-size: 0.7rem;
+  }
+}

@@ -1,0 +1,129 @@
+{{!-- TODO: Reestruturar e simplificar --}}
+<div class="card-body w-100 h-100">
+    <div class="container-fluid globalContainer">
+        <!--  Row 1 -->
+        <div class="row w-100 h-100 justify-content-center">
+            <span class="title">Em apenas Uma Aplicação</span>
+            <span class="sub-title">Todos os Métodos de análise de circuitos</span>
+        </div>
+        <!--  Row 2 -->
+        <div class="row w-100 h-100 justify-content-center">
+            <div class="w-100 h-100 align-items-center simContainer">
+                <div class="card h-100 simCard">
+                    <div class="card-title w-100 simCardHeader">
+                        Esta aplicação de análise de circuitos disponibiliza uma solução, passo a passo, usando apenas um ficheiro do tipo <b>esquemático (.sch)</b> ou <b>netlist (.txt)</b>, ou diretamente utilizando o novo <b>editor de circuitos</b>.
+                    </div>
+                    <div class="card-body w-100 h-100 simCardBody">
+                        <div class="container-fluid w-100 p-0">
+                            <!--  Row 1 -->
+                            <div class="row w-100 justify-content-center p-0 m-0 mb-4 mt-4">
+                                <div class="row justify-content-center buttonParent p-0">
+                                    <div class="p-0 fileWrap">
+                                        <label class="fileLabel">Selecionar ficheiro</label>
+                                        <div class="fileInputWrap">
+                                            <label class="fileInputBtn" for="fileInput">
+                                                <i class="ti ti-search"></i>
+                                            </label>
+                                            <div class="fileInputName" id="fileInputName">
+                                                Sem ficheiros selecionados
+                                            </div>
+                                        </div>
+                                        <input type="file" class="form-control" accept=".sch, .txt" id="fileInput" style="display: none;" onchange="handleFileSelect">
+                                    </div>
+                                    <div class="p-0 middleDiv">
+                                        OU
+                                    </div>
+                                    <div class="m-0 p-0 editorBtnWrap">
+                                        <label class="fileLabel">Criar circuito</label>
+                                        <button class="editorBtn" style="cursor:not-allowed"> <div class="newLabel">Novo!</div>Abrir editor</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="divider"></div>
+                            <!--  Row 2 -->
+                            <div class="row w-100 h-100 justify-content-center p-0 m-0">
+                                <div class="row justify-content-center buttonParent p-0">
+                                    <button class="btn-primary simButton" onclick="analyseCircuit('MTN')">Método da Tensão nos Nós</button>
+                                    <button class="btn-primary simButton" onclick="analyseCircuit('MCR')">Método da Corrente nos Ramos</button>
+                                    <button class="btn-primary simButton" onclick="analyseCircuit('MCM')">Método da Corrente nas Malhas</button>
+                                    <button class="btn-primary simButton" onclick="analyseCircuit('TSP')">Teorema da Sobreposição</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {{!-- <img src="/images/backgrounds/simulator.svg" class="simImage"/> --}}
+            </div>
+        </div>
+    </div>
+</div>
+
+<section id="results" style="display: none">
+    <!-- Modal -->
+    <div class="modal fade" id="results-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg" style="max-width:1250px" role="document">
+            <div class="modal-content border border-dark"> <!-- Updated class for border -->
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">URIsolve Analysis Results</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> <!-- Updated class for close button -->
+                </div>
+                <div id="results-board" class="modal-body"></div>
+                <!-- <div id="results-json" class="modal-body"></div> -->
+                <!-- User name box -->
+                <div id="output-info-global" class="container" style="visibility: visible;">
+                    <form role="form" method="post" id="userform-temp" class="col-lg-6 offset-lg-3">
+                    <div class="row justify-content-center">
+                        <div class="col-4 form-group">
+                            <label for="name"> <span data-translate="_firstname"></span></label>
+                            <input type="text" class="form-control" id="output-name" name="name">
+                        </div>
+                        <div class="col-4 form-group">
+                            <label for="lastname"> <span data-translate="_lastname"></span></label>
+                            <input type="text" class="form-control" id="output-lastname" name="lastname">
+                        </div>
+                        <div class="col-4 form-group">
+                            <label for="number"> <span data-translate="_number"></span></label>
+                            <input type="text" class="form-control" id="output-number" name="number">
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <small id="output-info" class="form-text text-muted"><span data-translate="_user-info-text"></span></small>
+                    </div>
+                </form>
+                </div>
+
+                <div id="buttons-div" class="modal-footer">
+                    <fieldset class="w-100">
+                    <a id='printLnk' download='urisolve_results.pdf' style="display:none;"></a>
+                    <button id="pdfPrintButton" type="button" class="btn btn-secondary font-weight-light col-md-2">
+                        <i class="fas fa-file-pdf" aria-hidden="true"></i>&nbsp;&nbsp;Download PDF
+                        <div class="ldld bare em-1 light d-inline-block ml-1 align-middle" id="pdfLoader"></div>
+                    </button>
+                    <button id="json" type="button" class="btn btn-secondary font-weight-light col-md-2">
+                        <i class="fas fa-file-code" aria-hidden="true"></i>&nbsp;&nbsp;Download JSON </button>
+                    <button id="tex" type="button" class="btn btn-secondary font-weight-light col-md-2">
+                    <img src="img/TeX.png" style="width: 35px;"></img>&nbsp;&nbsp;Download TeX </button>
+
+
+                    <form id="overleaf" action="https://www.overleaf.com/docs" method="post" target="_blank" class="btn btn-secondary font-weight-light col-md-2">
+                        <input id="main" type="hidden" name="encoded_snip">
+                        <input id="images" type="hidden" name="encoded_snip">
+                        <input type="hidden" name="snip_name[]" value="main.tex">
+                        <input type="hidden" name="snip_name[]" value="images.tex">
+                        <img src="img/overleaf.png" style="width: 22px;"></img>&nbsp;&nbsp;Open in Overleaf 
+                    </form>
+                    
+
+                    <button id="print" type="button" class="btn btn-secondary font-weight-light col-md-1">
+                        <img src="img/print.png" style="width: 22px;"></img>&nbsp;&nbsp;Print </button>
+                    <button id="modal-btn-cancel" type="button" class="btn btn-primary font-weight-light float-right col-md-2" data-bs-dismiss="modal">
+                        <i class="fas fa-angle-double-left mr-2" aria-hidden="true"></i><span data-translate="_return"></span></button>
+                    </fieldset>
+                </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

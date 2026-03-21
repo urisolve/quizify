@@ -1,0 +1,197 @@
+@use '../abstracts' as *;
+
+.globalContainer {
+    padding: 0
+}
+
+.simContainer {
+    display: flex;
+}
+
+.simCard {
+    width: 50%;
+    background-color: $ur_black;
+    color: $ur_white;
+    padding: $ur_md;
+    margin: 0;
+    margin-right: 5%;
+}
+
+.simCardHeader {
+    color: $ur_white;
+    font-size: $ur_xs;
+}
+
+.simCardBody{
+    padding: 0;
+}
+
+.simImage {
+    width: 45%;
+    margin: 0;
+}
+
+.simButton {
+    background-color: $ur_red;
+    color: $ur_white;
+    border: none;
+    border-radius: 3px;
+    padding: 2px;
+    width: 30%;
+    min-height: 46px;
+    margin-top: $ur_lg;
+    font-size: $ur_xxs;
+    font-weight: 500;
+}
+
+.simButton:disabled {
+    background-color: $ur_gray;
+    color: $ur_black;
+    cursor: not-allowed;
+}
+
+
+.buttonParent{
+    display: flex;
+    justify-content: space-between !important;
+}
+
+.divider {
+    height: 1px;
+    background-color: rgba($ur_white, 0.5);
+    margin: 0;
+    padding: 0;
+}
+
+.fileInputWrap {
+    height: calc(2 * $ur_lg);
+    border: 1px solid $ur_white;
+    background-color: transparent;
+    border-radius: 3px;
+    width: 100%;
+    display: flex;
+}
+
+.fileInputBtn {
+    height: 100%;
+    width: 20%;
+    min-width: calc(2 * $ur_lg);
+    border: none;
+    background-color: $ur_white;
+    border-radius: 2px;
+    font-size: $ur_md;
+    color: $ur_black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.fileInputName {
+    height: 100%;
+    width: auto;
+    display: flex;
+    align-items: center;
+    padding-left: $ur_xs;
+}
+
+.fileLabel{
+    text-indent: 0;
+    margin-bottom: $ur_xs;
+    padding: 0;
+}
+
+
+.fileWrap {
+    width: 60%;
+}
+
+.middleDiv {
+    width: 10%;
+    text-align: center;
+}
+
+.editorBtnWrap {
+    width: 30%;
+    align-items: end;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: start;
+}
+
+.editorBtn {
+    width: 100%;
+    height: calc(2 * $ur_lg);
+    position: absolute;
+    bottom: 0;
+    background-color: $ur_white;
+    color: $ur_black;
+    outline: none;
+    border: none;
+    border-radius: 3px;
+    font-weight: 500;
+}
+
+
+.newLabel {
+    position: absolute;
+    top: -15px;
+    right: -10px;
+    transform: rotate(20deg);
+    background-color: $ur_red;
+    padding: 3px 7px;
+    border-radius: 5px;
+    color: $ur_white;
+}
+
+
+
+// @include media-breakpoint-down(lg) {
+//     .simCard {
+//         width: 100%;
+//         margin-right: 0;
+//     }
+
+//     .simImage {
+//         width: 70%;
+//         margin-top: $ur_md;
+//         margin-left: 15%;
+//     }
+
+//     .simContainer {
+//         display: block;
+//     }
+
+//   }
+
+
+//   @include media-breakpoint-down(sm) {
+//     .simButton {
+//         width: 100%;
+//         margin-top: $ur_xs 0;
+//     }
+
+//     .fileWrap {
+//         width: 100%;
+//     }
+
+//     .middleDiv {
+//         width: 100%;
+//         height: fit-content;
+//         margin: $ur_xs 0;
+//     }
+
+//     .editorBtnWrap {
+//         width: 100%;
+//         height: calc(3.5 * $ur_lg);
+//     }
+    
+//     .simImage {
+//         width: 100%;
+//         margin: 0;
+//         margin-top: $ur_md
+//     }
+    
+//   }

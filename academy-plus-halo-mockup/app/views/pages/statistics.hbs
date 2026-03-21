@@ -1,0 +1,131 @@
+<div class="statistics-container">
+  <div class="statistics-cards">
+    <div class="statistics-flex">
+      <!-- LEFT COLUMN: Performance -->
+      <div class="card performance-summary">
+        <!-- Weekly Points and Leaderboard Button -->
+        <div class="weekly-points-leaderboard">
+          <div class="weekly-points-label">
+            {{t 'statistics.weekly_points'}}:
+            <span class="weekly-points-value">{{userWeeklyScore}}</span>
+          </div>
+          <a href="/leaderboard" class="red-button leaderboard-button">
+            {{t 'statistics.leaderboard'}}
+          </a>
+        </div>
+        <h3>{{t 'statistics.general_performance'}}</h3>
+        <div class="general-performance-bolts">
+          <span class="performance-bolts">
+            {{#each (range generalPerformanceBolts)}}
+            <i class="bi bi-lightning-charge-fill" style="color:#fbc02d;"></i>
+            {{/each}}
+            {{#each (range generalOutlineBolts)}}
+            <i class="bi bi-lightning-charge" style="color:#ccc;"></i>
+            {{/each}}
+          </span>
+        </div>
+        <h3>{{t 'statistics.performance_by_topic'}}</h3>
+        <div class="performance-table-wrapper">
+          <div class="table-scroll">
+            <table class="topic-performance-table">
+              <thead>
+                <tr>
+                  <th>{{t 'statistics.topic'}}</th>
+                  <th>{{t 'statistics.progress'}}</th>
+                  <th>{{t 'statistics.subtopics'}}</th>
+                  <th>{{t 'statistics.performance'}}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {{#each topicStats}}
+                <tr>
+                  <td>
+                    <a href="#" class="topic-link" data-topic-id="{{this.id}}">{{this.name}}</a>
+                  </td>
+                  <td>
+                    <div class="topic-progress-bar-bg">
+                      <div class="topic-progress-bar-fill" style="width: {{this.averageProgress}}%;"></div>
+                    </div>
+                    <span style="margin-left:8px;">{{this.averageProgress}}%</span>
+                  </td>
+                  <td>{{this.completedSubtopics}} / {{this.totalSubtopics}}</td>
+                  <td>
+                    <span class="performance-bolts">
+                      {{#each (range this.performanceBolts)}}
+                      <i class="bi bi-lightning-charge-fill" style="color:#fbc02d;"></i>
+                      {{/each}}
+                      {{#each (range this.outlineBolts)}}
+                      <i class="bi bi-lightning-charge" style="color:#ccc;"></i>
+                      {{/each}}
+                    </span>
+                  </td>
+                </tr>
+                {{else}}
+                <tr>
+                  <td colspan="4" style="text-align: center; color: #999;">
+                    {{t 'statistics.no_topics_available'}}
+                  </td>
+                </tr>
+                {{/each}}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- RIGHT COLUMN: Radial Graph + Activity Log -->
+      <div class="right-stack">
+        <div class="card radial-graph-card">
+          <div class="radial-graph-placeholder">
+            <span>{{t 'statistics.radial_graph_placeholder'}}</span>
+          </div>
+        </div>
+        <div class="card activity-log">
+          <h3>{{t 'statistics.badges_and_conquests'}}</h3>
+          <div class="badges-conquests-wrapper">
+            {{#if userBadges}}
+            <div class="badges-grid compact-grid">
+              {{#each userBadges}}
+              <div class="badge-item compact-item"
+                title="{{this.name}}&#10;{{t 'statistics.earned_on'}}: {{formatDate this.date_earned}}">
+                <span class="badge-icon compact-icon">
+                  <img src="{{this.svg}}" alt="{{this.name}}" class="badge-img" />
+                </span>
+              </div>
+              {{/each}}
+            </div>
+            {{else}}
+            <div class="badges-grid compact-grid">
+              <div class="badge-item compact-item">
+                <span class="badge-icon compact-icon"
+                  style="width:26px;height:26px;border-radius:50%;background:#ffe5e9;border:1.5px solid #a51c30;display:flex;align-items:center;justify-content:center;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#a51c30">
+                    <circle cx="12" cy="12" r="10" />
+                  </svg>
+                </span>
+              </div>
+              <div class="badge-item compact-item">
+                <span class="badge-icon compact-icon"
+                  style="width:26px;height:26px;border-radius:50%;background:#e8f5e9;border:1.5px solid #43a047;display:flex;align-items:center;justify-content:center;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#43a047">
+                    <rect x="4" y="4" width="16" height="16" rx="4" />
+                  </svg>
+                </span>
+              </div>
+              <div class="badge-item compact-item">
+                <span class="badge-icon compact-icon"
+                  style="width:26px;height:26px;border-radius:50%;background:#fffde7;border:1.5px solid #fbc02d;display:flex;align-items:center;justify-content:center;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#fbc02d">
+                    <polygon points="12,2 15,8 22,9 17,14 18,21 12,18 6,21 7,14 2,9 9,8" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+<script src="/js/pages/statistics.js"></script>

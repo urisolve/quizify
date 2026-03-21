@@ -1,0 +1,82 @@
+<!-- Settings Menu -->
+<div class="settings-menu">
+    <div class="offcanvas-header">
+        <p id="settingsMenuLabel">Settings</p>
+        <button type="button" class="btn-close" aria-label="Close">&times;</button>
+    </div>
+    <div class="offcanvas-content">
+        <div class="settings-sidebar">
+            <ul>
+                <li><button class="sidebar-category active" data-section="general">General</button></li>
+                <li><button class="sidebar-category" data-section="personalization">Personalization</button></li>
+                <li><button class="sidebar-category" data-section="voice">Voice</button></li>
+            </ul>
+        </div>
+        <div class="settings-main">
+            <div id="general" class="settings-section active">
+                <span class="settings-section-header">General</span>
+                <div class="settings-section-content">
+                    <!-- Maybe create a template to then be used based on the different general settings needed (copy paste of the previous one) -->
+                    <div class="settings-section-content-item">
+                        <span>Enable Sentiment Analysis</span>
+                        <button class="toggle-button" aria-pressed="false" data-option="enableSentimentAnalysis">
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                    <div class="settings-section-content-item">
+                        <span>Enable Language Detection</span>
+                        <button class="toggle-button" aria-pressed="false" data-option="enableLanguageDetection">
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div id="personalization" class="settings-section">
+                <span class="settings-section-header">Personalization</span>
+                <div class="settings-section-content">
+                    <!-- Maybe create a template to then be used based on the different general settings needed (copy paste of the previous one) -->
+                    <div class="settings-section-content-item">
+                        <span>Enable Chat Memory</span>
+                        <button class="toggle-button active" aria-pressed="true" data-option="enablePromptMemoryChain">
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                    <div class="settings-section-content-item">
+                        <span>Choose the model</span>
+                        <select id="model-selector" class="model-selector">
+                            <option value="null">Base model</option>
+                            <option value="nvm-conceptual:latest">NVM Conceptual</option>
+                            <option value="nvm-procedural:latest">NVM Procedural</option>
+                            <option value="nvm-application:latest">NVM Application</option>
+                            <option value="nvm-evaluation:latest">NVM Evaluation</option>
+                            <option value="nvm-advanced:latest">NVM Advanced</option>
+                            <option value="nvm-full:latest">NVM Full</option>
+                            <option value="nvm-full-v2:latest">NVM Full V2</option>
+                            <option value="lcm-full-v2:latest">LCM Full V2</option>
+                            <option value="lcm-conceptual-v2:latest">LCM Conceptual V2</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div id="voice" class="settings-section">
+                <span class="settings-section-header">Voice</span>
+                <div class="settings-section-content">
+                    <!-- Maybe create a template to then be used based on the different general settings needed (copy paste of the previous one) -->
+                    <div class="settings-section-content-item">
+                        <span>Enable Speech-to-Text</span>
+                        <button class="toggle-button" aria-pressed="false" data-option="enableSTT">
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                    <div class="settings-section-content-item">
+                        <span>Enable Text-to-Speech</span>
+                        <button class="toggle-button" aria-pressed="false" data-option="enableTTS">
+                            <span class="toggle-thumb"></span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="module" src="/js/pages/settings.js"></script>

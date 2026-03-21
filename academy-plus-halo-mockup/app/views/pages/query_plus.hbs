@@ -1,0 +1,50 @@
+<div class="practice-question-container">  
+    <div class="query-progress-container">
+      <div class="query-progress-bg">
+        <div class="query-progress-fill" data-progress="{{progress}}" style="width: {{progress}}%;"></div>
+      </div>
+    </div>  
+  {{!-- <h2>Practice Question</h2> --}}
+  <div class="qa-row">
+    <div class="question-card">
+      {{#if question.image}}
+        <img id="question-img" src="{{question.image}}" alt="Question image" />
+      {{/if}}
+      <div id="question-text">
+        {{question.question_text}}
+      </div>
+       <!-- Floating feedback icon and message INSIDE the question card -->
+      <div class="floating-feedback" id="floating-feedback" style="display:none;">
+        <div class="feedback-fab" id="feedback-fab">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <circle cx="16" cy="16" r="16" fill="#FFA726"/>
+            <text x="16" y="23" text-anchor="middle" font-size="20" fill="#fff" font-family="Arial" font-weight="bold">i</text>
+          </svg>
+        </div>
+        <div class="feedback-fab-tooltip" id="feedback-fab-tooltip" style="display:none;">
+          Click the "i" for help
+        </div>
+        <div class="floating-feedback-message" id="floating-feedback-message">
+          <!-- Message will be set by JS -->
+          Incorrect. Try again!<br>
+          The current increases when the switch is closed because the circuit is completed.
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="answers-card">
+    <form id="answer-form" autocomplete="off">
+      <div id="answers-area" class="answers-grid">
+        {{#each answers}}
+          <label class="answer-option">
+            <input type="radio" name="answer" value="{{@index}}" hidden>
+            {{this.text}}
+          </label>
+        {{/each}}
+      </div>
+    </form>
+  </div>
+  <button type="submit" form="answer-form" class="red-button-inverse btn">{{ t 'query_plus.submit_btn' }}</button>
+</div>
+<audio id="correct-sound" src="/sounds/correct.mp3" preload="auto"></audio>
+<script src="/js/pages/query_plus.js"></script>
