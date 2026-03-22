@@ -3,11 +3,7 @@
 const express = require('express');
 const router = express.Router();
 
-
-
 const requireAuthentication = require('../middleware/authMiddleware');
-const homeController = require('../controllers/pages/homeController');
-router.get('/', homeController);
 
 const aboutController = require('../controllers/pages/aboutController');
 router.get('/aboutus', aboutController);
@@ -54,10 +50,16 @@ const topicLogController = require('../controllers/pages/topicLogController');
 router.get('/topic-log', topicLogController.topicLogController);
 router.post('/topic-log', topicLogController.handleTopicLogPost);
 
+const homeController = require('../controllers/pages/homeController');
+router.get('/', homeController);
+
 const publicationsController = require('../controllers/pages/publicationsController');
 router.get('/publications', publicationsController);
 
 const contributorsController = require('../controllers/pages/contributorsController');
 router.get('/contributors', contributorsController);
+
+const chatbotController = require('../controllers/pages/chatbotController');
+router.get('/chatbot', chatbotController);
 
 module.exports = router;

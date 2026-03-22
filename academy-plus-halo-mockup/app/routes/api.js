@@ -1,3 +1,4 @@
+// app/routes/api.js
 //? Routes for the APIs of the application
 const express = require('express');
 const router = express.Router();
@@ -33,5 +34,10 @@ router.post('/subtopic-progress', requireAuthentication, subtopicProgressControl
 router.get('/leaderboard', leaderboardController.getLeaderboard);
 
 router.get('/leaderboard/position', requireAuthentication, leaderboardController.getUserPosition);
+
+const chatbotControllerAPI = require('../controllers/api/chatbotControllerAPI');
+
+router.post('/chatbot/stream', chatbotControllerAPI.handleStream);
+router.post('/chatbot/stop', chatbotControllerAPI.stopStream);
 
 module.exports = router;

@@ -1,3 +1,4 @@
+// app/controllers/api/chatControllerAPI.js
 //? Handles the communication with HALO System.
 
 //* Modules required
