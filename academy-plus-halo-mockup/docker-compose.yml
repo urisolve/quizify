@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile
     container_name: halo-ai-engineering-app
     ports:
-      - "2030:3000"
+      - "${APP_HOST_PORT}:${APP_PORT}"
     volumes:
       - ./app:/usr/src/app/app
       - ./db:/usr/src/app/db
@@ -13,7 +13,7 @@ services:
       - mysql
     environment:
       NODE_ENV: ${NODE_ENV}
-      PORT: ${PORT}
+      PORT: ${APP_PORT}
       BASE_URL: ${BASE_URL}
       APP_NAME: ${APP_NAME}
       SESSION_SECRET: ${SESSION_SECRET}
@@ -39,7 +39,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3310:3306"
+      - "${MYSQL_HOST_PORT}:3306"
     volumes:
       - mysql-data:/var/lib/mysql
     networks:
@@ -55,7 +55,7 @@ services:
       PMA_USER: ${MYSQL_USER}
       PMA_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "8085:80"
+      - "${PHPMYADMIN_HOST_PORT}:80"
     depends_on:
       - mysql
     networks:
