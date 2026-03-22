@@ -51,7 +51,7 @@
           "description": "Evolução da plataforma U=RIsolve Academy com foco na escalabilidade e integração de módulos inteligentes, incluindo o desenvolvimento do assistente HALO baseado em processamento de linguagem natural para apoio ao ensino de circuitos elétricos",
           "file": "TESE_JOAO_FERREIRA.pdf",
           "date": "07-2025",
-          "institution": "ISEP"
+          "institution": "FEUP"
         },
         {
           "title": "Projeto e desenvolvimento de aplicação web para simulação e interface de Osciloscópio",
@@ -119,7 +119,7 @@
       ]
     },
     {
-      "name": "Simon Cruz",
+      "name": "Pedro Cruz",
       "group": "Development and Programming",
       "role": "Student Contributor",
       "email": "1141265@isep.ipp.pt",
@@ -128,7 +128,7 @@
         {
           "title": "Desenvolvimento da Interface Interativa da aplicação U=RIsolve Academy",
           "description": "Desenvolvimento de uma nova interface de utilizador para a plataforma U=RIsolve Academy, com foco na melhoria da experiência do utilizador através de funcionalidades como gestão de perfil, modo de treino interativo, acompanhamento de progresso e elementos de gamificação como pontos, conquistas e rankings.",
-          "file": "PESTA_SIMON_CRUZ.pdf",
+          "file": "PESTA_PEDRO_CRUZ.pdf",
           "date": "09-2025",
           "institution": "ISEP"
         }
