@@ -62,21 +62,21 @@
         }
       ]
     },
-      {
-        "name": "Ângelo Pinheiro",
-        "group": "Professor Collaborators",
-        "role": "SW Architect/Management",
-        "email": "elo@isep.ipp.pt",
-        "photo": "elo.png",
-        "contributions": [
+    {
+      "name": "Ângelo Pinheiro",
+      "group": "Professor Collaborators",
+      "role": "SW Architect/Management",
+      "email": "elo@isep.ipp.pt",
+      "photo": "elo.png",
+      "contributions": [
         {
-            "title": "Projeto, implementação e integração do Método das Correntes de Malha na aplicação U=RIsolve",
-            "description": "Desenvolvimento e integração do Método das Correntes de Malha na aplicação U=RIsolve.",
-            "file": "PESTA_ANGELO_PINHEIRO.pdf",
-            "date": "07-2022",
-            "institution": "ISEP"
+          "title": "Projeto, implementação e integração do Método das Correntes de Malha na aplicação U=RIsolve",
+          "description": "Desenvolvimento e integração do Método das Correntes de Malha na aplicação U=RIsolve.",
+          "file": "PESTA_ANGELO_PINHEIRO.pdf",
+          "date": "07-2022",
+          "institution": "ISEP"
         }
-        ]
+      ]
     },
     {
       "name": "Armando Sousa",
@@ -102,149 +102,213 @@
       "photo": "fdp.png",
       "contributions": []
     },
-  {
-    "name": "Diogo Moreira",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_male.png",
-    "contributions": [
-      {
-        "title": "Recognising and Modelling Electrical Circuit Diagrams",
-        "description": "Desenvolvimento de novas técnicas para o reconhecimento e modelação de diagramas de circuitos elétricos.",
-        "file": "PESTA_DIOGO_MOREIRA.pdf",
-        "date": "12-2024",
-        "institution": "FEUP"
-      }
-    ]
-  },
-  {
-    "name": "Emanuel Cunha",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_male.png",
-    "contributions": [
-      {
-        "title": "Identificação de componentes de esquemas elétricos através de técnicas de classificação de imagem",
-        "description": "Desenvolvimento de técnicas para a identificação de componentes em esquemas elétricos utilizando algoritmos de classificação de imagem.",
-        "file": "TESE_EMANUEL_CUNHA.pdf",
-        "date": "06-2024",
-        "institution": "ISEP"
-      }
-    ]
-  },
-  {
-    "name": "Ana Castedo",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_female.png",
-    "contributions": [
-      {
-        "title": "U=RIsolve Academy - Caminhos para uma aprendizagem autónoma",
-        "description": "Introdução do Academy no universo U=RIsolve.",
-        "file": "PESTA_ANA_CASTEDO.pdf",
-        "date": "07-2023",
-        "institution": "ISEP"
-      }
-    ]
-  },
-  {
-    "name": "Guilherme Zenha",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_male.png",
-    "contributions": [
-      {
-        "title": "U=RIsolve - Implementação do Teorema da Sobreposição",
-        "description": "Implementação do Teorema da Sobreposição na aplicação U=RIsolve.",
-        "file": "PESTA_GUILHERME_ZENHA.pdf",
-        "date": "07-2023",
-        "institution": "ISEP"
-      }
-    ]
-  },
-  {
-    "name": "Pedro Morim",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_male.png",
-    "contributions": [
-      {
-        "title": "Circuit Editor - Design, implementation, and integration into the U=RIsolve web application",
-        "description": "Design e implementação do primeiro editor de circuitos na aplicação U=RIsolve.",
-        "file": "PROJECT_PEDRO_MORIM.pdf",
-        "date": "04-2023",
-        "institution": "ISEP"
-      }
-    ]
-  },
-  {
-    "name": "Helder Carvalho",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_male.png",
-    "contributions": [
-      {
-        "title": "U=RIsolve APP Implementação do Método das Correntes nos Ramos",
-        "description": "Implementação do Método das Correntes nos Ramos na aplicação U=RIsolve.",
-        "file": "PESTA_HELDER_CARVALHO.pdf",
-        "date": "01-2023",
-        "institution": "ISEP"
-      }
-    ]
-  },
-  {
-    "name": "Hugo Barbosa",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_male.png",
-    "contributions": [
-      {
-        "title": "Interpretação e modelação de esquemas elétricos com recurso a algoritmos de visão computacional",
-        "description": "Desenvolvimento de técnicas para a interpretação e modelação de esquemas elétricos utilizando algoritmos de visão computacional.",
-        "file": "TESE_HUGO_BARBOSA.pdf",
-        "date": "11-2021",
-        "institution": "ISEP"
-      }
-    ]
-  },
-  {
-    "name": "Joshua Soares",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_male.png",
-    "contributions": [
-      {
-        "title": "Aplicação para Geração da Metodologia/Equações do Método das Correntes nos Ramos, a partir do Qucs",
-        "description": "Criação e adição do método das correntes de malha independentes, utilizando análise combinatória.",
-        "file": "PESTA_JOSHUA_SOARES.pdf",
-        "date": "10-2019",
-        "institution": "ISEP"
-      }
-    ]
-  },
-  {
-    "name": "Miguel Duarte",
-    "group": "Development and Programming",
-    "role": "Student Contributor",
-    "email": "",
-    "photo": "default_male.png",
-    "contributions": [
-      {
-        "title": "Aplicação para Geração da Metodologia/Equações do Método das Correntes nas Malhas, a partir do Qucs",
-        "description": "Criação e adição do método das correntes de malha independentes, utilizando análise combinatória.",
-        "file": "PESTA_MIGUEL_DUARTE.pdf",
-        "date": "09-2019",
-        "institution": "ISEP"
-      }
-    ]
-  }
+        {
+      "name": "Catarina Pires",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1230387@isep.ipp.pt",
+      "photo": "default_female.png",
+      "contributions": [
+        {
+           "title": "[in progress] U=RIsolve Quizify: Utilização de Ferramentas Generativas para Criação de Quizzes em Circuitos Elétricos",
+      "description": "Desenvolvimento de sistema gamificado com ferramentas generativas, focada nos conteúdos de Fundamentos de Engenharia Eletrotécnica e Teoria de Circuitos, para integração na plataforma U=RIsolve Academy.",
+      "file": "",
+          "date": "",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Simon Cruz",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1141265@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "Desenvolvimento da Interface Interativa da aplicação U=RIsolve Academy",
+          "description": "Desenvolvimento de uma nova interface de utilizador para a plataforma U=RIsolve Academy, com foco na melhoria da experiência do utilizador através de funcionalidades como gestão de perfil, modo de treino interativo, acompanhamento de progresso e elementos de gamificação como pontos, conquistas e rankings.",
+          "file": "PESTA_SIMON_CRUZ.pdf",
+          "date": "09-2025",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Óscar Pinheiro",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1171424@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "U=RIsolve ScopeAcademy: Simulador de Osciloscópio para Integração no Editor de Circuitos",
+          "description": "Desenvolvimento de um simulador de osciloscópio digital em ambiente web, concebido para integração com o editor de circuitos da U=RIsolve Academy, permitindo a visualização e análise de sinais elétricos a partir de funções matemáticas com uma interface intuitiva.",
+          "file": "PESTA_OSCAR_PINHEIRO.pdf",
+          "date": "09-2025",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Rodrigo Ferrero",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1211629@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "U=RIsolve: Geração Automática de Modelos de Circuitos Elétricos",
+          "description": "Desenvolvimento do módulo GAME para a plataforma U=RIsolve Academy, permitindo a geração automática de circuitos elétricos com base em parâmetros definidos pelo utilizador, como tipo de circuito, número de componentes e topologia.",
+          "file": "PESTA_RODRIGO_FERRERO.pdf",
+          "date": "02-2025",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Diogo Moreira",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "up201806636@edu.fe.up.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "Recognising and Modelling Electrical Circuit Diagrams",
+          "description": "Desenvolvimento de novas técnicas para o reconhecimento e modelação de diagramas de circuitos elétricos.",
+          "file": "PESTA_DIOGO_MOREIRA.pdf",
+          "date": "12-2024",
+          "institution": "FEUP"
+        }
+      ]
+    },
+    {
+      "name": "Emanuel Cunha",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1151134@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "Identificação de componentes de esquemas elétricos através de técnicas de classificação de imagem",
+          "description": "Desenvolvimento de técnicas para a identificação de componentes em esquemas elétricos utilizando algoritmos de classificação de imagem.",
+          "file": "TESE_EMANUEL_CUNHA.pdf",
+          "date": "06-2024",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Ana Castedo",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1171363@isep.ipp.pt",
+      "photo": "default_female.png",
+      "contributions": [
+        {
+          "title": "U=RIsolve Academy - Caminhos para uma aprendizagem autónoma",
+          "description": "Introdução do Academy no universo U=RIsolve.",
+          "file": "PESTA_ANA_CASTEDO.pdf",
+          "date": "07-2023",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Guilherme Zenha",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1222922@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "U=RIsolve - Implementação do Teorema da Sobreposição",
+          "description": "Implementação do Teorema da Sobreposição na aplicação U=RIsolve.",
+          "file": "PESTA_GUILHERME_ZENHA.pdf",
+          "date": "07-2023",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Pedro Morim",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1180798@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "Circuit Editor - Design, implementation, and integration into the U=RIsolve web application",
+          "description": "Design e implementação do primeiro editor de circuitos na aplicação U=RIsolve.",
+          "file": "PROJECT_PEDRO_MORIM.pdf",
+          "date": "04-2023",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Helder Carvalho",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1171114@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "U=RIsolve APP Implementação do Método das Correntes nos Ramos",
+          "description": "Implementação do Método das Correntes nos Ramos na aplicação U=RIsolve.",
+          "file": "PESTA_HELDER_CARVALHO.pdf",
+          "date": "01-2023",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Hugo Barbosa",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1110539@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "Interpretação e modelação de esquemas elétricos com recurso a algoritmos de visão computacional",
+          "description": "Desenvolvimento de técnicas para a interpretação e modelação de esquemas elétricos utilizando algoritmos de visão computacional.",
+          "file": "TESE_HUGO_BARBOSA.pdf",
+          "date": "11-2021",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Joshua Soares",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1141227@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "Aplicação para Geração da Metodologia/Equações do Método das Correntes nos Ramos, a partir do Qucs",
+          "description": "Criação e adição do método das correntes de malha independentes, utilizando análise combinatória.",
+          "file": "PESTA_JOSHUA_SOARES.pdf",
+          "date": "10-2019",
+          "institution": "ISEP"
+        }
+      ]
+    },
+    {
+      "name": "Miguel Duarte",
+      "group": "Development and Programming",
+      "role": "Student Contributor",
+      "email": "1230149@isep.ipp.pt",
+      "photo": "default_male.png",
+      "contributions": [
+        {
+          "title": "Aplicação para Geração da Metodologia/Equações do Método das Correntes nas Malhas, a partir do Qucs",
+          "description": "Criação e adição do método das correntes de malha independentes, utilizando análise combinatória.",
+          "file": "PESTA_MIGUEL_DUARTE.pdf",
+          "date": "09-2019",
+          "institution": "ISEP"
+        }
+      ]
+    }
   ]
 }
