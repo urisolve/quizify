@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const clearResponseBtn = document.getElementById('clearResponseBtn');
 
   const responseBox = document.getElementById('responseBox');
+  const responseContent = document.getElementById('responseContent');
   const statusBox = document.getElementById('statusBox');
 
   function parseMessagesInput(rawValue) {
@@ -30,6 +31,45 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  function decodeHtmlEntities(str) {
+    return _.unescape(str);
+  }
+
+  function scrollResponseToBottom() {
+    responseBox.scrollTop = responseBox.scrollHeight;
+  }
+
+  function renderFinalResponse(rawText) {
+    let html = marked.parse(rawText);
+
+    responseContent.innerHTML = html;
+    responseContent.innerHTML = decodeHtmlEntities(responseContent.innerHTML);
+
+    responseContent.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block);
+    });
+
+    styleTables(responseContent);
+
+    if (window.MathJax && window.MathJax.typesetPromise) {
+      MathJax.typesetPromise([responseContent]).catch((error) => {
+        console.error('[chatbot.js] MathJax rendering failed:', error);
+      });
+    }
+  }
+
+  function styleTables(container) {
+    container.querySelectorAll('table').forEach((table) => {
+      table.classList.add('table', 'table-bordered', 'table-hover', 'table-sm', 'align-middle');
+      if (!table.parentElement.classList.contains('table-responsive')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'table-responsive my-3';
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      }
+    });
+  }
+
   async function sendPrompt() {
     const promptText = promptInput.value.trim();
     const systemText = systemInput.value.trim();
@@ -38,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let parsedMessages = [];
 
     if (!promptText) {
-      responseBox.textContent = 'Please write a prompt first.';
+      responseContent.textContent = 'Please write a prompt first.';
       statusBox.textContent = '';
       return;
     }
@@ -47,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
       parsedMessages = parseMessagesInput(messagesInput.value);
     } catch (error) {
       console.error('[chatbot.js] Invalid messages payload:', error);
-      responseBox.textContent = error.message;
+      responseContent.textContent = error.message;
       statusBox.textContent = 'Invalid advanced options.';
       return;
     }
@@ -63,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('[chatbot.js] Payload:', payload);
 
     sendPromptBtn.disabled = true;
-    responseBox.textContent = '';
+    responseContent.textContent = '';
     statusBox.textContent = 'Waiting for HALO response...';
 
     try {
@@ -85,6 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
+      let rawResponse = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -124,11 +165,15 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (typeof parsed.content === 'string') {
-              responseBox.textContent += parsed.content;
+              rawResponse += parsed.content;
+              responseContent.textContent = rawResponse;
+              scrollResponseToBottom();
             }
 
             if (parsed.done) {
+              renderFinalResponse(rawResponse);
               statusBox.textContent = 'Response received successfully.';
+              scrollResponseToBottom();
             }
           } catch (error) {
             console.error('[chatbot.js] Failed to parse stream chunk:', error);
@@ -137,11 +182,12 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (!statusBox.textContent) {
+        renderFinalResponse(rawResponse);
         statusBox.textContent = 'Response received successfully.';
       }
     } catch (error) {
       console.error('[chatbot.js] Error while requesting HALO:', error);
-      responseBox.textContent = error.message || 'An error occurred while requesting HALO.';
+      responseContent.textContent = error.message || 'An error occurred while requesting HALO.';
       statusBox.textContent = 'Request failed.';
     } finally {
       sendPromptBtn.disabled = false;
@@ -153,7 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     systemInput.value = '';
     messagesInput.value = '[]';
     modelSelect.selectedIndex = 0;
-    responseBox.textContent = 'Response will appear here...';
+    responseContent.textContent = 'Response will appear here...';
     statusBox.textContent = '';
     promptInput.focus();
   }

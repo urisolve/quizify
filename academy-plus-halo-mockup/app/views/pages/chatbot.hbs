@@ -9,8 +9,7 @@
           <h1 class="display-6 fw-semibold mb-3">Trigger HALO</h1>
           <p class="fs-4 text-dark mb-0 halo-lead" style="text-align: justify;">
             Interact with the HALO system through a clean prompt-based interface. Use the main prompt area for
-            regular interaction, and expand the advanced options only when you need to define system instructions,
-            prior messages or a specific model.
+            regular interaction, and expand the advanced options only when needed.
           </p>
         </div>
       </section>
@@ -126,15 +125,21 @@
               <div class="card border rounded-4 shadow-sm h-100">
                 <div class="card-body p-4 d-flex flex-column">
                   <div class="mb-3">
-                    <label class="form-label fw-semibold">Response</label>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <label class="form-label fw-semibold mb-0">Response</label>
+                      <small id="statusBox" class="text-muted"></small>
+                    </div>
+
                     <div
                       id="responseBox"
-                      class="form-control bg-light"
-                      style="min-height: 520px; white-space: pre-wrap; text-align: justify;"
-                    >Response will appear here...</div>
+                      class="form-control bg-light overflow-auto"
+                      style="min-height: 520px; max-height: 520px;"
+                    >
+                      <div id="responseContent" class="halo-chat-response">
+                        Response will appear here...
+                      </div>
+                    </div>
                   </div>
-
-                  <div id="statusBox" class="small text-muted mt-auto"></div>
                 </div>
               </div>
             </div>
@@ -146,5 +151,18 @@
 
   </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']]
+    }
+  };
+</script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-min.js"></script>
 
 <script src="/js/pages/chatbot.js"></script>
