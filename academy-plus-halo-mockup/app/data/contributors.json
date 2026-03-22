@@ -24,17 +24,17 @@
       "photo": "sss.png",
       "contributions": [
         {
-          "title": "U=RIsolve Nodal Voltage Method",
-          "description": "Início da plataforma U=RIsolve para simulação de circuitos elétricos utilizando exclusivamente o método MTN",
-          "file": "PESTA_LINO_SOUSA.pdf",
-          "date": "23-07-2018",
-          "institution": "ISEP"
-        },
-        {
           "title": "U=RIsolve: a web-based tool for teaching & self-learning the Nodal Voltage Method",
           "description": "Re-design e implementação da ferramenta U=RIsolve para o ensino e auto-aprendizagem do método de tensão nodal.",
           "file": "TESE_LINO_SOUSA.pdf",
           "date": "10-2020",
+          "institution": "ISEP"
+        },
+        {
+          "title": "U=RIsolve Nodal Voltage Method",
+          "description": "Início da plataforma U=RIsolve para simulação de circuitos elétricos utilizando exclusivamente o método MTN",
+          "file": "PESTA_LINO_SOUSA.pdf",
+          "date": "07-2018",
           "institution": "ISEP"
         }
       ]
@@ -46,6 +46,13 @@
       "email": "jfa@isep.ipp.pt",
       "photo": "jfa.png",
       "contributions": [
+        {
+          "title": "HALOgen: on the foundations for NLP interactions in electrical engineering education",
+          "description": "Evolução da plataforma U=RIsolve Academy com foco na escalabilidade e integração de módulos inteligentes, incluindo o desenvolvimento do assistente HALO baseado em processamento de linguagem natural para apoio ao ensino de circuitos elétricos",
+          "file": "TESE_JOAO_FERREIRA.pdf",
+          "date": "07-2025",
+          "institution": "ISEP"
+        },
         {
           "title": "Projeto e desenvolvimento de aplicação web para simulação e interface de Osciloscópio",
           "description": "Desenvolvimento de uma aplicação web para simulação e interface de um osciloscópio.",
@@ -66,7 +73,7 @@
             "title": "Projeto, implementação e integração do Método das Correntes de Malha na aplicação U=RIsolve",
             "description": "Desenvolvimento e integração do Método das Correntes de Malha na aplicação U=RIsolve.",
             "file": "PESTA_ANGELO_PINHEIRO.pdf",
-            "date": "08-07-2022",
+            "date": "07-2022",
             "institution": "ISEP"
         }
         ]
@@ -106,7 +113,7 @@
         "title": "Recognising and Modelling Electrical Circuit Diagrams",
         "description": "Desenvolvimento de novas técnicas para o reconhecimento e modelação de diagramas de circuitos elétricos.",
         "file": "PESTA_DIOGO_MOREIRA.pdf",
-        "date": "31-12-2024",
+        "date": "12-2024",
         "institution": "FEUP"
       }
     ]
@@ -122,7 +129,7 @@
         "title": "Identificação de componentes de esquemas elétricos através de técnicas de classificação de imagem",
         "description": "Desenvolvimento de técnicas para a identificação de componentes em esquemas elétricos utilizando algoritmos de classificação de imagem.",
         "file": "TESE_EMANUEL_CUNHA.pdf",
-        "date": "30-06-2024",
+        "date": "06-2024",
         "institution": "ISEP"
       }
     ]
@@ -218,7 +225,7 @@
         "title": "Aplicação para Geração da Metodologia/Equações do Método das Correntes nos Ramos, a partir do Qucs",
         "description": "Criação e adição do método das correntes de malha independentes, utilizando análise combinatória.",
         "file": "PESTA_JOSHUA_SOARES.pdf",
-        "date": "24-10-2019",
+        "date": "10-2019",
         "institution": "ISEP"
       }
     ]
@@ -234,7 +241,7 @@
         "title": "Aplicação para Geração da Metodologia/Equações do Método das Correntes nas Malhas, a partir do Qucs",
         "description": "Criação e adição do método das correntes de malha independentes, utilizando análise combinatória.",
         "file": "PESTA_MIGUEL_DUARTE.pdf",
-        "date": "05-09-2019",
+        "date": "09-2019",
         "institution": "ISEP"
       }
     ]
