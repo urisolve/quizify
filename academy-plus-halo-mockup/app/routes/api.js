@@ -39,5 +39,6 @@ const chatbotControllerAPI = require('../controllers/api/chatbotControllerAPI');
 
 router.post('/chatbot/stream', chatbotControllerAPI.handleStream);
 router.post('/chatbot/stop', chatbotControllerAPI.stopStream);
+router.get('/chatbot/models', chatbotControllerAPI.handleModels);
 
 module.exports = router;

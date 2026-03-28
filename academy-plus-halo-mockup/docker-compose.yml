@@ -4,6 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: halo-ai-engineering-app
+    restart: unless-stopped
     ports:
       - "${APP_HOST_PORT}:${APP_PORT}"
     volumes:

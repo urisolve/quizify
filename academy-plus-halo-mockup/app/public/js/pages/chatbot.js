@@ -8,10 +8,64 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const sendPromptBtn = document.getElementById('sendPromptBtn');
   const clearResponseBtn = document.getElementById('clearResponseBtn');
+  const toggleRenderBtn = document.getElementById('toggleRenderBtn');
 
   const responseBox = document.getElementById('responseBox');
   const responseContent = document.getElementById('responseContent');
   const statusBox = document.getElementById('statusBox');
+
+  let latestRawResponse = '';
+  let isRenderedView = true;
+
+  function resetModelSelect(placeholderText = 'Default model') {
+    modelSelect.innerHTML = '';
+
+    const defaultOption = document.createElement('option');
+    defaultOption.value = '';
+    defaultOption.textContent = placeholderText;
+    modelSelect.appendChild(defaultOption);
+  }
+
+  function populateModelSelect(models) {
+    resetModelSelect('Default model');
+
+    models.forEach((model) => {
+      const option = document.createElement('option');
+      option.value = model.id;
+      option.textContent = model.label || model.id;
+      modelSelect.appendChild(option);
+    });
+  }
+
+  async function loadAvailableModels() {
+    try {
+      resetModelSelect('Loading models...');
+      modelSelect.disabled = true;
+
+      const response = await fetch('/api/chatbot/models', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || 'Failed to load models.');
+      }
+
+      const data = await response.json();
+      const models = Array.isArray(data.models) ? data.models : [];
+
+      populateModelSelect(models);
+    } catch (error) {
+      console.error('[chatbot.js] Failed to load models:', error);
+      resetModelSelect('Default model');
+      statusBox.textContent = 'Could not load models.';
+    } finally {
+      modelSelect.disabled = false;
+    }
+  }
 
   function parseMessagesInput(rawValue) {
     const trimmedValue = rawValue.trim();
@@ -31,19 +85,53 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  function decodeHtmlEntities(str) {
-    return _.unescape(str);
-  }
-
   function scrollResponseToBottom() {
     responseBox.scrollTop = responseBox.scrollHeight;
   }
 
-  function renderFinalResponse(rawText) {
-    let html = marked.parse(rawText);
+  function waitForMathJax(timeoutMs = 5000) {
+    return new Promise((resolve, reject) => {
+      const start = Date.now();
 
+      function check() {
+        if (window.MathJax && window.MathJax.typesetPromise) {
+          console.log('[MathJax] Detected and ready');
+          resolve(window.MathJax);
+          return;
+        }
+
+        if (Date.now() - start >= timeoutMs) {
+          console.error('[MathJax] Timeout waiting for MathJax');
+          reject(new Error('MathJax did not load in time.'));
+          return;
+        }
+
+        setTimeout(check, 50);
+      }
+
+      console.log('[MathJax] Waiting for MathJax...');
+      check();
+    });
+  }
+
+  async function renderFinalResponse(rawText) {
+    const html = marked.parse(rawText);
+    responseContent.classList.remove('font-monospace');
     responseContent.innerHTML = html;
-    responseContent.innerHTML = decodeHtmlEntities(responseContent.innerHTML);
+
+    console.log('[MathJax] renderFinalResponse called');
+
+    if (!window.MathJax) {
+      console.warn('[MathJax] window.MathJax is NOT defined yet');
+    } else {
+      console.log('[MathJax] window.MathJax exists');
+
+      if (!window.MathJax.typesetPromise) {
+        console.warn('[MathJax] typesetPromise NOT available yet');
+      } else {
+        console.log('[MathJax] typesetPromise is available');
+      }
+    }
 
     responseContent.querySelectorAll('pre code').forEach((block) => {
       hljs.highlightElement(block);
@@ -51,11 +139,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     styleTables(responseContent);
 
-    if (window.MathJax && window.MathJax.typesetPromise) {
-      MathJax.typesetPromise([responseContent]).catch((error) => {
-        console.error('[chatbot.js] MathJax rendering failed:', error);
-      });
+    try {
+      const mathJax = await waitForMathJax();
+      console.log('[MathJax] Ready → running typeset');
+
+      await mathJax.typesetPromise([responseContent]);
+
+      console.log('[MathJax] Typeset complete');
+    } catch (error) {
+      console.error('[MathJax] Rendering failed:', error);
     }
+  }
+
+  function renderRawMarkdown(rawText) {
+    responseContent.classList.add('font-monospace');
+    responseContent.textContent = rawText || '';
+  }
+
+  async function updateResponseView() {
+    if (isRenderedView) {
+      await renderFinalResponse(latestRawResponse);
+      if (toggleRenderBtn) {
+        toggleRenderBtn.textContent = 'Show markdown';
+      }
+    } else {
+      renderRawMarkdown(latestRawResponse);
+      if (toggleRenderBtn) {
+        toggleRenderBtn.textContent = 'Show rendered';
+      }
+    }
+
+    scrollResponseToBottom();
   }
 
   function styleTables(container) {
@@ -103,6 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('[chatbot.js] Payload:', payload);
 
     sendPromptBtn.disabled = true;
+    latestRawResponse = '';
     responseContent.textContent = '';
     statusBox.textContent = 'Waiting for HALO response...';
 
@@ -125,7 +240,6 @@ document.addEventListener('DOMContentLoaded', () => {
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let buffer = '';
-      let rawResponse = '';
 
       while (true) {
         const { done, value } = await reader.read();
@@ -165,15 +279,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (typeof parsed.content === 'string') {
-              rawResponse += parsed.content;
-              responseContent.textContent = rawResponse;
+              latestRawResponse += parsed.content;
+
+              if (isRenderedView) {
+                responseContent.classList.remove('font-monospace');
+                responseContent.textContent = latestRawResponse;
+              } else {
+                renderRawMarkdown(latestRawResponse);
+              }
+
               scrollResponseToBottom();
             }
 
             if (parsed.done) {
-              renderFinalResponse(rawResponse);
+              await updateResponseView();
               statusBox.textContent = 'Response received successfully.';
-              scrollResponseToBottom();
             }
           } catch (error) {
             console.error('[chatbot.js] Failed to parse stream chunk:', error);
@@ -182,7 +302,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (!statusBox.textContent) {
-        renderFinalResponse(rawResponse);
+        await updateResponseView();
         statusBox.textContent = 'Response received successfully.';
       }
     } catch (error) {
@@ -199,13 +319,28 @@ document.addEventListener('DOMContentLoaded', () => {
     systemInput.value = '';
     messagesInput.value = '[]';
     modelSelect.selectedIndex = 0;
+    latestRawResponse = '';
+    isRenderedView = true;
+    responseContent.classList.remove('font-monospace');
     responseContent.textContent = 'Response will appear here...';
+    if (toggleRenderBtn) {
+      toggleRenderBtn.textContent = 'Show markdown';
+    }
     statusBox.textContent = '';
     promptInput.focus();
   }
 
+  loadAvailableModels();
+
   sendPromptBtn.addEventListener('click', sendPrompt);
   clearResponseBtn.addEventListener('click', clearInterface);
+
+  if (toggleRenderBtn) {
+    toggleRenderBtn.addEventListener('click', async () => {
+      isRenderedView = !isRenderedView;
+      await updateResponseView();
+    });
+  }
 
   promptInput.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {

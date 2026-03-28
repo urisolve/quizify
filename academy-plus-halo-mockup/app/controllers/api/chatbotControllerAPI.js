@@ -10,6 +10,43 @@ const HALO_PORT = process.env.HALO_PORT || 2020;
 const HALO_STREAM_URL = `${HALO_URL}:${HALO_PORT}/chat/stream`;
 const HALO_STOP_URL = `${HALO_URL}:${HALO_PORT}/chat/stop`;
 
+const HALO_MODELS_URL = `${HALO_URL}:${HALO_PORT}/chat/models`;
+
+exports.handleModels = async (req, res) => {
+  console.log('[chatbotControllerAPI] Incoming models request');
+  console.log('[chatbotControllerAPI] HALO models URL:', HALO_MODELS_URL);
+
+  try {
+    const response = await fetch(HALO_MODELS_URL, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    console.log('[chatbotControllerAPI] HALO models response status:', response.status, response.statusText);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[chatbotControllerAPI] HALO models error body:', errorText);
+      return res.status(response.status).json({
+        error: errorText || 'Failed to get models from HALO.'
+      });
+    }
+
+    const data = await response.json();
+
+    return res.status(200).json({
+      models: Array.isArray(data.models) ? data.models : []
+    });
+  } catch (error) {
+    console.error('[chatbotControllerAPI] Models request failed:', error);
+    return res.status(500).json({
+      error: 'Failed to get models from HALO.'
+    });
+  }
+};
+
 exports.handleStream = async (req, res) => {
   const { prompt, system = '', messages = [], model = null } = req.body;
 
