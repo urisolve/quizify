@@ -41,4 +41,10 @@ router.post('/chatbot/stream', chatbotControllerAPI.handleStream);
 router.post('/chatbot/stop', chatbotControllerAPI.stopStream);
 router.get('/chatbot/models', chatbotControllerAPI.handleModels);
 
+// Get System Info
+const systemControllerAPI = require('../controllers/api/systemControllerAPI');
+
+router.get('/system/hardware', systemControllerAPI.handleHardwareInfo);
+router.get('/system/load', systemControllerAPI.handleSystemLoad);
+
 module.exports = router;

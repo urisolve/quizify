@@ -37,42 +37,27 @@
                 <div class="card-body p-4">
                   <div class="mb-4">
                     <label for="promptInput" class="form-label fw-semibold">Prompt</label>
-                    <textarea
-                      id="promptInput"
-                      class="form-control"
-                      rows="12"
-                      placeholder="Write a prompt for HALO..."
-                    >Explain what nodal analysis is in simple terms.</textarea>
+                    <textarea id="promptInput" class="form-control" rows="12"
+                      placeholder="Write a prompt for HALO...">Explain what nodal analysis is in simple terms.</textarea>
                   </div>
 
                   <div class="d-flex flex-wrap gap-3 mb-3">
-                    <button
-                      id="sendPromptBtn"
-                      class="btn btn-primary px-4 py-2 d-inline-flex align-items-center gap-2"
-                      type="button"
-                    >
+                    <button id="sendPromptBtn" class="btn btn-primary px-4 py-2 d-inline-flex align-items-center gap-2"
+                      type="button">
                       <i class="ti ti-send"></i>
                       <span>Send</span>
                     </button>
 
-                    <button
-                      id="clearResponseBtn"
-                      class="btn btn-outline-secondary px-4 py-2 d-inline-flex align-items-center gap-2"
-                      type="button"
-                    >
+                    <button id="clearResponseBtn"
+                      class="btn btn-outline-secondary px-4 py-2 d-inline-flex align-items-center gap-2" type="button">
                       <i class="ti ti-eraser"></i>
                       <span>Clear</span>
                     </button>
                   </div>
 
-                  <button
-                    class="btn btn-link px-0 text-decoration-none d-inline-flex align-items-center gap-2"
-                    type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#advancedOptions"
-                    aria-expanded="false"
-                    aria-controls="advancedOptions"
-                  >
+                  <button class="btn btn-link px-0 text-decoration-none d-inline-flex align-items-center gap-2"
+                    type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false"
+                    aria-controls="advancedOptions">
                     <i class="ti ti-adjustments-horizontal"></i>
                     <span>Advanced options</span>
                   </button>
@@ -89,22 +74,14 @@
 
                         <div class="mb-3">
                           <label for="systemInput" class="form-label fw-semibold">System</label>
-                          <textarea
-                            id="systemInput"
-                            class="form-control"
-                            rows="4"
-                            placeholder="Optional system instruction..."
-                          >You are a helpful Engineering Education assistant.</textarea>
+                          <textarea id="systemInput" class="form-control" rows="4"
+                            placeholder="Optional system instruction...">You are a helpful Engineering Education assistant.</textarea>
                         </div>
 
                         <div class="mb-0">
                           <label for="messagesInput" class="form-label fw-semibold">Messages (JSON array)</label>
-                          <textarea
-                            id="messagesInput"
-                            class="form-control font-monospace"
-                            rows="6"
-                            placeholder="[]"
-                          >[]</textarea>
+                          <textarea id="messagesInput" class="form-control font-monospace" rows="6"
+                            placeholder="[]">[]</textarea>
                         </div>
                       </div>
                     </div>
@@ -118,26 +95,19 @@
               <div class="card border rounded-4 shadow-sm h-100">
                 <div class="card-body p-4 d-flex flex-column">
                   <div class="mb-3">
-<div class="d-flex justify-content-between align-items-center mb-2">
-  <label class="form-label fw-semibold mb-0">Response</label>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                      <label class="form-label fw-semibold mb-0">Response</label>
 
-  <div class="d-flex align-items-center gap-2">
-    <button
-      id="toggleRenderBtn"
-      class="btn btn-sm btn-outline-secondary"
-      type="button"
-    >
-      Show markdown
-    </button>
-    <small id="statusBox" class="text-muted"></small>
-  </div>
-</div>
+                      <div class="d-flex align-items-center gap-2">
+                        <button id="toggleRenderBtn" class="btn btn-sm btn-outline-secondary" type="button">
+                          Show markdown
+                        </button>
+                        <small id="statusBox" class="text-muted"></small>
+                      </div>
+                    </div>
 
-                    <div
-                      id="responseBox"
-                      class="form-control bg-light overflow-auto"
-                      style="min-height: 520px; max-height: 520px;"
-                    >
+                    <div id="responseBox" class="form-control bg-light overflow-auto"
+                      style="min-height: 520px; max-height: 520px;">
                       <div id="responseContent" class="halo-chat-response">
                         Response will appear here...
                       </div>
@@ -148,6 +118,128 @@
             </div>
           </div>
 
+        </div>
+      </section>
+    </div>
+
+    <!-- SYSTEM TELEMETRY -->
+    <div class="col-12">
+      <section class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5" role="button" data-bs-toggle="collapse"
+          data-bs-target="#systemTelemetryCollapse" aria-expanded="true" aria-controls="systemTelemetryCollapse">
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+              <span class="halo-section-icon bg-light-primary text-primary">
+                <i class="ti ti-activity-heartbeat"></i>
+              </span>
+              <div>
+                <h2 class="card-title fw-semibold mb-1">System Telemetry</h2>
+                <p class="mb-0 text-muted">
+                  Live hardware load and latest runtime information
+                </p>
+              </div>
+            </div>
+
+            <span class="text-muted d-inline-flex align-items-center gap-2">
+              <i id="telemetryChevron" class="ti ti-chevron-down"></i>
+              <span id="telemetryToggleLabel">Collapse</span>
+            </span>
+          </div>
+        </div>
+
+        <div id="systemTelemetryCollapse" class="collapse show">
+          <div class="px-4 px-lg-5 pb-4 pb-lg-5">
+            <div class="row g-4">
+
+              <div class="col-12 col-xl-6">
+                <section class="card border rounded-4 shadow-sm h-100">
+                  <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                      <span class="halo-section-icon bg-light-primary text-primary">
+                        <i class="ti ti-cpu"></i>
+                      </span>
+                      <div>
+                        <h3 class="h4 fw-semibold mb-1">System Load</h3>
+                        <p class="mb-0 text-muted">
+                          Real-time hardware load information
+                        </p>
+                      </div>
+                    </div>
+
+                    <div id="systemLoadChart" style="min-height: 280px;"></div>
+
+                    <hr>
+
+                    <div class="small text-center">
+                      <p class="mb-3">
+                        <strong>CPU:</strong> <span id="cpuModel">—</span><br>
+                        <span id="cpuCores">—</span>
+                      </p>
+
+                      <p class="mb-3">
+                        <strong>GPU:</strong> <span id="gpuModel">—</span><br>
+                        <span id="gpuVram">—</span>
+                      </p>
+
+                      <p class="mb-0">
+                        <strong>RAM:</strong> <span id="memory">—</span>
+                      </p>
+                    </div>
+                  </div>
+                </section>
+              </div>
+
+              <div class="col-12 col-xl-6">
+                <section class="card border rounded-4 shadow-sm h-100">
+                  <div class="card-body p-4">
+                    <div class="d-flex align-items-center gap-3 mb-4">
+                      <span class="halo-section-icon bg-light-primary text-primary">
+                        <i class="ti ti-robot"></i>
+                      </span>
+                      <div>
+                        <h3 class="h4 fw-semibold mb-1">Runtime Info</h3>
+                        <p class="mb-0 text-muted">
+                          Information about the latest response
+                        </p>
+                      </div>
+                    </div>
+
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Model</strong>
+                        <span id="runtimeModel">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Created At</strong>
+                        <span id="runtimeCreatedAt">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Total Duration</strong>
+                        <span id="runtimeTotalDuration">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Load Duration</strong>
+                        <span id="runtimeLoadDuration">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Prompt Eval Duration</strong>
+                        <span id="runtimePromptEvalDuration">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Eval Count</strong>
+                        <span id="runtimeEvalCount">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Eval Duration</strong>
+                        <span id="runtimeEvalDuration">—</span>
+                      </li>
+                    </ul>
+                  </div>
+                </section>
+              </div>
+
+            </div>
+          </div>
         </div>
       </section>
     </div>
@@ -168,4 +260,5 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-min.js"></script>
 
+<script src="/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
 <script src="/js/pages/chatbot.js"></script>

@@ -1,5 +1,3 @@
-// app/public/js/pages/chatbot.js
-
 document.addEventListener('DOMContentLoaded', () => {
   const promptInput = document.getElementById('promptInput');
   const systemInput = document.getElementById('systemInput');
@@ -14,8 +12,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const responseContent = document.getElementById('responseContent');
   const statusBox = document.getElementById('statusBox');
 
+  const cpuModel = document.getElementById('cpuModel');
+  const cpuCores = document.getElementById('cpuCores');
+  const gpuModel = document.getElementById('gpuModel');
+  const gpuVram = document.getElementById('gpuVram');
+  const memory = document.getElementById('memory');
+
+  const runtimeModel = document.getElementById('runtimeModel');
+  const runtimeCreatedAt = document.getElementById('runtimeCreatedAt');
+  const runtimeTotalDuration = document.getElementById('runtimeTotalDuration');
+  const runtimeLoadDuration = document.getElementById('runtimeLoadDuration');
+  const runtimePromptEvalDuration = document.getElementById('runtimePromptEvalDuration');
+  const runtimeEvalCount = document.getElementById('runtimeEvalCount');
+  const runtimeEvalDuration = document.getElementById('runtimeEvalDuration');
+
   let latestRawResponse = '';
   let isRenderedView = true;
+  let systemLoadChart = null;
 
   function resetModelSelect(placeholderText = 'Default model') {
     modelSelect.innerHTML = '';
@@ -119,18 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
     responseContent.classList.remove('font-monospace');
     responseContent.innerHTML = html;
 
-    console.log('[MathJax] renderFinalResponse called');
-
     if (!window.MathJax) {
       console.warn('[MathJax] window.MathJax is NOT defined yet');
-    } else {
-      console.log('[MathJax] window.MathJax exists');
-
-      if (!window.MathJax.typesetPromise) {
-        console.warn('[MathJax] typesetPromise NOT available yet');
-      } else {
-        console.log('[MathJax] typesetPromise is available');
-      }
+    } else if (!window.MathJax.typesetPromise) {
+      console.warn('[MathJax] typesetPromise NOT available yet');
     }
 
     responseContent.querySelectorAll('pre code').forEach((block) => {
@@ -141,11 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     try {
       const mathJax = await waitForMathJax();
-      console.log('[MathJax] Ready → running typeset');
-
       await mathJax.typesetPromise([responseContent]);
-
-      console.log('[MathJax] Typeset complete');
     } catch (error) {
       console.error('[MathJax] Rendering failed:', error);
     }
@@ -182,6 +183,211 @@ document.addEventListener('DOMContentLoaded', () => {
         wrapper.appendChild(table);
       }
     });
+  }
+
+  function formatBytesToGB(bytes) {
+    const numericBytes = Number(bytes);
+
+    if (!Number.isFinite(numericBytes) || numericBytes <= 0) {
+      return '—';
+    }
+
+    return `${(numericBytes / 1073741824).toFixed(2)} GB`;
+  }
+
+  function formatDuration(value) {
+    const numericValue = Number(value);
+
+    if (!Number.isFinite(numericValue) || numericValue < 0) {
+      return '—';
+    }
+
+    if (numericValue >= 1000000000) {
+      return `${(numericValue / 1000000000).toFixed(2)} s`;
+    }
+
+    if (numericValue >= 1000000) {
+      return `${(numericValue / 1000000).toFixed(2)} ms`;
+    }
+
+    if (numericValue >= 1000) {
+      return `${(numericValue / 1000).toFixed(2)} µs`;
+    }
+
+    return `${numericValue} ns`;
+  }
+
+  function formatDateTime(value) {
+    if (!value) {
+      return '—';
+    }
+
+    const parsedDate = new Date(value);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+      return value;
+    }
+
+    return parsedDate.toLocaleString();
+  }
+
+  async function loadHardwareInfo() {
+    try {
+      const response = await fetch('/api/system/hardware', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load hardware information.');
+      }
+
+      const data = await response.json();
+      const gpuList = Array.isArray(data.gpu) ? data.gpu : [];
+
+      if (cpuModel) {
+        cpuModel.textContent = `${data.cpu?.manufacturer || ''} ${data.cpu?.brand || ''}`.trim() || '—';
+      }
+
+      if (cpuCores) {
+        const parts = [];
+
+        if (data.cpu?.cores) {
+          parts.push(`${data.cpu.cores} cores`);
+        }
+
+        if (data.cpu?.speed) {
+          parts.push(`${data.cpu.speed} GHz`);
+        }
+
+        cpuCores.textContent = parts.join(', ') || '—';
+      }
+
+      if (gpuModel) {
+        gpuModel.textContent = gpuList.map((item) => item.model).filter(Boolean).join('; ') || '—';
+      }
+
+      if (gpuVram) {
+        gpuVram.textContent = gpuList.map((item) => `${item.vram} GB`).filter(Boolean).join('; ') || '—';
+      }
+
+      if (memory) {
+        memory.textContent = formatBytesToGB(data.memory?.total);
+      }
+    } catch (error) {
+      console.error('[chatbot.js] Failed to load hardware information:', error);
+    }
+  }
+
+  function renderSystemLoadChart(cpuLoadValue, gpuLoadValue, memoryUsageValue) {
+    const chartElement = document.querySelector('#systemLoadChart');
+
+    if (!chartElement || typeof ApexCharts === 'undefined') {
+      return;
+    }
+
+    const series = [{
+      name: 'Load',
+      data: [
+        Math.round(cpuLoadValue || 0),
+        Math.round(gpuLoadValue || 0),
+        Math.round(memoryUsageValue || 0)
+      ]
+    }];
+
+    if (systemLoadChart) {
+      systemLoadChart.updateSeries(series);
+      return;
+    }
+
+    systemLoadChart = new ApexCharts(chartElement, {
+      chart: {
+        type: 'radar',
+        height: 280,
+        toolbar: {
+          show: false
+        }
+      },
+      series,
+      xaxis: {
+        categories: ['CPU', 'GPU', 'RAM']
+      },
+      yaxis: {
+        show:false
+      },
+      stroke: {
+        width: 2
+      },
+      markers: {
+        size: 4
+      },
+      dataLabels: {
+        enabled: true
+      }
+    });
+
+    systemLoadChart.render();
+  }
+
+  async function loadSystemLoad() {
+    try {
+      const response = await fetch('/api/system/load', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to load system load.');
+      }
+
+      const data = await response.json();
+
+      renderSystemLoadChart(
+        data.cpuLoad || 0,
+        data.gpuLoad || 0,
+        data.memoryUsage || 0
+      );
+    } catch (error) {
+      console.error('[chatbot.js] Failed to load system load:', error);
+    }
+  }
+
+  function updateRuntimeInfo(stats) {
+    if (!stats || typeof stats !== 'object') {
+      return;
+    }
+
+    if (runtimeModel) {
+      runtimeModel.textContent = stats.model || '—';
+    }
+
+    if (runtimeCreatedAt) {
+      runtimeCreatedAt.textContent = formatDateTime(stats.created_at);
+    }
+
+    if (runtimeTotalDuration) {
+      runtimeTotalDuration.textContent = formatDuration(stats.total_duration);
+    }
+
+    if (runtimeLoadDuration) {
+      runtimeLoadDuration.textContent = formatDuration(stats.load_duration);
+    }
+
+    if (runtimePromptEvalDuration) {
+      runtimePromptEvalDuration.textContent = formatDuration(stats.prompt_eval_duration);
+    }
+
+    if (runtimeEvalCount) {
+      runtimeEvalCount.textContent = stats.eval_count ?? '—';
+    }
+
+    if (runtimeEvalDuration) {
+      runtimeEvalDuration.textContent = formatDuration(stats.eval_duration);
+    }
   }
 
   async function sendPrompt() {
@@ -293,6 +499,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (parsed.done) {
               await updateResponseView();
+              updateRuntimeInfo(parsed.stats);
               statusBox.textContent = 'Response received successfully.';
             }
           } catch (error) {
@@ -323,14 +530,48 @@ document.addEventListener('DOMContentLoaded', () => {
     isRenderedView = true;
     responseContent.classList.remove('font-monospace');
     responseContent.textContent = 'Response will appear here...';
+
     if (toggleRenderBtn) {
       toggleRenderBtn.textContent = 'Show markdown';
     }
+
+    if (runtimeModel) {
+      runtimeModel.textContent = '—';
+    }
+
+    if (runtimeCreatedAt) {
+      runtimeCreatedAt.textContent = '—';
+    }
+
+    if (runtimeTotalDuration) {
+      runtimeTotalDuration.textContent = '—';
+    }
+
+    if (runtimeLoadDuration) {
+      runtimeLoadDuration.textContent = '—';
+    }
+
+    if (runtimePromptEvalDuration) {
+      runtimePromptEvalDuration.textContent = '—';
+    }
+
+    if (runtimeEvalCount) {
+      runtimeEvalCount.textContent = '—';
+    }
+
+    if (runtimeEvalDuration) {
+      runtimeEvalDuration.textContent = '—';
+    }
+
     statusBox.textContent = '';
     promptInput.focus();
   }
 
   loadAvailableModels();
+  loadHardwareInfo();
+  loadSystemLoad();
+
+  setInterval(loadSystemLoad, 5000);
 
   sendPromptBtn.addEventListener('click', sendPrompt);
   clearResponseBtn.addEventListener('click', clearInterface);
@@ -347,4 +588,29 @@ document.addEventListener('DOMContentLoaded', () => {
       sendPrompt();
     }
   });
+
+  // System Telemetry
+  const systemTelemetryCollapse = document.getElementById('systemTelemetryCollapse');
+  const telemetryChevron = document.getElementById('telemetryChevron');
+  const telemetryToggleLabel = document.getElementById('telemetryToggleLabel');
+
+  if (systemTelemetryCollapse) {
+    systemTelemetryCollapse.addEventListener('show.bs.collapse', () => {
+      if (telemetryChevron) {
+        telemetryChevron.className = 'ti ti-chevron-down';
+      }
+      if (telemetryToggleLabel) {
+        telemetryToggleLabel.textContent = 'Collapse';
+      }
+    });
+
+    systemTelemetryCollapse.addEventListener('hide.bs.collapse', () => {
+      if (telemetryChevron) {
+        telemetryChevron.className = 'ti ti-chevron-right';
+      }
+      if (telemetryToggleLabel) {
+        telemetryToggleLabel.textContent = 'Expand';
+      }
+    });
+  }
 });

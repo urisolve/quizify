@@ -1,3 +1,4 @@
+// academy-plus-halo-mockup/app/controllers/api/hardware.js
 //? Handles communication with the hardware that is running the HALO - System
 
 //* Modules required
