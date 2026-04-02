@@ -1,13 +1,35 @@
-//? Handles API routes to chat with HALO - System
 const express = require('express');
+const multer = require('multer');
+const os = require('os');
+const path = require('path');
+
 const router = express.Router();
+const chatControllerAPI = require('../../controllers/api/chatbotControllerAPI');
 
-const chatControllerAPI = require('../../controllers/api/chatControllerAPI');
+const upload = multer({
+  dest: path.join(os.tmpdir(), 'quizify-rag-uploads'),
+  limits: {
+    fileSize: 5 * 1024 * 1024
+  }
+});
 
-router.post('/', chatControllerAPI.handleChatCompletion);  // Handles chat requests
-router.post('/stream', chatControllerAPI.handleStream);   // Handles streamed responses
-router.post('/stop', chatControllerAPI.stopStream);       // Stops ongoing response
-router.post('/reset', chatControllerAPI.resetConversation); // Resets chatbot memory
-router.post('/sentiment', chatControllerAPI.analyzeSentiment); // Analyzes sentiment
+// Direct chat
+router.get('/models', chatControllerAPI.handleModels);
+router.post('/stream', chatControllerAPI.handleStream);
+router.post('/stop', chatControllerAPI.stopStream);
+
+// RAG
+router.get('/rag/capabilities', chatControllerAPI.handleRagCapabilities);
+router.get('/rag/models', chatControllerAPI.handleRagModels);
+router.get('/rag/examples', chatControllerAPI.listRagExamples);
+
+// Legacy endpoints kept for compatibility
+router.get('/rag/sources', chatControllerAPI.handleRagSources);
+router.post('/rag/upload', upload.single('file'), chatControllerAPI.handleRagUpload);
+
+// Request-scoped RAG flow
+router.post('/rag/stream', chatControllerAPI.handleRagStream);
+router.post('/rag/stop', chatControllerAPI.stopRagStream);
+router.get('/rag/traces/:traceId', chatControllerAPI.handleRagTrace);
 
 module.exports = router;

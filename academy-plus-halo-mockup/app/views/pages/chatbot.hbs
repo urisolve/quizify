@@ -8,8 +8,8 @@
           <span class="badge rounded-pill bg-primary-subtle text-primary mb-3">HALO Assistant</span>
           <h1 class="display-6 fw-semibold mb-3">Trigger HALO</h1>
           <p class="fs-4 text-dark mb-0 halo-lead" style="text-align: justify;">
-            Interact with the HALO system through a clean prompt-based interface. Use the main prompt area for
-            regular interaction, and expand the advanced options only when needed.
+            Interact with the HALO system through a clean prompt-based interface. Use document grounding only when
+            you want HALO to use a Markdown document for the current request.
           </p>
         </div>
       </section>
@@ -32,56 +32,131 @@
           </div>
 
           <div class="row g-4">
+            <!-- INPUT COLUMN -->
             <div class="col-12 col-xl-5">
               <div class="card border rounded-4 shadow-sm h-100">
                 <div class="card-body p-4">
                   <div class="mb-4">
                     <label for="promptInput" class="form-label fw-semibold">Prompt</label>
-                    <textarea id="promptInput" class="form-control" rows="12"
-                      placeholder="Write a prompt for HALO...">Explain what nodal analysis is in simple terms.</textarea>
+                    <textarea
+                      id="promptInput"
+                      class="form-control"
+                      rows="12"
+                      placeholder="Write a prompt for HALO..."
+                    >Explain what nodal analysis is in simple terms.</textarea>
                   </div>
 
-                  <div class="d-flex flex-wrap gap-3 mb-3">
-                    <button id="sendPromptBtn" class="btn btn-primary px-4 py-2 d-inline-flex align-items-center gap-2"
+                  <div class="d-flex flex-wrap gap-3 mb-4">
+                    <button
+                      id="sendPromptBtn"
+                      class="btn btn-primary px-4 py-2 d-inline-flex align-items-center gap-2"
                       type="button">
                       <i class="ti ti-send"></i>
                       <span>Send</span>
                     </button>
 
-                    <button id="clearResponseBtn"
-                      class="btn btn-outline-secondary px-4 py-2 d-inline-flex align-items-center gap-2" type="button">
+                    <button
+                      id="clearResponseBtn"
+                      class="btn btn-outline-secondary px-4 py-2 d-inline-flex align-items-center gap-2"
+                      type="button">
                       <i class="ti ti-eraser"></i>
                       <span>Clear</span>
                     </button>
                   </div>
 
-                  <button class="btn btn-link px-0 text-decoration-none d-inline-flex align-items-center gap-2"
-                    type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions" aria-expanded="false"
-                    aria-controls="advancedOptions">
-                    <i class="ti ti-adjustments-horizontal"></i>
-                    <span>Advanced options</span>
-                  </button>
-
-                  <div class="collapse mt-3" id="advancedOptions">
-                    <div class="card border-0 bg-light-subtle rounded-4">
-                      <div class="card-body p-4">
-                        <div class="mb-3">
-                          <label for="modelSelect" class="form-label fw-semibold">Model</label>
-                          <select id="modelSelect" class="form-select">
-                            <option value="">Loading models...</option>
-                          </select>
+                  <!-- DOCUMENT GROUNDING SECTION -->
+                  <div class="card border-0 bg-light-subtle rounded-4 mb-3">
+                    <div class="card-body p-4">
+                      <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-3">
+                        <div>
+                          <h3 class="h6 fw-semibold mb-1">Document Grounding</h3>
+                          <p class="mb-0 text-muted small">
+                            Use a sample or custom Markdown document for this request.
+                          </p>
                         </div>
 
-                        <div class="mb-3">
-                          <label for="systemInput" class="form-label fw-semibold">System</label>
-                          <textarea id="systemInput" class="form-control" rows="4"
-                            placeholder="Optional system instruction...">You are a helpful Engineering Education assistant.</textarea>
-                        </div>
+                        <span id="ragStatusBadge" class="badge bg-light text-dark border">RAG disabled</span>
+                      </div>
 
-                        <div class="mb-0">
-                          <label for="messagesInput" class="form-label fw-semibold">Messages (JSON array)</label>
-                          <textarea id="messagesInput" class="form-control font-monospace" rows="6"
-                            placeholder="[]">[]</textarea>
+                      <div class="form-check form-switch mb-3">
+                        <input class="form-check-input" type="checkbox" id="ragEnabled">
+                        <label class="form-check-label fw-semibold" for="ragEnabled">
+                          Use document grounding
+                        </label>
+                      </div>
+
+                      <div id="ragQuickSummary" class="small text-muted mb-2">
+                        No document grounding is being used for this request.
+                      </div>
+
+                      <div id="ragLoadedDocumentInfo" class="small text-muted mb-0 d-none">
+                        <strong>Loaded document:</strong> <span id="ragLoadedDocumentLabel">—</span>
+                      </div>
+
+                      <button
+                        id="openRagOptionsBtn"
+                        class="btn btn-link px-0 mt-3 text-decoration-none d-none d-inline-flex align-items-center gap-2"
+                        type="button"
+                        data-bs-toggle="offcanvas"
+                        data-bs-target="#ragOffcanvas"
+                        aria-controls="ragOffcanvas">
+                        <i class="ti ti-adjustments-horizontal"></i>
+                        <span>RAG options</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- LLM SECTION -->
+                  <div class="card border-0 bg-light-subtle rounded-4">
+                    <div class="card-body p-4">
+                      <div class="mb-3">
+                        <h3 class="h6 fw-semibold mb-1">LLM</h3>
+                        <p id="llmQuickSummary" class="mb-0 text-muted small">
+                          Configure model and advanced chat behavior.
+                        </p>
+                      </div>
+
+                      <button
+                        class="btn btn-link px-0 text-decoration-none d-inline-flex align-items-center gap-2"
+                        type="button"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#advancedChatOptions"
+                        aria-expanded="false"
+                        aria-controls="advancedChatOptions">
+                        <i class="ti ti-adjustments-horizontal"></i>
+                        <span>Advanced options</span>
+                      </button>
+
+                      <div class="collapse mt-3" id="advancedChatOptions">
+                        <div class="card border rounded-4 shadow-sm">
+                          <div class="card-body p-4">
+                            <div class="mb-3">
+                              <label for="modelSelect" class="form-label fw-semibold">Model</label>
+                              <select id="modelSelect" class="form-select">
+                                <option value="">Loading models...</option>
+                              </select>
+                            </div>
+
+                            <div class="mb-3">
+                              <label for="systemInput" class="form-label fw-semibold">System</label>
+                              <textarea
+                                id="systemInput"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Optional system instruction..."
+                              >You are a helpful Engineering Education assistant.</textarea>
+                            </div>
+
+                            <div class="mb-0">
+                              <label for="messagesInput" class="form-label fw-semibold">Messages (JSON array)</label>
+                              <textarea
+                                id="messagesInput"
+                                class="form-control font-monospace"
+                                rows="6"
+                                placeholder="[]"
+                              >[]</textarea>
+                            </div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -91,26 +166,36 @@
               </div>
             </div>
 
+            <!-- RESPONSE COLUMN -->
             <div class="col-12 col-xl-7">
               <div class="card border rounded-4 shadow-sm h-100">
                 <div class="card-body p-4 d-flex flex-column">
                   <div class="mb-3">
-                    <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex justify-content-between align-items-center mb-2 flex-wrap gap-2">
                       <label class="form-label fw-semibold mb-0">Response</label>
 
-                      <div class="d-flex align-items-center gap-2">
+                      <div class="d-flex align-items-center gap-2 flex-wrap">
                         <button id="toggleRenderBtn" class="btn btn-sm btn-outline-secondary" type="button">
                           Show markdown
+                        </button>
+                        <button id="loadTraceBtn" class="btn btn-sm btn-outline-primary" type="button" disabled>
+                          Show trace
                         </button>
                         <small id="statusBox" class="text-muted"></small>
                       </div>
                     </div>
 
-                    <div id="responseBox" class="form-control bg-light overflow-auto"
+                    <div
+                      id="responseBox"
+                      class="form-control bg-light overflow-auto"
                       style="min-height: 520px; max-height: 520px;">
                       <div id="responseContent" class="halo-chat-response">
                         Response will appear here...
                       </div>
+                    </div>
+
+                    <div class="mt-3 small text-muted">
+                      <strong>Trace ID:</strong> <span id="traceIdBox">—</span>
                     </div>
                   </div>
                 </div>
@@ -122,11 +207,113 @@
       </section>
     </div>
 
+    <!-- TRACE PANEL -->
+    <div class="col-12">
+      <section class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-route-2"></i>
+            </span>
+            <div>
+              <h2 class="card-title fw-semibold mb-1">Answer Trace</h2>
+              <p class="mb-0 text-muted">
+                Grounding, retrieval, and runtime details for the latest RAG response.
+              </p>
+            </div>
+          </div>
+
+          <div id="traceEmptyState" class="text-muted">
+            No trace loaded yet.
+          </div>
+
+          <div id="tracePanel" class="d-none">
+            <div class="row g-4">
+              <div class="col-12 col-xl-6">
+                <section class="card border rounded-4 shadow-sm h-100">
+                  <div class="card-body p-4">
+                    <h3 class="h5 fw-semibold mb-3">Trace Summary</h3>
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Trace ID</strong>
+                        <span id="traceSummaryId">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Model</strong>
+                        <span id="traceSummaryModel">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Search Mode</strong>
+                        <span id="traceSummarySearchMode">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Grounding Mode</strong>
+                        <span id="traceSummaryGroundingMode">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Top K</strong>
+                        <span id="traceSummaryTopK">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Context Budget</strong>
+                        <span id="traceSummaryContextBudget">—</span>
+                      </li>
+                    </ul>
+                  </div>
+                </section>
+              </div>
+
+              <div class="col-12 col-xl-6">
+                <section class="card border rounded-4 shadow-sm h-100">
+                  <div class="card-body p-4">
+                    <h3 class="h5 fw-semibold mb-3">Retrieval</h3>
+                    <ul class="list-group list-group-flush">
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Semantic Candidates</strong>
+                        <span id="traceRetrievalSemantic">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Lexical Candidates</strong>
+                        <span id="traceRetrievalLexical">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Fused Candidates</strong>
+                        <span id="traceRetrievalFused">—</span>
+                      </li>
+                      <li class="list-group-item px-0 d-flex justify-content-between">
+                        <strong>Used Chunks</strong>
+                        <span id="traceRetrievalUsedChunks">—</span>
+                      </li>
+                    </ul>
+                  </div>
+                </section>
+              </div>
+
+              <div class="col-12">
+                <section class="card border rounded-4 shadow-sm">
+                  <div class="card-body p-4">
+                    <h3 class="h5 fw-semibold mb-3">Sources and Warnings</h3>
+                    <div id="traceSourcesBox" class="mb-4 text-muted">—</div>
+                    <div id="traceWarningsBox" class="text-muted">—</div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
     <!-- SYSTEM TELEMETRY -->
     <div class="col-12">
       <section class="card border-0 shadow-sm">
-        <div class="card-body p-4 p-lg-5" role="button" data-bs-toggle="collapse"
-          data-bs-target="#systemTelemetryCollapse" aria-expanded="true" aria-controls="systemTelemetryCollapse">
+        <div
+          class="card-body p-4 p-lg-5"
+          role="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#systemTelemetryCollapse"
+          aria-expanded="true"
+          aria-controls="systemTelemetryCollapse">
           <div class="d-flex align-items-center justify-content-between">
             <div class="d-flex align-items-center gap-3">
               <span class="halo-section-icon bg-light-primary text-primary">
@@ -247,6 +434,205 @@
   </div>
 </div>
 
+<!-- RAG OFFCANVAS -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="ragOffcanvas" aria-labelledby="ragOffcanvasLabel">
+  <div class="offcanvas-header">
+    <h5 class="offcanvas-title fw-semibold" id="ragOffcanvasLabel">RAG Options</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+  </div>
+
+  <div class="offcanvas-body">
+    <div class="card border rounded-4 shadow-sm mb-4">
+      <div class="card-body">
+        <div class="mb-3">
+          <label for="ragPresetSelect" class="form-label fw-semibold">Preset</label>
+          <select id="ragPresetSelect" class="form-select">
+            <option value="recommended">Recommended</option>
+            <option value="strict">Strict</option>
+            <option value="explain">Explain</option>
+            <option value="fast">Fast</option>
+          </select>
+        </div>
+
+        <div class="small text-muted" id="ragOptionsSummary">
+          Choose a document source and adjust grounding behavior for this request.
+        </div>
+      </div>
+    </div>
+
+    <div class="card border rounded-4 shadow-sm mb-4">
+      <div class="card-body">
+        <h6 class="fw-semibold mb-3">Document for this request</h6>
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold d-block">Source type</label>
+          <div class="btn-group w-100" role="group" aria-label="Document source type">
+            <input type="radio" class="btn-check" name="ragDocumentMode" id="ragDocumentModeSample" value="sample" checked>
+            <label class="btn btn-outline-primary" for="ragDocumentModeSample">Sample file</label>
+
+            <input type="radio" class="btn-check" name="ragDocumentMode" id="ragDocumentModeCustom" value="custom">
+            <label class="btn btn-outline-primary" for="ragDocumentModeCustom">Custom file</label>
+          </div>
+        </div>
+
+        <div id="ragSampleSection">
+          <div class="mb-0">
+            <label for="ragExampleSelect" class="form-label fw-semibold">Built-in Markdown example</label>
+            <select id="ragExampleSelect" class="form-select">
+              <option value="">Loading examples...</option>
+            </select>
+            <div class="form-text">Choose one sample document for this request.</div>
+          </div>
+        </div>
+
+        <div id="ragCustomSection" class="d-none">
+          <div class="mb-3">
+            <label for="ragUploadInput" class="form-label fw-semibold">Markdown file</label>
+            <input id="ragUploadInput" class="form-control" type="file" accept=".md,.markdown,text/markdown">
+            <div class="form-text">The selected file will be used only for this request.</div>
+          </div>
+
+          <div id="ragCustomFilePreviewCard" class="card border-0 bg-light-subtle rounded-4 d-none">
+            <div class="card-body p-3">
+              <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
+                <div class="min-w-0">
+                  <div class="fw-semibold text-truncate" id="ragCustomFileName">—</div>
+                  <div class="small text-muted" id="ragCustomFileMeta">No file loaded</div>
+                </div>
+              </div>
+
+              <label class="form-label fw-semibold small mb-2">Preview</label>
+              <div
+                id="ragCustomFilePreview"
+                class="form-control bg-white overflow-auto small"
+                style="min-height: 140px; max-height: 140px; white-space: pre-wrap;"></div>
+
+              <div class="d-flex justify-content-end mt-3">
+                <button
+                  id="ragViewFullFileBtn"
+                  class="btn btn-sm btn-outline-primary d-inline-flex align-items-center gap-2"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#ragFilePreviewModal"
+                  disabled>
+                  <i class="ti ti-eye"></i>
+                  <span>View full file</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-3">
+          <label for="ragLanguage" class="form-label fw-semibold">Document language</label>
+          <select id="ragLanguage" class="form-select">
+            <option value="auto" selected>Auto</option>
+            <option value="en">English</option>
+            <option value="pt-PT">Portuguese (PT-PT)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card border rounded-4 shadow-sm">
+      <div class="card-body">
+        <h6 class="fw-semibold mb-3">Advanced RAG Settings</h6>
+
+        <div class="mb-3">
+          <label for="ragTopK" class="form-label fw-semibold d-flex justify-content-between">
+            <span>Retrieval depth (top_k)</span>
+            <span id="ragTopKValue">5</span>
+          </label>
+          <input id="ragTopK" class="form-range" type="range" min="1" max="10" step="1" value="5">
+          <div class="form-text">
+            Controls how many chunks HALO retrieves before final selection.
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label for="ragSearchMode" class="form-label fw-semibold">Search mode</label>
+          <select id="ragSearchMode" class="form-select">
+            <option value="hybrid" selected>Hybrid</option>
+            <option value="semantic">Semantic</option>
+            <option value="keyword">Keyword</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="ragGroundingMode" class="form-label fw-semibold">Grounding mode</label>
+          <select id="ragGroundingMode" class="form-select">
+            <option value="strict">Strict</option>
+            <option value="balanced" selected>Balanced</option>
+            <option value="explain">Explain</option>
+          </select>
+        </div>
+
+        <div class="mb-3">
+          <label for="ragContextBudget" class="form-label fw-semibold">Context budget</label>
+          <select id="ragContextBudget" class="form-select">
+            <option value="compact">Compact</option>
+            <option value="standard" selected>Standard</option>
+            <option value="extended">Extended</option>
+          </select>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+          <input class="form-check-input" type="checkbox" id="ragRerankEnabled" checked>
+          <label class="form-check-label" for="ragRerankEnabled">Enable reranking</label>
+        </div>
+
+        <div class="form-check form-switch mb-2">
+          <input class="form-check-input" type="checkbox" id="ragTraceEnabled" checked>
+          <label class="form-check-label" for="ragTraceEnabled">Enable answer trace</label>
+        </div>
+
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" id="ragShowCitations" checked>
+          <label class="form-check-label" for="ragShowCitations">Show citations</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="alert alert-light border rounded-4 small mb-0">
+      <strong>RAG v1.0.0</strong>
+      <ul class="mb-0 mt-2 ps-3">
+        <li>Per-request document grounding</li>
+        <li>Sample and custom Markdown support</li>
+        <li>Preset-based retrieval configuration</li>
+        <li>top_k and search mode controls</li>
+        <li>Strict, balanced, and explain grounding modes</li>
+        <li>Configurable context budget</li>
+        <li>Optional reranking and citations</li>
+        <li>Trace output for retrieval diagnostics</li>
+        <li>Inline file preview and full file modal</li>
+      </ul>
+    </div>
+
+  </div>
+</div>
+
+<!-- FULL FILE PREVIEW MODAL -->
+<div class="modal fade" id="ragFilePreviewModal" tabindex="-1" aria-labelledby="ragFilePreviewModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header">
+        <div>
+          <h5 class="modal-title fw-semibold" id="ragFilePreviewModalLabel">Custom Markdown File</h5>
+          <div class="small text-muted" id="ragFilePreviewModalMeta">—</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <div
+          id="ragFullFileContent"
+          class="form-control bg-light overflow-auto"
+          style="min-height: 420px; white-space: pre-wrap;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
 <script>
@@ -259,6 +645,7 @@
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/underscore@1.13.1/underscore-min.js"></script>
-
 <script src="/assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-<script src="/js/pages/chatbot.js"></script>
+
+<script type="module" src="/js/pages/chatbot-rag.js"></script>
+<script type="module" src="/js/pages/chatbot.js"></script>

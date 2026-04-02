@@ -1,8 +1,19 @@
+// public/js/pages/chatbot.js
+
+import {
+  initializeRagUi,
+  getRagRuntimeState,
+  buildRagPayload,
+  setLatestTraceId,
+  clearRenderedTrace
+} from '/js/pages/chatbot-rag.js';
+
 document.addEventListener('DOMContentLoaded', () => {
   const promptInput = document.getElementById('promptInput');
   const systemInput = document.getElementById('systemInput');
   const messagesInput = document.getElementById('messagesInput');
   const modelSelect = document.getElementById('modelSelect');
+  const llmQuickSummary = document.getElementById('llmQuickSummary');
 
   const sendPromptBtn = document.getElementById('sendPromptBtn');
   const clearResponseBtn = document.getElementById('clearResponseBtn');
@@ -26,11 +37,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const runtimeEvalCount = document.getElementById('runtimeEvalCount');
   const runtimeEvalDuration = document.getElementById('runtimeEvalDuration');
 
+  const initialSystemValue = systemInput?.value ?? '';
+  const initialMessagesValue = messagesInput?.value ?? '[]';
+
   let latestRawResponse = '';
   let isRenderedView = true;
   let systemLoadChart = null;
 
   function resetModelSelect(placeholderText = 'Default model') {
+    if (!modelSelect) return;
+
     modelSelect.innerHTML = '';
 
     const defaultOption = document.createElement('option');
@@ -40,6 +56,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function populateModelSelect(models) {
+    if (!modelSelect) return;
+
     resetModelSelect('Default model');
 
     models.forEach((model) => {
@@ -53,9 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
   async function loadAvailableModels() {
     try {
       resetModelSelect('Loading models...');
-      modelSelect.disabled = true;
+      if (modelSelect) {
+        modelSelect.disabled = true;
+      }
 
-      const response = await fetch('/api/chatbot/models', {
+      const response = await fetch('/api/chat/models', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -74,9 +94,14 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       console.error('[chatbot.js] Failed to load models:', error);
       resetModelSelect('Default model');
-      statusBox.textContent = 'Could not load models.';
+      if (statusBox) {
+        statusBox.textContent = 'Could not load models.';
+      }
     } finally {
-      modelSelect.disabled = false;
+      if (modelSelect) {
+        modelSelect.disabled = false;
+      }
+      updateLlmQuickSummary();
     }
   }
 
@@ -87,18 +112,45 @@ document.addEventListener('DOMContentLoaded', () => {
       return [];
     }
 
-    try {
-      const parsed = JSON.parse(trimmedValue);
-      if (!Array.isArray(parsed)) {
-        throw new Error('Messages must be a JSON array.');
-      }
-      return parsed;
-    } catch (error) {
-      throw new Error('Messages must be a valid JSON array.');
+    const parsed = JSON.parse(trimmedValue);
+
+    if (!Array.isArray(parsed)) {
+      throw new Error('Messages must be a JSON array.');
     }
+
+    return parsed;
+  }
+
+  function updateLlmQuickSummary() {
+    if (!llmQuickSummary) return;
+
+    const selectedModelLabel =
+      modelSelect?.selectedOptions?.[0]?.textContent?.trim() || 'Default model';
+
+    const modelSummary = modelSelect?.value
+      ? selectedModelLabel
+      : 'Default model';
+
+    const systemSummary = systemInput?.value?.trim()
+      ? 'custom system instruction'
+      : 'no custom system instruction';
+
+    let messagesSummary = '0 extra messages';
+
+    try {
+      const parsedMessages = parseMessagesInput(messagesInput?.value || '[]');
+      const count = parsedMessages.length;
+      messagesSummary = `${count} extra message${count === 1 ? '' : 's'}`;
+    } catch (error) {
+      messagesSummary = 'messages JSON invalid';
+    }
+
+    llmQuickSummary.textContent =
+      `${modelSummary} · ${systemSummary} · ${messagesSummary}.`;
   }
 
   function scrollResponseToBottom() {
+    if (!responseBox) return;
     responseBox.scrollTop = responseBox.scrollHeight;
   }
 
@@ -108,13 +160,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
       function check() {
         if (window.MathJax && window.MathJax.typesetPromise) {
-          console.log('[MathJax] Detected and ready');
           resolve(window.MathJax);
           return;
         }
 
         if (Date.now() - start >= timeoutMs) {
-          console.error('[MathJax] Timeout waiting for MathJax');
           reject(new Error('MathJax did not load in time.'));
           return;
         }
@@ -122,21 +172,32 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(check, 50);
       }
 
-      console.log('[MathJax] Waiting for MathJax...');
       check();
     });
   }
 
+  function styleTables(container) {
+    if (!container) return;
+
+    container.querySelectorAll('table').forEach((table) => {
+      table.classList.add('table', 'table-bordered', 'table-hover', 'table-sm', 'align-middle');
+
+      if (!table.parentElement.classList.contains('table-responsive')) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'table-responsive my-3';
+        table.parentNode.insertBefore(wrapper, table);
+        wrapper.appendChild(table);
+      }
+    });
+  }
+
   async function renderFinalResponse(rawText) {
-    const html = marked.parse(rawText);
+    if (!responseContent) return;
+
+    const html = marked.parse(rawText || '');
+
     responseContent.classList.remove('font-monospace');
     responseContent.innerHTML = html;
-
-    if (!window.MathJax) {
-      console.warn('[MathJax] window.MathJax is NOT defined yet');
-    } else if (!window.MathJax.typesetPromise) {
-      console.warn('[MathJax] typesetPromise NOT available yet');
-    }
 
     responseContent.querySelectorAll('pre code').forEach((block) => {
       hljs.highlightElement(block);
@@ -153,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderRawMarkdown(rawText) {
+    if (!responseContent) return;
     responseContent.classList.add('font-monospace');
     responseContent.textContent = rawText || '';
   }
@@ -171,18 +233,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     scrollResponseToBottom();
-  }
-
-  function styleTables(container) {
-    container.querySelectorAll('table').forEach((table) => {
-      table.classList.add('table', 'table-bordered', 'table-hover', 'table-sm', 'align-middle');
-      if (!table.parentElement.classList.contains('table-responsive')) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'table-responsive my-3';
-        table.parentNode.insertBefore(wrapper, table);
-        wrapper.appendChild(table);
-      }
-    });
   }
 
   function formatBytesToGB(bytes) {
@@ -248,7 +298,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const gpuList = Array.isArray(data.gpu) ? data.gpu : [];
 
       if (cpuModel) {
-        cpuModel.textContent = `${data.cpu?.manufacturer || ''} ${data.cpu?.brand || ''}`.trim() || '—';
+        cpuModel.textContent =
+          `${data.cpu?.manufacturer || ''} ${data.cpu?.brand || ''}`.trim() || '—';
       }
 
       if (cpuCores) {
@@ -266,11 +317,13 @@ document.addEventListener('DOMContentLoaded', () => {
       }
 
       if (gpuModel) {
-        gpuModel.textContent = gpuList.map((item) => item.model).filter(Boolean).join('; ') || '—';
+        gpuModel.textContent =
+          gpuList.map((item) => item.model).filter(Boolean).join('; ') || '—';
       }
 
       if (gpuVram) {
-        gpuVram.textContent = gpuList.map((item) => `${item.vram} GB`).filter(Boolean).join('; ') || '—';
+        gpuVram.textContent =
+          gpuList.map((item) => `${item.vram} GB`).filter(Boolean).join('; ') || '—';
       }
 
       if (memory) {
@@ -315,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         categories: ['CPU', 'GPU', 'RAM']
       },
       yaxis: {
-        show:false
+        show: false
       },
       stroke: {
         width: 2
@@ -391,25 +444,51 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   async function sendPrompt() {
-    const promptText = promptInput.value.trim();
-    const systemText = systemInput.value.trim();
-    const selectedModel = modelSelect.value.trim();
-
-    let parsedMessages = [];
+    const promptText = promptInput?.value?.trim() || '';
+    const systemText = systemInput?.value?.trim() || '';
+    const selectedModel = modelSelect?.value?.trim() || '';
 
     if (!promptText) {
-      responseContent.textContent = 'Please write a prompt first.';
-      statusBox.textContent = '';
+      if (responseContent) {
+        responseContent.textContent = 'Please write a prompt first.';
+      }
+      if (statusBox) {
+        statusBox.textContent = '';
+      }
       return;
     }
 
+    let parsedMessages = [];
     try {
-      parsedMessages = parseMessagesInput(messagesInput.value);
+      parsedMessages = parseMessagesInput(messagesInput?.value || '[]');
     } catch (error) {
       console.error('[chatbot.js] Invalid messages payload:', error);
-      responseContent.textContent = error.message;
-      statusBox.textContent = 'Invalid advanced options.';
+      if (responseContent) {
+        responseContent.textContent = error.message || 'Messages must be a valid JSON array.';
+      }
+      if (statusBox) {
+        statusBox.textContent = 'Invalid advanced chat options.';
+      }
       return;
+    }
+
+    const ragRuntime = getRagRuntimeState();
+    const useRag = Boolean(ragRuntime?.settings?.enabled);
+
+    let ragPayload = null;
+    if (useRag) {
+      try {
+        ragPayload = await buildRagPayload({ settings: ragRuntime.settings });
+      } catch (error) {
+        console.error('[chatbot.js] Invalid RAG payload:', error);
+        if (responseContent) {
+          responseContent.textContent = error.message || 'Invalid RAG configuration.';
+        }
+        if (statusBox) {
+          statusBox.textContent = 'Invalid RAG configuration.';
+        }
+        return;
+      }
     }
 
     const payload = {
@@ -419,24 +498,39 @@ document.addEventListener('DOMContentLoaded', () => {
       model: selectedModel || null
     };
 
-    console.log('[chatbot.js] Sending payload to /api/chatbot/stream');
-    console.log('[chatbot.js] Payload:', payload);
+    if (useRag && ragPayload) {
+      payload.rag = ragPayload;
+    }
 
-    sendPromptBtn.disabled = true;
+    const endpoint = useRag ? '/api/chat/rag/stream' : '/api/chat/stream';
+
+    if (sendPromptBtn) {
+      sendPromptBtn.disabled = true;
+    }
+
     latestRawResponse = '';
-    responseContent.textContent = '';
-    statusBox.textContent = 'Waiting for HALO response...';
+    clearRenderedTrace();
+    setLatestTraceId(null);
+
+    if (responseContent) {
+      responseContent.textContent = '';
+      responseContent.classList.remove('font-monospace');
+    }
+
+    if (statusBox) {
+      statusBox.textContent = useRag
+        ? 'Waiting for HALO grounded response...'
+        : 'Waiting for HALO response...';
+    }
 
     try {
-      const response = await fetch('/api/chatbot/stream', {
+      const response = await fetch(endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify(payload)
       });
-
-      console.log('[chatbot.js] Response status:', response.status, response.statusText);
 
       if (!response.ok || !response.body) {
         const errorText = await response.text();
@@ -467,7 +561,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
 
           const jsonPart = line.slice(5).trim();
-
           if (!jsonPart) {
             continue;
           }
@@ -480,16 +573,21 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             if (parsed.info) {
-              console.log('[chatbot.js] Stream info:', parsed.info);
               continue;
+            }
+
+            if (parsed.meta?.traceId) {
+              setLatestTraceId(parsed.meta.traceId);
             }
 
             if (typeof parsed.content === 'string') {
               latestRawResponse += parsed.content;
 
               if (isRenderedView) {
-                responseContent.classList.remove('font-monospace');
-                responseContent.textContent = latestRawResponse;
+                if (responseContent) {
+                  responseContent.classList.remove('font-monospace');
+                  responseContent.textContent = latestRawResponse;
+                }
               } else {
                 renderRawMarkdown(latestRawResponse);
               }
@@ -499,8 +597,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (parsed.done) {
               await updateResponseView();
-              updateRuntimeInfo(parsed.stats);
-              statusBox.textContent = 'Response received successfully.';
+              updateRuntimeInfo(parsed.stats || parsed.runtime || {});
+              if (statusBox) {
+                statusBox.textContent = useRag
+                  ? 'Grounded response received successfully.'
+                  : 'Response received successfully.';
+              }
             }
           } catch (error) {
             console.error('[chatbot.js] Failed to parse stream chunk:', error);
@@ -508,88 +610,107 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      if (!statusBox.textContent) {
+      if (!statusBox?.textContent) {
         await updateResponseView();
-        statusBox.textContent = 'Response received successfully.';
+        if (statusBox) {
+          statusBox.textContent = useRag
+            ? 'Grounded response received successfully.'
+            : 'Response received successfully.';
+        }
       }
     } catch (error) {
       console.error('[chatbot.js] Error while requesting HALO:', error);
-      responseContent.textContent = error.message || 'An error occurred while requesting HALO.';
-      statusBox.textContent = 'Request failed.';
+      if (responseContent) {
+        responseContent.textContent =
+          error.message || 'An error occurred while requesting HALO.';
+      }
+      if (statusBox) {
+        statusBox.textContent = 'Request failed.';
+      }
     } finally {
-      sendPromptBtn.disabled = false;
+      if (sendPromptBtn) {
+        sendPromptBtn.disabled = false;
+      }
     }
   }
 
   function clearInterface() {
-    promptInput.value = '';
-    systemInput.value = '';
-    messagesInput.value = '[]';
-    modelSelect.selectedIndex = 0;
+    if (promptInput) {
+      promptInput.value = '';
+    }
+
+    if (systemInput) {
+      systemInput.value = initialSystemValue;
+    }
+
+    if (messagesInput) {
+      messagesInput.value = initialMessagesValue;
+    }
+
+    if (modelSelect) {
+      modelSelect.selectedIndex = 0;
+    }
+
     latestRawResponse = '';
     isRenderedView = true;
-    responseContent.classList.remove('font-monospace');
-    responseContent.textContent = 'Response will appear here...';
+
+    if (responseContent) {
+      responseContent.classList.remove('font-monospace');
+      responseContent.textContent = 'Response will appear here...';
+    }
 
     if (toggleRenderBtn) {
       toggleRenderBtn.textContent = 'Show markdown';
     }
 
-    if (runtimeModel) {
-      runtimeModel.textContent = '—';
+    if (runtimeModel) runtimeModel.textContent = '—';
+    if (runtimeCreatedAt) runtimeCreatedAt.textContent = '—';
+    if (runtimeTotalDuration) runtimeTotalDuration.textContent = '—';
+    if (runtimeLoadDuration) runtimeLoadDuration.textContent = '—';
+    if (runtimePromptEvalDuration) runtimePromptEvalDuration.textContent = '—';
+    if (runtimeEvalCount) runtimeEvalCount.textContent = '—';
+    if (runtimeEvalDuration) runtimeEvalDuration.textContent = '—';
+
+    if (statusBox) {
+      statusBox.textContent = '';
     }
 
-    if (runtimeCreatedAt) {
-      runtimeCreatedAt.textContent = '—';
-    }
+    clearRenderedTrace();
+    setLatestTraceId(null);
+    updateLlmQuickSummary();
 
-    if (runtimeTotalDuration) {
-      runtimeTotalDuration.textContent = '—';
-    }
-
-    if (runtimeLoadDuration) {
-      runtimeLoadDuration.textContent = '—';
-    }
-
-    if (runtimePromptEvalDuration) {
-      runtimePromptEvalDuration.textContent = '—';
-    }
-
-    if (runtimeEvalCount) {
-      runtimeEvalCount.textContent = '—';
-    }
-
-    if (runtimeEvalDuration) {
-      runtimeEvalDuration.textContent = '—';
-    }
-
-    statusBox.textContent = '';
-    promptInput.focus();
+    promptInput?.focus();
   }
 
-  loadAvailableModels();
-  loadHardwareInfo();
-  loadSystemLoad();
+  async function initializePage() {
+    await initializeRagUi();
+    await loadAvailableModels();
+    await loadHardwareInfo();
+    await loadSystemLoad();
+    updateLlmQuickSummary();
+  }
 
+  initializePage();
   setInterval(loadSystemLoad, 5000);
 
-  sendPromptBtn.addEventListener('click', sendPrompt);
-  clearResponseBtn.addEventListener('click', clearInterface);
+  sendPromptBtn?.addEventListener('click', sendPrompt);
+  clearResponseBtn?.addEventListener('click', clearInterface);
 
-  if (toggleRenderBtn) {
-    toggleRenderBtn.addEventListener('click', async () => {
-      isRenderedView = !isRenderedView;
-      await updateResponseView();
-    });
-  }
+  toggleRenderBtn?.addEventListener('click', async () => {
+    isRenderedView = !isRenderedView;
+    await updateResponseView();
+  });
 
-  promptInput.addEventListener('keydown', (event) => {
+  promptInput?.addEventListener('keydown', (event) => {
     if ((event.ctrlKey || event.metaKey) && event.key === 'Enter') {
       sendPrompt();
     }
   });
 
-  // System Telemetry
+  modelSelect?.addEventListener('change', updateLlmQuickSummary);
+  systemInput?.addEventListener('input', updateLlmQuickSummary);
+  messagesInput?.addEventListener('input', updateLlmQuickSummary);
+
   const systemTelemetryCollapse = document.getElementById('systemTelemetryCollapse');
   const telemetryChevron = document.getElementById('telemetryChevron');
   const telemetryToggleLabel = document.getElementById('telemetryToggleLabel');
