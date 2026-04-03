@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const messagesInput = document.getElementById('messagesInput');
   const modelSelect = document.getElementById('modelSelect');
   const llmQuickSummary = document.getElementById('llmQuickSummary');
+  const ragEnabled = document.getElementById('ragEnabled');
 
   const sendPromptBtn = document.getElementById('sendPromptBtn');
   const clearResponseBtn = document.getElementById('clearResponseBtn');
@@ -60,22 +61,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
     resetModelSelect('Default model');
 
-    models.forEach((model) => {
-      const option = document.createElement('option');
-      option.value = model.id;
-      option.textContent = model.label || model.id;
-      modelSelect.appendChild(option);
-    });
+    models
+      .filter((model) => model?.rag_supported !== false)
+      .forEach((model) => {
+        const option = document.createElement('option');
+        option.value = model.id;
+
+        const labelParts = [model.label || model.id];
+
+        if (model.tier) {
+          labelParts.push(model.tier);
+        }
+
+        if (model.recommended) {
+          labelParts.push('recommended');
+        }
+
+        option.textContent = labelParts.join(' — ');
+        modelSelect.appendChild(option);
+      });
   }
 
-  async function loadAvailableModels() {
+  async function loadAvailableModels({ useRag = false } = {}) {
     try {
       resetModelSelect('Loading models...');
       if (modelSelect) {
         modelSelect.disabled = true;
       }
 
-      const response = await fetch('/api/chat/models', {
+      const endpoint = useRag ? '/api/chat/rag/models' : '/api/chat/models';
+
+      const response = await fetch(endpoint, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
@@ -474,6 +490,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const ragRuntime = getRagRuntimeState();
     const useRag = Boolean(ragRuntime?.settings?.enabled);
+    const requestId = useRag
+      ? `quizity-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+      : null;
 
     let ragPayload = null;
     if (useRag) {
@@ -499,6 +518,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     if (useRag && ragPayload) {
+      payload.requestId = requestId;
       payload.rag = ragPayload;
     }
 
@@ -684,7 +704,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function initializePage() {
     await initializeRagUi();
-    await loadAvailableModels();
+    await loadAvailableModels({
+      useRag: Boolean(ragEnabled?.checked)
+    });
     await loadHardwareInfo();
     await loadSystemLoad();
     updateLlmQuickSummary();
@@ -710,6 +732,12 @@ document.addEventListener('DOMContentLoaded', () => {
   modelSelect?.addEventListener('change', updateLlmQuickSummary);
   systemInput?.addEventListener('input', updateLlmQuickSummary);
   messagesInput?.addEventListener('input', updateLlmQuickSummary);
+
+  ragEnabled?.addEventListener('change', async () => {
+    await loadAvailableModels({
+      useRag: Boolean(ragEnabled.checked)
+    });
+  });
 
   const systemTelemetryCollapse = document.getElementById('systemTelemetryCollapse');
   const telemetryChevron = document.getElementById('telemetryChevron');

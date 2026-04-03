@@ -775,6 +775,7 @@ export async function buildRagPayload({ settings } = {}) {
 
   return {
     enabled: true,
+    preset: currentSettings.preset,
     top_k: Number(currentSettings.top_k),
     search_mode: currentSettings.search_mode,
     grounding_mode: currentSettings.grounding_mode,
@@ -791,7 +792,9 @@ export async function buildRagPayload({ settings } = {}) {
       mime_type: documentState.mimeType || 'text/markdown',
       size_bytes: documentState.sizeBytes,
       line_count: documentState.lineCount,
-      url: documentState.url || null
+      url: documentState.url || null,
+      language: currentSettings.language,
+      document_profile: 'auto'
     }
   };
 }

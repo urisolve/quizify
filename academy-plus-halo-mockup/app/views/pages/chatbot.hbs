@@ -593,19 +593,126 @@
       </div>
     </div>
 
-    <div class="alert alert-light border rounded-4 small mb-0">
-      <strong>RAG v1.0.0</strong>
-      <ul class="mb-0 mt-2 ps-3">
-        <li>Per-request document grounding</li>
-        <li>Sample and custom Markdown support</li>
-        <li>Preset-based retrieval configuration</li>
-        <li>top_k and search mode controls</li>
-        <li>Strict, balanced, and explain grounding modes</li>
-        <li>Configurable context budget</li>
-        <li>Optional reranking and citations</li>
-        <li>Trace output for retrieval diagnostics</li>
-        <li>Inline file preview and full file modal</li>
-      </ul>
+    <div class="card border rounded-4 shadow-sm mt-4">
+      <div class="card-body">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h6 class="fw-semibold mb-0">RAG Version History</h6>
+          <span class="badge bg-primary-subtle text-primary border">Current: v1.0.1</span>
+        </div>
+
+        <div class="accordion accordion-flush" id="ragVersionHistoryAccordion">
+          <!-- v1.0.1 -->
+          <div class="accordion-item border rounded-4 mb-2 overflow-hidden">
+            <h2 class="accordion-header" id="ragVersion101Heading">
+              <button
+                class="accordion-button fw-semibold"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#ragVersion101Collapse"
+                aria-expanded="true"
+                aria-controls="ragVersion101Collapse">
+                v1.0.1
+              </button>
+            </h2>
+            <div
+              id="ragVersion101Collapse"
+              class="accordion-collapse collapse show"
+              aria-labelledby="ragVersion101Heading"
+              data-bs-parent="#ragVersionHistoryAccordion">
+              <div class="accordion-body small">
+                <div class="mb-2 text-muted">
+                  Current iteration with improved Quizity ↔ HALO RAG alignment.
+                </div>
+                <ul class="mb-0 ps-3">
+                  <li>Per-request document grounding</li>
+                  <li>Sample and custom Markdown support</li>
+                  <li>Preset-aware RAG requests</li>
+                  <li>Dynamic RAG model list in Quizity</li>
+                  <li>top_k and search mode controls</li>
+                  <li>Strict, balanced, and explain grounding modes</li>
+                  <li>Configurable context budget</li>
+                  <li>Optional reranking, trace, and citations</li>
+                  <li>Inline file preview and full file modal</li>
+                  <li>Document language hint forwarding</li>
+                  <li>
+                    Prepared for future specialized document profiles
+                    <ul class="mt-2 ps-3">
+                      <li><strong>Auto:</strong> universal use case</li>
+                      <li><strong>Solver Output:</strong> specialized for solver outputs</li>
+                      <li><strong>Theory Reference:</strong> specialized for theoretical materials</li>
+                      <li><strong>FAQ:</strong> specialized for students doubts and most common questions</li>
+                      <li><strong>Exercise Example:</strong> specialized for exercise examples used in Gamification scenarios</li>
+                    </ul>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- v1.0.0 -->
+          <div class="accordion-item border rounded-4 mb-2 overflow-hidden">
+            <h2 class="accordion-header" id="ragVersion100Heading">
+              <button
+                class="accordion-button collapsed fw-semibold"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#ragVersion100Collapse"
+                aria-expanded="false"
+                aria-controls="ragVersion100Collapse">
+                v1.0.0
+              </button>
+            </h2>
+            <div
+              id="ragVersion100Collapse"
+              class="accordion-collapse collapse"
+              aria-labelledby="ragVersion100Heading"
+              data-bs-parent="#ragVersionHistoryAccordion">
+              <div class="accordion-body small">
+                <div class="mb-2 text-muted">
+                  First working RAG interface in Quizity.
+                </div>
+                <ul class="mb-0 ps-3">
+                  <li>Per-request document grounding</li>
+                  <li>Sample and custom Markdown support</li>
+                  <li>Preset-based retrieval configuration</li>
+                  <li>top_k and search mode controls</li>
+                  <li>Strict, balanced, and explain grounding modes</li>
+                  <li>Configurable context budget</li>
+                  <li>Optional reranking and citations</li>
+                  <li>Trace output for retrieval diagnostics</li>
+                  <li>Inline file preview and full file modal</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- v0.0.1 -->
+          <div class="accordion-item border rounded-4 overflow-hidden">
+            <h2 class="accordion-header" id="ragVersion001Heading">
+              <button
+                class="accordion-button collapsed fw-semibold"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#ragVersion001Collapse"
+                aria-expanded="false"
+                aria-controls="ragVersion001Collapse">
+                v0.0.1
+              </button>
+            </h2>
+            <div
+              id="ragVersion001Collapse"
+              class="accordion-collapse collapse"
+              aria-labelledby="ragVersion001Heading"
+              data-bs-parent="#ragVersionHistoryAccordion">
+              <div class="accordion-body small">
+                <div class="text-muted">
+                  Initial concept stage — just an idea. :)
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </div>
