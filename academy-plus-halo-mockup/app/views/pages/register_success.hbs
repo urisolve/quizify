@@ -1,8 +1,43 @@
-<div class="register-success-container">
-  <div class="register-success-card">
-    <h2>{{t 'auth.user_created'}}</h2>
-    <p>{{t 'auth.register_success_message'}}</p>
-    <a href="/login" class="red-button register-success-button">{{t 'login'}}</a>
+<div class="container-fluid">
+  <div class="row g-4 justify-content-center align-items-stretch">
+
+    <!-- Branding -->
+    <div class="col-12 col-lg-6">
+      <section class="card h-100 halo-hero-card">
+        <div class="card-body p-4 p-lg-5 d-flex flex-column justify-content-center">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <img src="assets/images/logos/favicon.png" alt="HALO Logo" style="height: 52px; width: auto;">
+            <img src="assets/images/logos/isep.png" alt="ISEP Logo" style="height: 52px; width: auto;"/>
+          </div>
+          <h1 class="display-6 fw-semibold mb-3">{{ t 'auth.welcome_to_urisolve_academy' }}</h1>
+          <p class="fs-5 text-dark halo-lead" style="text-align: justify;">{{ t 'auth.account_success' }}
+            
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Success message -->
+    <div class="col-12 col-lg-6">
+      <section class="card h-100">
+        <div class="card-body p-4 p-lg-5 d-flex flex-column justify-content-center">
+
+          <div class="text-center mb-4">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light-success text-success mb-3"
+              style="width: 64px; height: 64px;">
+              <i class="ti ti-circle-check fs-1"></i>
+            </span>
+            <h2 class="card-title fw-semibold mb-2">{{t 'auth.user_created'}}</h2>
+            <p class="text-muted">{{t 'auth.register_success_message'}}</p>
+          </div>
+
+          <a href="/login" class="btn btn-primary w-100 py-2 fw-semibold">
+            <i class="ti ti-login me-2"></i>{{t 'auth.login'}}
+          </a>
+
+        </div>
+      </section>
+    </div>
+
   </div>
 </div>
-

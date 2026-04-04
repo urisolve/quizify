@@ -52,6 +52,23 @@ app.use(i18nMiddleware.handle(i18next));
 //* Middleware 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+//* Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  //cookie: { secure: false } // change to true if using HTTPS
+  cookie: { secure: false, maxAge: 3600000 } // 1 hour sessions
+}));
+
+app.use((req, res, next) => {
+  res.locals.user = req.session.user;
+  next();
+});
+
+
+//* Middleware 
 const middlewares = require('./middleware/middleware');
 middlewares.forEach(middleware => {
   app.use(middleware);
@@ -117,6 +134,9 @@ app.set('view engine', 'hbs'); // tells express that the views are handlebars fi
 app.set('views', path.join(__dirname, './views')); // location of the views
 
 
+//* Routes auth
+const authRoutes = require('./routes/auth');
+app.use('/auth', authRoutes); 
 
 //* Routes
 const routes = require('./routes/routes');
@@ -130,19 +150,7 @@ app.use('/api/user', userApiRoutes);
 const apiRoutes = require('./routes/api');
 app.use('/api', apiRoutes);
 
-//* Session configuration
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  //cookie: { secure: false } // change to true if using HTTPS
-  cookie: { secure: false, maxAge: 3600000 } // 1 hour sessions
-}));
 
-app.use((req, res, next) => {
-  res.locals.user = req.session.user;
-  next();
-});
 
 // Table initialization imports
 const { initTopicsTable } = require('./models/Topic');

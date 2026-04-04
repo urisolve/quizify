@@ -1,8 +1,50 @@
-<div id="auth-warning-page" class="auth-warning-container">
-    <h2>🔒 Restricted Access</h2>
-    <p>To access this page, you need to be logged in.</p>
-    <a href="/login" class="red-button btn">Login Now</a>
-    <p>If you don't have an account, you can <a href="/register">register here</a>.</p>
-    <p>For any issues, please contact our support team.</p>
-    <p>Thank you for your understanding!</p>
+<div class="container-fluid">
+  <div class="row g-4 justify-content-center align-items-stretch">
+
+    <!-- Branding -->
+    <div class="col-12 col-lg-6">
+      <section class="card h-100 bg-warning">
+        <div class="card-body p-4 p-lg-5 d-flex flex-column justify-content-center">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <img src="assets/images/logos/favicon.png" alt="HALO Logo" style="height: 52px; width: auto;">
+            <img src="assets/images/logos/isep.png" alt="ISEP Logo" style="height: 52px; width: auto;"/>
+          </div>
+          <h1 class="display-6 fw-semibold mb-3">{{ t 'auth.restricted_access' }}</h1>
+          <p class="fs-5 text-dark halo-lead" style="text-align: justify;">{{ t 'auth.restricted_access_sub' }}
+            
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <!-- Warning message -->
+    <div class="col-12 col-lg-6">
+      <section class="card h-100">
+        <div class="card-body p-4 p-lg-5 d-flex flex-column justify-content-center">
+
+          <div class="text-center mb-4">
+            <span class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light-danger text-danger mb-3"
+              style="width: 64px; height: 64px;">
+              <i class="ti ti-lock fs-1"></i>
+            </span>
+            <h2 class="card-title fw-semibold mb-2">{{ t 'auth.access_denied' }}</h2>
+            <p class="text-muted">{{ t 'auth.access_denied_sub' }}</p>
+          </div>
+
+          <a href="/login" class="btn btn-primary w-100 py-2 fw-semibold mb-3">
+            <i class="ti ti-login me-2"></i>{{ t 'auth.login' }}
+          </a>
+
+          <hr class="my-2">
+
+          <p class="text-center text-muted small mb-0">
+            {{ t 'auth.dont_have_an_account?' }}
+            <a href="/register" class="text-primary fw-medium">{{ t 'auth.register' }}</a>
+          </p>
+
+        </div>
+      </section>
+    </div>
+
+  </div>
 </div>

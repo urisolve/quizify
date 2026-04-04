@@ -1,30 +1,97 @@
-<div class="login-header-icons">
-  <img src="/img/favicon.png" alt="Circle Logo" class="logo-circle" />
-  <img src="/img/logos/isep_logo.png" alt="Rectangular Logo" class="logo-rect" />
-</div>
+<div class="container-fluid">
+  <div class="row g-4 justify-content-center align-items-stretch">
 
-<div class="auth-container">
-  <div class="login-card">
-    <h2>{{ t 'welcome_back' }}</h2>
-    <form id="login-form">
-      <label>Email</label>
-      <input class="input-field" type="email" name="email" placeholder="{{ t 'email' }}" required/>
-
-      <label>{{ t 'password' }}</label>
-      <input class="input-field" type="password" name="password" placeholder="{{ t 'enter_password' }}" required/>
-
-      <div class="login-options">
-        <label><input type="checkbox" disabled/> {{ t 'remember_me' }}</label>
-        <a href="/password-recovery">{{ t 'forgot_password?' }}</a>
-      </div>
-
-      <button class="red-button login-button" id="login-button" type="submit">{{ t 'login' }}</button>
-
-      <div id="login-message" class="login-message"></div>
-    </form>
-    <div class="register-link">
-      {{ t 'dont_have_an_account?' }} <a href="/register"> {{ t 'register' }}</a>
+    <!-- Branding -->
+    <div class="col-12 col-lg-6">
+      <section class="card h-100 halo-hero-card">
+        <div class="card-body p-4 p-lg-5 d-flex flex-column justify-content-center">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <img src="assets/images/logos/favicon.png" alt="HALO Logo" style="height: 52px; width: auto;">
+            <img src="assets/images/logos/isep.png" alt="ISEP Logo" style="height: 52px; width: auto;"/>
+          </div>
+          
+          <h1 class="display-6 fw-semibold mb-3">{{ t 'auth.welcome_back_halo' }}</h1>
+          <p class="fs-5 text-dark halo-lead" style="text-align: justify;">{{ t 'auth.welcome_back_halo_sub' }}</p>
+        </div>
+      </section>
     </div>
+
+    <!-- Login form -->
+    <div class="col-12 col-lg-6">
+      <section class="card h-100">
+        <div class="card-body p-4 p-lg-5">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-lock"></i>
+            </span>
+            <div>
+              <h2 class="card-title fw-semibold mb-0">{{ t 'auth.welcome_back' }}</h2>
+              <p class="mb-0 text-muted small">{{ t 'auth.login_to_continue' }} </p>
+            </div>
+          </div>
+
+          <div class="auth-container">
+            <form id="login-form">
+
+              <div class="mb-3">
+                <label class="form-label fw-medium">{{ t 'auth.email' }}</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="ti ti-mail text-muted"></i>
+                  </span>
+                  <input
+                    class="form-control border-start-0 ps-0"
+                    type="email"
+                    name="email"
+                    placeholder="{{ t 'auth.email_ex' }}"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-medium">{{ t 'auth.password' }}</label>
+                <div class="input-group">
+                  <span class="input-group-text bg-light border-end-0">
+                    <i class="ti ti-key text-muted"></i>
+                  </span>
+                  <input
+                    class="form-control border-start-0 ps-0"
+                    type="password"
+                    name="password"
+                    placeholder="{{ t 'auth.enter_password' }}"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <label class="d-flex align-items-center gap-2 text-muted small">
+                  <input type="checkbox" disabled /> {{ t 'auth.remember_me' }}
+                </label>
+                <a href="/password-recovery" class="text-primary small">{{ t 'auth.forgot_password?' }}</a>
+              </div>
+
+              <button class="btn btn-primary w-100 py-2 fw-semibold" id="login-button" type="submit">
+                <i class="ti ti-login me-2"></i>{{ t 'auth.login' }}
+              </button>
+
+              <div id="login-message" class="mt-3 small text-center"></div>
+
+            </form>
+          </div>
+
+          <hr class="my-4">
+
+          <p class="text-center text-muted small mb-0">
+            {{ t 'auth.dont_have_an_account?' }}
+            <a href="/register" class="text-primary fw-medium">{{ t 'auth.register' }}</a>
+          </p>
+
+        </div>
+      </section>
+    </div>
+
   </div>
 </div>
 
