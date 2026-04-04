@@ -92,6 +92,16 @@ const hbsHelpers = {
     return key;
   },
 
+  topicT: function(id, field, options) {
+    const i18n = options.data.root.i18n;
+    return i18n ? i18n.t(`topics.${id}.${field}`) : '';
+  },
+
+  subtopicT: function(id, field, options) {
+    const i18n = options.data.root.i18n;
+    return i18n ? i18n.t(`subtopics.${id}.${field}`) : '';
+  },
+
   // equality check helper
   eq: function (a, b) {
     return a === b;
