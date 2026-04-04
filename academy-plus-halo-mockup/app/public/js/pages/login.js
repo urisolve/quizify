@@ -1,3 +1,7 @@
 import { enableButtonOnFilledFields } from '../ui/formButtonUI.js';
+import { registerAuthUI } from '../ui/authUI.js';
 
-enableButtonOnFilledFields('login-form', 'login-button');
+document.addEventListener('DOMContentLoaded', () => {
+    registerAuthUI();
+    enableButtonOnFilledFields('login-form', 'login-button');
+});
