@@ -11,5 +11,11 @@ router.use('/auth', authRoutes);
 router.use('/api', apiRoutes);
 router.use('/', pageRoutes);
 
+router.get('/lang', (req, res) => {
+    const lang = req.query.lng || 'pt';
+    res.cookie('i18next', lang, { maxAge: 365 * 24 * 60 * 60 * 1000 }); // 1 year
+    const redirectTo = req.headers.referer || '/';
+    res.redirect(redirectTo);
+});
 
 module.exports = router;
