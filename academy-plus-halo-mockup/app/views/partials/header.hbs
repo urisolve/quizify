@@ -73,32 +73,40 @@
               class="rounded-circle border"
               style="object-fit: cover;"
             >
-            <span class="d-none d-md-inline text-dark fw-medium">User</span>
+            <span class="d-none d-md-inline text-dark fw-medium">{{#if user}}{{user.username}}{{else}}Guest{{/if}}</span>
             <i class="ti ti-chevron-down fs-4"></i>
           </a>
 
           <div class="dropdown-menu dropdown-menu-end dropdown-menu-animate-up shadow-sm border-0 rounded-3"
             aria-labelledby="userDropdown">
-            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2" id="profile-logout">
-              <i class="ti ti-logout fs-5 text-danger"></i>
-              <span>Logout</span>
-            </a>
-            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
-              <i class="ti ti-settings fs-5 text-primary"></i>
-              <span>Settings</span>
-            </a>
-            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
-              <i class="ti ti-badge fs-5 text-warning"></i>
-              <span>Level</span>
-            </a>
-            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
-              <i class="ti ti-star fs-5 text-warning"></i>
-              <span>Stars</span>
-            </a>
-            <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
-              <i class="ti ti-chart-bar fs-5 text-info"></i>
-              <span>Statistics</span>
-            </a>
+            {{#if user}}
+              <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2" id="profile-logout">
+                <i class="ti ti-logout fs-5 text-danger"></i>
+                <span>Logout</span>
+              </a>
+              <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+                <i class="ti ti-settings fs-5 text-primary"></i>
+                <span>Settings</span>
+              </a>
+              <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+                <i class="ti ti-badge fs-5 text-warning"></i>
+                <span>Level</span>
+              </a>
+              <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+                <i class="ti ti-star fs-5 text-warning"></i>
+                <span>Stars</span>
+              </a>
+              <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+                <i class="ti ti-chart-bar fs-5 text-info"></i>
+                <span>Statistics</span>
+              </a>
+            {{else}}
+              <a href="/login" class="dropdown-item d-flex align-items-center gap-2 py-2">
+                <i class="ti ti-login fs-5 text-primary"></i>
+                <span>Login</span>
+              </a>
+            {{/if}}
+
           </div>
         </div>
 
