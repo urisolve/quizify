@@ -1,5 +1,7 @@
 // public/js/pages/chatbot-rag.js
 
+console.log('[chatbot-rag] module loaded', new Date().toISOString());
+
 const FALLBACK_CAPABILITIES = {
   accepted_file_types: ['.md', '.markdown'],
   max_file_size_mb: 5,
@@ -751,9 +753,17 @@ export async function loadRagTrace(traceId) {
     }
   });
 
+  const contentType = response.headers.get('content-type') || '';
+
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(errorText || 'Failed to load trace.');
+  }
+
+  if (!contentType.includes('application/json')) {
+    const rawText = await response.text();
+    console.error('[chatbot-rag] Trace endpoint returned non-JSON:', rawText.slice(0, 500));
+    throw new Error('Trace endpoint returned HTML instead of JSON.');
   }
 
   const data = await response.json();
@@ -799,7 +809,137 @@ export async function buildRagPayload({ settings } = {}) {
   };
 }
 
+function createTraceTextPreview(text = '', maxLength = 280) {
+  const safeText = String(text || '').trim();
+
+  if (!safeText) {
+    return '—';
+  }
+
+  if (safeText.length <= maxLength) {
+    return safeText;
+  }
+
+  return `${safeText.slice(0, maxLength)}…`;
+}
+
+function renderTraceSourcesHtml(sources = [], fallbackLanguage = 'auto') {
+  if (!Array.isArray(sources) || sources.length === 0) {
+    return '<div class="text-muted">No sources recorded.</div>';
+  }
+
+  return sources.map((item) => {
+    const title = escapeHtml(item.title || item.name || item.id || 'Document');
+    const language = escapeHtml(item.language || fallbackLanguage || 'auto');
+    const sourceType = item.source_type
+      ? `<span class="badge bg-light text-dark border ms-2">${escapeHtml(item.source_type)}</span>`
+      : '';
+
+    const documentProfile = item.document_profile && item.document_profile !== 'auto'
+      ? `<span class="badge bg-light text-dark border ms-2">${escapeHtml(item.document_profile)}</span>`
+      : '';
+
+    const metaParts = [];
+
+    if (item.chunk_count !== undefined && item.chunk_count !== null) {
+      metaParts.push(`${escapeHtml(String(item.chunk_count))} chunks`);
+    }
+
+    if (item.heading_count !== undefined && item.heading_count !== null) {
+      metaParts.push(`${escapeHtml(String(item.heading_count))} headings`);
+    }
+
+    if (item.ephemeral) {
+      metaParts.push('request-scoped');
+    }
+
+    return `
+      <div class="border rounded-3 p-3 mb-3">
+        <div class="fw-semibold">${title}</div>
+        <div class="small text-muted mt-1">
+          <span>${language}</span>
+          ${sourceType}
+          ${documentProfile}
+        </div>
+        ${metaParts.length ? `<div class="small text-muted mt-2">${metaParts.join(' · ')}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function renderTraceReferencesHtml(references = []) {
+  if (!Array.isArray(references) || references.length === 0) {
+    return '<div class="text-muted">No grounded references recorded.</div>';
+  }
+
+  return references.map((reference) => {
+    const label = escapeHtml(reference.label || 'S?');
+    const title = escapeHtml(reference.sourceTitle || reference.sourceId || 'Document');
+    const headingPath = Array.isArray(reference.headingPath) && reference.headingPath.length
+      ? escapeHtml(reference.headingPath.join(' > '))
+      : 'Untitled Section';
+
+    const type = escapeHtml(reference.type || reference.blockType || 'theory');
+    const previewStart = escapeHtml(reference.text_preview_start || '');
+    const previewEnd = escapeHtml(reference.text_preview_end || '');
+    const excerpt = escapeHtml(reference.text_excerpt || '');
+    const excerptPreview = createTraceTextPreview(reference.text_excerpt || '', 420);
+    const contextBlockPreview = createTraceTextPreview(reference.context_block_text || '', 520);
+
+    const chunkId = reference.chunkId
+      ? `<div class="small text-muted mt-2"><strong>Chunk:</strong> ${escapeHtml(reference.chunkId)}</div>`
+      : '';
+
+    const tokens = reference.context_tokens
+      ? `<div class="small text-muted"><strong>Context tokens:</strong> ${escapeHtml(String(reference.context_tokens))}</div>`
+      : '';
+
+    return `
+      <div class="border rounded-3 p-3 mb-3">
+        <div class="d-flex align-items-center justify-content-between gap-2 flex-wrap">
+          <div class="fw-semibold">[${label}] ${title}</div>
+          <span class="badge bg-light text-dark border">${type}</span>
+        </div>
+
+        <div class="small text-muted mt-2">
+          <strong>Heading:</strong> ${headingPath}
+        </div>
+
+        ${chunkId}
+        ${tokens}
+
+        <div class="mt-3">
+          <div class="small fw-semibold mb-1">Excerpt</div>
+          <div class="small text-muted border rounded-3 bg-light p-2" style="white-space: pre-wrap;">${escapeHtml(excerptPreview)}</div>
+        </div>
+
+        <div class="row g-2 mt-1">
+          <div class="col-12 col-lg-6">
+            <div class="small fw-semibold mb-1">Start preview</div>
+            <div class="small text-muted border rounded-3 bg-light p-2" style="white-space: pre-wrap;">${previewStart || '—'}</div>
+          </div>
+          <div class="col-12 col-lg-6">
+            <div class="small fw-semibold mb-1">End preview</div>
+            <div class="small text-muted border rounded-3 bg-light p-2" style="white-space: pre-wrap;">${previewEnd || '—'}</div>
+          </div>
+        </div>
+
+        <details class="mt-3">
+          <summary class="small fw-semibold" style="cursor: pointer;">Show exact grounded text</summary>
+          <div class="small border rounded-3 bg-light p-2 mt-2" style="white-space: pre-wrap;">${excerpt || '—'}</div>
+        </details>
+
+        <details class="mt-2">
+          <summary class="small fw-semibold" style="cursor: pointer;">Show exact context block sent to model</summary>
+          <div class="small border rounded-3 bg-light p-2 mt-2" style="white-space: pre-wrap;">${escapeHtml(contextBlockPreview)}</div>
+        </details>
+      </div>
+    `;
+  }).join('');
+}
+
 function renderTrace(trace) {
+  console.log('[chatbot-rag] renderTrace trace:', trace);
   const tracePanel = getEl('tracePanel');
   const emptyState = getEl('traceEmptyState');
 
@@ -821,6 +961,8 @@ function renderTrace(trace) {
     : (trace.rag?.document ? [trace.rag.document] : []);
 
   const warnings = Array.isArray(trace.warnings) ? trace.warnings : [];
+  const references = Array.isArray(trace.context?.references) ? trace.context.references : [];
+  const contextText = trace.context?.context_text || '';
 
   if (getEl('traceSummaryId')) getEl('traceSummaryId').textContent = trace.traceId || '—';
   if (getEl('traceSummaryModel')) getEl('traceSummaryModel').textContent = trace.model?.id || '—';
@@ -847,13 +989,39 @@ function renderTrace(trace) {
 
   const sourcesBox = getEl('traceSourcesBox');
   if (sourcesBox) {
-    sourcesBox.innerHTML = sourcesConsidered.length
-      ? sourcesConsidered.map((item) => {
-          const title = escapeHtml(item.title || item.name || item.id || 'Document');
-          const language = escapeHtml(item.language || trace.rag?.language || 'auto');
-          return `<div><strong>${title}</strong> <span class="text-muted">(${language})</span></div>`;
-        }).join('')
-      : 'No sources recorded.';
+    const sourcesHtml = renderTraceSourcesHtml(
+      sourcesConsidered,
+      trace.rag?.language || 'auto'
+    );
+
+    const referencesHtml = renderTraceReferencesHtml(references);
+
+    const contextPreview = contextText
+      ? escapeHtml(createTraceTextPreview(contextText, 1200))
+      : 'No grounded context text recorded.';
+
+    sourcesBox.innerHTML = `
+      <div class="mb-4">
+        <h4 class="h6 fw-semibold mb-3">Sources considered</h4>
+        ${sourcesHtml}
+      </div>
+
+      <div class="mb-4">
+        <h4 class="h6 fw-semibold mb-3">Grounded references used by HALO</h4>
+        ${referencesHtml}
+      </div>
+
+      <div>
+        <h4 class="h6 fw-semibold mb-3">Context passed to the model</h4>
+        <div class="small text-muted border rounded-3 bg-light p-3" style="white-space: pre-wrap;">${contextPreview}</div>
+        ${contextText ? `
+          <details class="mt-3">
+            <summary class="small fw-semibold" style="cursor: pointer;">Show full context text</summary>
+            <div class="small border rounded-3 bg-light p-3 mt-2" style="white-space: pre-wrap;">${escapeHtml(contextText)}</div>
+          </details>
+        ` : ''}
+      </div>
+    `;
   }
 
   const warningsBox = getEl('traceWarningsBox');
@@ -861,7 +1029,7 @@ function renderTrace(trace) {
     warningsBox.innerHTML = warnings.length
       ? warnings.map((item) => {
           const message = escapeHtml(item.message || item.type || 'Warning');
-          return `<div class="text-warning">${message}</div>`;
+          return `<div class="text-warning mb-2">${message}</div>`;
         }).join('')
       : 'No warnings.';
   }

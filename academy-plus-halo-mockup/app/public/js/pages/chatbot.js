@@ -1,4 +1,4 @@
-// public/js/pages/chatbot.js
+// academy-plus-halo-mockup/app/public/js/pages/chatbot.js
 
 import {
   initializeRagUi,
@@ -7,6 +7,8 @@ import {
   setLatestTraceId,
   clearRenderedTrace
 } from '/js/pages/chatbot-rag.js';
+
+import { renderMarkdown } from '/js/lib/markdown-renderer.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   const promptInput = document.getElementById('promptInput');
@@ -40,6 +42,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const initialSystemValue = systemInput?.value ?? '';
   const initialMessagesValue = messagesInput?.value ?? '[]';
+
+  const markdownRenderOptions = {
+    enableMath: true,
+    enableTableExport: true,
+    enableImageEnhancement: true,
+    enableLinkEnhancement: true
+  };
 
   let latestRawResponse = '';
   let isRenderedView = true;
@@ -170,62 +179,16 @@ document.addEventListener('DOMContentLoaded', () => {
     responseBox.scrollTop = responseBox.scrollHeight;
   }
 
-  function waitForMathJax(timeoutMs = 5000) {
-    return new Promise((resolve, reject) => {
-      const start = Date.now();
-
-      function check() {
-        if (window.MathJax && window.MathJax.typesetPromise) {
-          resolve(window.MathJax);
-          return;
-        }
-
-        if (Date.now() - start >= timeoutMs) {
-          reject(new Error('MathJax did not load in time.'));
-          return;
-        }
-
-        setTimeout(check, 50);
-      }
-
-      check();
-    });
-  }
-
-  function styleTables(container) {
-    if (!container) return;
-
-    container.querySelectorAll('table').forEach((table) => {
-      table.classList.add('table', 'table-bordered', 'table-hover', 'table-sm', 'align-middle');
-
-      if (!table.parentElement.classList.contains('table-responsive')) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'table-responsive my-3';
-        table.parentNode.insertBefore(wrapper, table);
-        wrapper.appendChild(table);
-      }
-    });
-  }
-
   async function renderFinalResponse(rawText) {
     if (!responseContent) return;
 
-    const html = marked.parse(rawText || '');
-
     responseContent.classList.remove('font-monospace');
-    responseContent.innerHTML = html;
-
-    responseContent.querySelectorAll('pre code').forEach((block) => {
-      hljs.highlightElement(block);
-    });
-
-    styleTables(responseContent);
 
     try {
-      const mathJax = await waitForMathJax();
-      await mathJax.typesetPromise([responseContent]);
+      await renderMarkdown(responseContent, rawText || '', markdownRenderOptions);
     } catch (error) {
-      console.error('[MathJax] Rendering failed:', error);
+      console.error('[chatbot.js] Markdown rendering failed:', error);
+      responseContent.textContent = rawText || '';
     }
   }
 
@@ -533,8 +496,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setLatestTraceId(null);
 
     if (responseContent) {
-      responseContent.textContent = '';
       responseContent.classList.remove('font-monospace');
+      responseContent.textContent = '';
     }
 
     if (statusBox) {
@@ -641,6 +604,7 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       console.error('[chatbot.js] Error while requesting HALO:', error);
       if (responseContent) {
+        responseContent.classList.remove('font-monospace');
         responseContent.textContent =
           error.message || 'An error occurred while requesting HALO.';
       }

@@ -1,3 +1,4 @@
+// app/routes/api/chatRoutes.js
 const express = require('express');
 const multer = require('multer');
 const os = require('os');
@@ -30,6 +31,9 @@ router.post('/rag/upload', upload.single('file'), chatControllerAPI.handleRagUpl
 // Request-scoped RAG flow
 router.post('/rag/stream', chatControllerAPI.handleRagStream);
 router.post('/rag/stop', chatControllerAPI.stopRagStream);
-router.get('/rag/traces/:traceId', chatControllerAPI.handleRagTrace);
+router.get('/rag/traces/:traceId', (req, res, next) => {
+  console.log('[Quizity API] Trace route hit:', req.params.traceId);
+  return chatControllerAPI.handleRagTrace(req, res, next);
+});
 
 module.exports = router;

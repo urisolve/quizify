@@ -77,14 +77,38 @@ async function proxyJsonGet(url, res, fallbackMessage) {
       }
     });
 
+    const contentType = response.headers.get('content-type') || '';
+    const rawText = await response.text();
+
+    console.log('[chatbotControllerAPI] GET proxy URL:', url);
+    console.log('[chatbotControllerAPI] GET proxy status:', response.status);
+    console.log('[chatbotControllerAPI] GET proxy content-type:', contentType);
+    console.log('[chatbotControllerAPI] GET proxy body preview:', rawText.slice(0, 300));
+
     if (!response.ok) {
-      const errorPayload = await readErrorPayload(response, fallbackMessage);
+      let errorPayload = rawText;
+
+      if (contentType.includes('application/json')) {
+        try {
+          const parsed = JSON.parse(rawText);
+          errorPayload = parsed?.error || parsed || fallbackMessage;
+        } catch (error) {
+          errorPayload = rawText || fallbackMessage;
+        }
+      }
+
       return res.status(response.status).json({
         error: errorPayload || fallbackMessage
       });
     }
 
-    const data = await response.json();
+    if (!contentType.includes('application/json')) {
+      return res.status(502).json({
+        error: `Upstream returned non-JSON content-type: ${contentType || 'unknown'}`
+      });
+    }
+
+    const data = JSON.parse(rawText);
     return res.status(200).json(data);
   } catch (error) {
     console.error('[chatbotControllerAPI] GET proxy failed:', error);

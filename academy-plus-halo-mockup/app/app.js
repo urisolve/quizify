@@ -1,4 +1,4 @@
-// Add this import at the top with other model initializations
+// app/app.js
 //? Main file of the application
 
 //* Import required modules
@@ -116,7 +116,14 @@ app.engine('hbs', engine({
 app.set('view engine', 'hbs'); // tells express that the views are handlebars files
 app.set('views', path.join(__dirname, './views')); // location of the views
 
-
+//* Session configuration
+app.use(session({
+  secret: process.env.SESSION_SECRET,
+  resave: false,
+  saveUninitialized: false,
+  //cookie: { secure: false } // change to true if using HTTPS
+  cookie: { secure: false, maxAge: 3600000 } // 1 hour sessions
+}));
 
 //* Routes
 const routes = require('./routes/routes');
@@ -129,15 +136,6 @@ app.use('/api/user', userApiRoutes);
 //* General API routes (add this)
 const apiRoutes = require('./routes/api');
 app.use('/api', apiRoutes);
-
-//* Session configuration
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  //cookie: { secure: false } // change to true if using HTTPS
-  cookie: { secure: false, maxAge: 3600000 } // 1 hour sessions
-}));
 
 app.use((req, res, next) => {
   res.locals.user = req.session.user;

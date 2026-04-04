@@ -601,7 +601,6 @@
         </div>
 
         <div class="accordion accordion-flush" id="ragVersionHistoryAccordion">
-          <!-- v1.0.1 -->
           <div class="accordion-item border rounded-4 mb-2 overflow-hidden">
             <h2 class="accordion-header" id="ragVersion101Heading">
               <button
@@ -649,7 +648,6 @@
             </div>
           </div>
 
-          <!-- v1.0.0 -->
           <div class="accordion-item border rounded-4 mb-2 overflow-hidden">
             <h2 class="accordion-header" id="ragVersion100Heading">
               <button
@@ -686,7 +684,6 @@
             </div>
           </div>
 
-          <!-- v0.0.1 -->
           <div class="accordion-item border rounded-4 overflow-hidden">
             <h2 class="accordion-header" id="ragVersion001Heading">
               <button
@@ -742,10 +739,17 @@
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.7/dist/purify.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script>
   window.MathJax = {
     tex: {
-      inlineMath: [['$', '$'], ['\\(', '\\)']]
+      inlineMath: [['\\(', '\\)']],
+      displayMath: [['\\[', '\\]']],
+      processEscapes: true
+    },
+    options: {
+      skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
     }
   };
 </script>

@@ -145,6 +145,244 @@ body {
   padding-bottom: 20px;
 }
 
+/* =========================
+   HALO MARKDOWN RENDERER
+   ========================= */
+
+#responseBox {
+  line-height: 1.6;
+}
+
+#responseContent.font-monospace {
+  white-space: pre-wrap;
+}
+
+.halo-chat-response {
+  color: #2a3547;
+  line-height: 1.7;
+  word-break: break-word;
+}
+
+.halo-chat-response > :first-child {
+  margin-top: 0;
+}
+
+.halo-chat-response > :last-child {
+  margin-bottom: 0;
+}
+
+.halo-chat-response h1,
+.halo-chat-response h2,
+.halo-chat-response h3,
+.halo-chat-response h4,
+.halo-chat-response h5,
+.halo-chat-response h6 {
+  color: #2a3547;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.halo-chat-response h1 {
+  font-size: 1.8rem;
+}
+
+.halo-chat-response h2 {
+  font-size: 1.55rem;
+}
+
+.halo-chat-response h3 {
+  font-size: 1.3rem;
+}
+
+.halo-chat-response h4 {
+  font-size: 1.15rem;
+}
+
+.halo-chat-response h5,
+.halo-chat-response h6 {
+  font-size: 1rem;
+}
+
+.halo-chat-response p,
+.halo-chat-response ul,
+.halo-chat-response ol,
+.halo-chat-response blockquote,
+.halo-chat-response pre,
+.halo-chat-response table,
+.halo-chat-response .halo-image-card,
+.halo-chat-response .halo-table-card {
+  margin-bottom: 1rem;
+}
+
+.halo-chat-response ul,
+.halo-chat-response ol {
+  padding-left: 1.35rem;
+}
+
+.halo-chat-response li + li {
+  margin-top: 0.3rem;
+}
+
+.halo-chat-response hr {
+  border: 0;
+  border-top: 1px solid rgba(42, 53, 71, 0.1);
+  margin: 1.5rem 0;
+}
+
+.halo-chat-response strong {
+  font-weight: 700;
+}
+
+.halo-chat-response em {
+  font-style: italic;
+}
+
+.halo-chat-response blockquote {
+  background: rgba(93, 135, 255, 0.08);
+  border-left: 4px solid #5d87ff;
+  border-radius: 0 14px 14px 0;
+  color: #2a3547;
+  padding: 0.9rem 1rem;
+}
+
+.halo-chat-response blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.halo-chat-response code:not(pre code) {
+  background: rgba(42, 53, 71, 0.08);
+  border-radius: 8px;
+  color: #30415f;
+  font-size: 0.92em;
+  padding: 0.15rem 0.4rem;
+}
+
+.halo-chat-response pre {
+  background: #0f172a;
+  border: 1px solid rgba(15, 23, 42, 0.18);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  color: #e2e8f0;
+  margin: 1rem 0;
+  overflow-x: auto;
+  padding: 1rem;
+}
+
+.halo-chat-response pre code {
+  background: transparent;
+  color: inherit;
+  display: block;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  min-width: max-content;
+  padding: 0;
+  border-radius: 0;
+}
+
+.halo-md-link,
+.halo-chat-response a {
+  color: #3769ff;
+  text-decoration: none;
+  text-underline-offset: 2px;
+  word-break: break-word;
+}
+
+.halo-md-link:hover,
+.halo-chat-response a:hover {
+  text-decoration: underline;
+}
+
+.halo-table-card {
+  background: #ffffff;
+  border: 1px solid rgba(42, 53, 71, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(42, 53, 71, 0.06);
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.halo-table-toolbar {
+  align-items: center;
+  background: #f8f9fc;
+  border-bottom: 1px solid rgba(42, 53, 71, 0.08);
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  padding: 0.75rem;
+}
+
+.halo-table-wrap {
+  overflow-x: auto;
+  width: 100%;
+}
+
+.halo-chat-response table {
+  margin-bottom: 0;
+  width: 100%;
+}
+
+.halo-chat-response table th {
+  background: #f8f9fc;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.halo-chat-response table th,
+.halo-chat-response table td {
+  vertical-align: middle;
+}
+
+.halo-image-card {
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.halo-image-card img {
+  border-radius: 16px;
+  box-shadow: 0 10px 24px rgba(42, 53, 71, 0.12);
+  display: block;
+  height: auto;
+  margin: 0 auto;
+  max-width: 100%;
+}
+
+.halo-image-caption {
+  color: #5a6a85;
+  font-size: 0.875rem;
+  margin-top: 0.65rem;
+}
+
+.halo-inline-math {
+  display: inline;
+}
+
+.halo-math-display {
+  display: block;
+  margin: 1rem 0;
+  overflow-x: auto;
+}
+
+.halo-chat-response .MathJax,
+.halo-chat-response mjx-container {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.halo-chat-response mjx-container[display='true'] {
+  margin: 1rem 0 !important;
+}
+
+.halo-chat-response img,
+.halo-chat-response table,
+.halo-chat-response pre,
+.halo-chat-response mjx-container {
+  max-width: 100%;
+}
+
 @media (max-width: 1199.98px) {
   .page-content {
     padding-top: 88px;
@@ -163,5 +401,24 @@ body {
   .halo-brand-subtitle {
     font-size: 0.7rem;
   }
-}
 
+  .halo-chat-response h1 {
+    font-size: 1.55rem;
+  }
+
+  .halo-chat-response h2 {
+    font-size: 1.35rem;
+  }
+
+  .halo-chat-response h3 {
+    font-size: 1.15rem;
+  }
+
+  .halo-table-toolbar {
+    justify-content: stretch;
+  }
+
+  .halo-table-toolbar .btn {
+    flex: 1 1 auto;
+  }
+}
