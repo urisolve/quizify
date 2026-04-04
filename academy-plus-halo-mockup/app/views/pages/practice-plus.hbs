@@ -68,12 +68,14 @@
                   </span>
                   <div class="flex-grow-1">
                     <div class="d-flex align-items-start justify-content-between gap-2">
-                      <h3 class="fs-5 fw-semibold mb-1">{{subtopicT id 'name'}}</h3>
+                      <div>
+                        <h3 class="fs-5 fw-semibold mb-1">{{subtopicT id 'name'}}</h3>
+                        <p class="mb-0 text-muted small" style="text-align: justify;">{{subtopicT id 'description'}}</p>
+                      </div>                      
                       {{#if image}}
                         <img class="rounded-2" src="{{image}}" alt="{{subtopicT id 'name'}}" style="width: 100px; object-fit: cover; flex-shrink: 0;" />
                       {{/if}}
                     </div>
-                    <p class="mb-0 text-muted small" style="text-align: justify;">{{subtopicT id 'description'}}</p>
                   </div>
                 </div>
 
@@ -113,26 +115,26 @@
       {{/each}}
     </div>
 
-    <!-- BOTTOM CTA -->
+    <!-- BOTTOM -->
     <div class="col-12">
       <section class="card">
-        <div class="card-body p-4 d-flex align-items-center justify-content-between flex-wrap gap-3">
-          <div class="d-flex align-items-center gap-3">
-            <span class="halo-section-icon bg-light-warning text-warning">
-              <i class="ti ti-trophy"></i>
-            </span>
-            <div>
-              <h3 class="fw-semibold mb-0">{{ t 'practice_plus.test_skills_prompt' }}</h3>
-              <p class="mb-0 text-muted small">{{generalProgress}}%</p>
+        <div class="card-body p-4 d-flex align-items-center gap-3">
+          <span class="halo-section-icon bg-light-warning text-warning">
+            <i class="ti ti-trophy"></i>
+          </span>
+          <div class="flex-grow-1">
+            <h3 class="fw-semibold">{{ t 'practice_plus.test_skills_prompt' }}</h3>
+            <div class="progress mt-4" style="height: 6px;">
+              <div class="progress-bar bg-primary" role="progressbar" style="width: {{generalProgress}}%"></div>
             </div>
+            <span class="small text-muted">{{generalProgress}}%</span>
           </div>
-          <button class="btn btn-warning text-white fw-semibold px-4 py-2 general-action-btn">
+          <button class="btn btn-warning mt-4 text-white fw-semibold px-4 py-2 general-action-btn flex-shrink-0">
             <i class="ti ti-arrow-right me-2"></i>{{ t 'practice_plus.continue_btn' }}
           </button>
         </div>
       </section>
     </div>
-
   </div>
 </div>
 
