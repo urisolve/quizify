@@ -43,7 +43,9 @@
         "great_job": "GREAT JOB!",
         "good_work": "GOOD WORK!",
         "nice_try": "NICE TRY!",
-        "keep_going": "KEEP GOING!"
+        "keep_going": "KEEP GOING!",
+        "experience": "Experience Progress:",
+        "levelup": "🎉 Level Up!"
     },
     "statistics": {
         "statistics": "Statistics",
@@ -79,14 +81,16 @@
         "no_subtopics": "No subtopics available"
     },
     "query_plus": {
-        "submit_btn": "Submit Answer"
+        "submit_btn": "Submit Answer",
+        "answers_label": "Select the Correct Answer"
     },
     "practice_plus": {
         "practiceplus": "Practice Plus",
         "test_skills_prompt": "Do you want to test your skills?",
         "continue_btn": "Continue",
         "topic_start": "Start Topic",
-        "start": "Start"
+        "start": "Start",
+        "redo": "Redo"
     },
     "topics": {
         "1": { "name": "Systems of Units", "description": "Fundamental concepts about systems of measurement units" },

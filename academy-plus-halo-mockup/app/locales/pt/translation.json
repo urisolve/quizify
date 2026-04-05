@@ -44,7 +44,9 @@
         "great_job": "MUITO BEM!",
         "good_work": "BOM TRABALHO!",
         "nice_try": "BOA TENTATIVA!",
-        "keep_going": "CONTINUE!"
+        "keep_going": "CONTINUE!",
+        "experience": "O teu progresso:",
+        "levelup": "🎉 Subiu de nível!"
     },
     "statistics": {
         "statistics": "Estatísticas",
@@ -88,14 +90,16 @@
         "no_subtopics": "Nenhum subtópico disponível"
     },
     "query_plus": {
-        "submit_btn": "Submeter Resposta"
+        "submit_btn": "Submeter Resposta",
+        "answers_label": "Selecione a resposta correta."
     },
     "practice_plus": {
         "practiceplus": "Practice Plus",
         "test_skills_prompt": "Quer testar as suas competências?",
         "continue_btn": "Continuar",
         "topic_start": "Iniciar Tópico",
-        "start": "Iniciar"
+        "start": "Iniciar",
+        "redo": "Repetir"
     },
     "topics": {
         "1": { "name": "Sistemas de Unidades", "description": "Conceitos fundamentais sobre sistemas de unidades de medição" },
