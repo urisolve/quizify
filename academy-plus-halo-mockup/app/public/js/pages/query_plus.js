@@ -19,25 +19,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function showFloatingFeedback(message) {
     const floating = document.getElementById('floating-feedback');
-    const msg = document.getElementById('floating-feedback-message');
     const tooltip = document.getElementById('feedback-fab-tooltip');
-    if (floating && msg) {
-      msg.innerHTML = message;
+    
+    if (floating && tooltip) {
+      tooltip.textContent = message;
       floating.style.display = 'flex';
-      // Show tooltip for a few seconds if present
-      if (tooltip) {
-        tooltip.classList.remove('hide');
-        tooltip.classList.add('show');
-        tooltip.style.display = 'block';
-        setTimeout(() => {
-          tooltip.classList.remove('show');
-          tooltip.classList.add('hide');
-          setTimeout(() => {
-            tooltip.classList.remove('hide');
-            tooltip.style.display = 'none';
-          }, 350); // <-- match SCSS animation duration
-        }, 1500);
-      }
     }
   }
  
@@ -49,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const selected = document.querySelector('.answer-option input[type="radio"]:checked');
       if (!selected) return;
 
-      const answerText = selected.parentElement.textContent.trim();
+      const answerText = selected.parentElement.querySelector('span:last-child').textContent.trim();
 
       const res = await fetch('/api/query/submit-answer', {
         method: 'POST',

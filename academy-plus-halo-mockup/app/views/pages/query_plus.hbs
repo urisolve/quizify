@@ -1,50 +1,84 @@
-<div class="practice-question-container">  
-    <div class="query-progress-container">
-      <div class="query-progress-bg">
-        <div class="query-progress-fill" data-progress="{{progress}}" style="width: {{progress}}%;"></div>
-      </div>
-    </div>  
-  {{!-- <h2>Practice Question</h2> --}}
-  <div class="qa-row">
-    <div class="question-card">
-      {{#if question.image}}
-        <img id="question-img" src="{{question.image}}" alt="Question image" />
-      {{/if}}
-      <div id="question-text">
-        {{question.question_text}}
-      </div>
-       <!-- Floating feedback icon and message INSIDE the question card -->
-      <div class="floating-feedback" id="floating-feedback" style="display:none;">
-        <div class="feedback-fab" id="feedback-fab">
-          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-            <circle cx="16" cy="16" r="16" fill="#FFA726"/>
-            <text x="16" y="23" text-anchor="middle" font-size="20" fill="#fff" font-family="Arial" font-weight="bold">i</text>
-          </svg>
+<div class="container-fluid">
+  <div class="row g-4">
+    <!-- Topic -->
+    <div class="col-12 mb-0">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center justify-content-between flex-wrap ">
+            <div class="d-flex align-items-center gap-3">
+              <span class="halo-section-icon bg-light-primary text-primary">
+                <i class="ti ti-book"></i>
+              </span>
+              <h1 class="fw-semibold mb-0 fs-4">{{ headerTitle }}</h1>
+            </div>
+          </div>
         </div>
-        <div class="feedback-fab-tooltip" id="feedback-fab-tooltip" style="display:none;">
-          Click the "i" for help
+      </section>
+    </div>
+
+    <!-- QUESTION -->
+    <div class="col-12 mt-0">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-question-mark"></i>
+            </span>
+            <p id="question-text" class="fs-5 mb-0" style="text-align: justify;">
+              {{question.question_text}}
+            </p>
+          </div>
+
+          {{#if question.image}}
+            <img id="question-img" src="{{question.image}}" alt="Question image"
+              class="img-fluid rounded-3 mb-2" style="max-height: 220px; object-fit: contain;">
+          {{/if}}
+
+          <!-- ANSWERS -->
+          <div class="d-flex align-items-center gap-3 mb-2">
+            <span class="halo-section-icon bg-light-success text-success">
+              <i class="ti ti-list-check"></i>
+            </span>
+            <h2 class="card-title fw-semibold mb-0 fs-5">{{ t 'query_plus.answers_label' }}</h2>
+          </div>
+
+          <form id="answer-form" autocomplete="off">
+            <div id="answers-area" class="d-grid gap-2">
+              {{#each answers}}
+                <label class="answer-option btn btn-outline-secondary text-start px-3 py-2 d-flex align-items-center gap-2" 
+                  style="cursor: pointer;">
+                  <input type="radio" name="answer" value="{{@index}}" hidden>
+                  <span class="d-inline-flex align-items-center justify-content-center rounded-circle border flex-shrink-0"
+                    style="width: 28px; height: 28px; font-size: 0.8rem; pointer-events: none;">
+                    {{letterIndex @index}}
+                  </span>
+                  <span style="pointer-events: none;">{{this.text}}</span>
+                </label>
+              {{/each}}
+            </div>
+          </form>
+
+          <!-- Feedback -->
+          <div class="floating-feedback" id="floating-feedback" style="display:none;">
+            <div class="d-flex align-items-center gap-3" id="floating-feedback-message" role="alert">
+              <span class="halo-section-icon bg-light-warning text-warning flex-shrink-0" id="feedback-fab" style="cursor: pointer;">
+                <i class="ti ti-info-circle"></i>
+              </span>
+              <div id="feedback-fab-tooltip" class="fw-medium"></div>
+            </div>
+          </div>
+
+          <div class="mt-auto">
+            <button type="submit" form="answer-form" class="btn btn-primary w-100 py-2 fw-semibold">
+              <i class="ti ti-send me-2"></i>{{ t 'query_plus.submit_btn' }}
+            </button>
+          </div>
+
         </div>
-        <div class="floating-feedback-message" id="floating-feedback-message">
-          <!-- Message will be set by JS -->
-          Incorrect. Try again!<br>
-          The current increases when the switch is closed because the circuit is completed.
-        </div>
-      </div>
+      </section>
     </div>
   </div>
-  <div class="answers-card">
-    <form id="answer-form" autocomplete="off">
-      <div id="answers-area" class="answers-grid">
-        {{#each answers}}
-          <label class="answer-option">
-            <input type="radio" name="answer" value="{{@index}}" hidden>
-            {{this.text}}
-          </label>
-        {{/each}}
-      </div>
-    </form>
-  </div>
-  <button type="submit" form="answer-form" class="red-button-inverse btn">{{ t 'query_plus.submit_btn' }}</button>
 </div>
+
 <audio id="correct-sound" src="/sounds/correct.mp3" preload="auto"></audio>
 <script src="/js/pages/query_plus.js"></script>

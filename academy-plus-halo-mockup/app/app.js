@@ -121,6 +121,11 @@ const hbsHelpers = {
     return JSON.stringify(context);
   },
 
+  // Letter Index in questions
+  letterIndex: function(index) {
+    return String.fromCharCode(65 + index); // 0→A, 1→B, 2→C, 3→D
+  },
+
   // formatDate helper: formats date as YYYY-MM-DD (local time)
   formatDate: function (dateString) {
     if (!dateString) return '';
