@@ -41,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
   const form = document.getElementById('answer-form');
   if (form) {
     form.addEventListener('submit', async function (e) {
-      clearInterval(timerInterval);
       e.preventDefault();
       const selected = document.querySelector('.answer-option input[type="radio"]:checked');
       if (!selected) return;
@@ -56,30 +55,33 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
 
       const selectedLabel = selected ? selected.parentElement : null;
+
       // Remove previous feedback classes
       document.querySelectorAll('.answer-option').forEach(label => {
         label.classList.remove('answer-correct', 'answer-incorrect');
       });
+
       if (data.correct) {
+        clearInterval(timerInterval);
         if (selectedLabel) selectedLabel.classList.add('answer-correct');
         // Update progress bar
         if (typeof data.progress === 'number') {
           const progressBar = document.querySelector('.query-progress-fill');
           if (progressBar) progressBar.style.width = `${data.progress}%`;
         }
-    // Play correct answer sound
-    const correctAudio = document.getElementById('correct-sound');
-    if (correctAudio) {
-      correctAudio.volume = 0.15;
-      correctAudio.play();
-    }
-    setTimeout(() => {
-      if (data.complete) {
-        window.location.href = '/query-complete';
-      } else {
-        window.location.reload();
-      }
-    }, 1000);
+        // Play correct answer sound
+        const correctAudio = document.getElementById('correct-sound');
+        if (correctAudio) {
+          correctAudio.volume = 0.15;
+          correctAudio.play();
+        }
+        setTimeout(() => {
+          if (data.complete) {
+            window.location.href = '/query-complete';
+          } else {
+            window.location.reload();
+          }
+        }, 1000);
       } else {
         if (selectedLabel) selectedLabel.classList.add('answer-incorrect');
         // Update progress bar
