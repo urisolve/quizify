@@ -1,17 +1,34 @@
 // ...existing code...
 
-document.addEventListener('DOMContentLoaded', () => {
-  const topicItems = document.querySelectorAll('.practive-topic-selector li');
+function initPracticePlus() {
+  const selectorBtns = document.querySelectorAll('.topic-selector-btn');
   const topicBlocks = document.querySelectorAll('.topic-content-block');
 
-  topicItems.forEach((item, idx) => {
-    item.addEventListener('click', function (e) {
-      e.preventDefault();
-      topicItems.forEach(i => i.classList.remove('active'));
-      this.classList.add('active');
+  console.log('Selector buttons found:', selectorBtns.length);
+  console.log('Topic blocks found:', topicBlocks.length);
+
+  selectorBtns.forEach((btn, idx) => {
+    btn.addEventListener('click', function () {
+      console.log('clicked index:', idx);
+
+      // Update button styles
+      selectorBtns.forEach(b => {
+        b.classList.remove('btn-primary');
+        b.classList.add('btn-outline-secondary');
+        b.querySelector('.progress-bar').classList.remove('bg-white', 'bg-opacity-50');
+        b.querySelector('.progress-bar').classList.add('bg-primary');
+      });
+      this.classList.remove('btn-outline-secondary');
+      this.classList.add('btn-primary');
+      this.querySelector('.progress-bar').classList.remove('bg-primary');
+      this.querySelector('.progress-bar').classList.add('bg-white', 'bg-opacity-50');
+
+      // Show correct content block
       topicBlocks.forEach((block, bidx) => {
         block.style.display = (idx === bidx) ? '' : 'none';
       });
     });
   });
-});
+}
+
+initPracticePlus();

@@ -23,11 +23,11 @@ const queryPlusController = async (req, res) => {
   // Get title based on query type
   if (query.type === 'subtopic' && query.subtopicId) {
     const [[subtopic]] = await getSubtopicById(query.subtopicId);
-    headerTitle = subtopic ? subtopic.title : 'Subtopic Quiz';
+    headerTitle = subtopic ? subtopic.title : 'Subtopic';
   } else if (query.type === 'topic' && query.topicId) {
     const [topics] = await getTopics();
     const topic = topics.find(t => t.id == query.topicId);
-    headerTitle = topic ? `${topic.name} Quiz` : 'Topic Quiz';
+    headerTitle = topic ? `${topic.name} Quiz` : 'Topic';
   }
 
   // Get the current question
@@ -78,7 +78,10 @@ const queryPlusController = async (req, res) => {
 
   res.renderPage('query_plus', {
     layout: 'main',
+    type: query.type,
     headerTitle,
+    topicId: query.topicId || null,
+    subtopicId: query.subtopicId || null,
     question: questionData,
     answers,
     progress,

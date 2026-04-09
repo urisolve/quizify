@@ -92,6 +92,16 @@ const hbsHelpers = {
     return key;
   },
 
+  topicT: function(id, field, options) {
+    const i18n = options.data.root.i18n;
+    return i18n ? i18n.t(`topics.${id}.${field}`) : '';
+  },
+
+  subtopicT: function(id, field, options) {
+    const i18n = options.data.root.i18n;
+    return i18n ? i18n.t(`subtopics.${id}.${field}`) : '';
+  },
+
   // equality check helper
   eq: function (a, b) {
     return a === b;
@@ -109,6 +119,11 @@ const hbsHelpers = {
   // JSON stringify helper
   json: function (context) {
     return JSON.stringify(context);
+  },
+
+  // Letter Index in questions
+  letterIndex: function(index) {
+    return String.fromCharCode(65 + index); // 0→A, 1→B, 2→C, 3→D
   },
 
   // formatDate helper: formats date as YYYY-MM-DD (local time)

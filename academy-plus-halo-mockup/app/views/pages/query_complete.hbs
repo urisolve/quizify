@@ -1,50 +1,98 @@
+<div class="container-fluid">
+  <div class="row g-4 justify-content-center">
 
+    <!-- HERO -->
+    <div class="col-12">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-4 p-lg-5 text-center">
+          <h1 class="display-5 fw-semibold mb-3">{{t 'query_complete.congratulations'}}</h1>
 
-<div class="completion-container">
-  <h2>{{t 'query_complete.congratulations'}}</h2>
-  <div class="performance-row" id="performance-row">
-    <span class="performance-bolts">
-      {{#each (range filledBolts)}}
-        <i class="bi bi-lightning-charge-fill bolt-lightning"></i>
-      {{/each}}
-      {{#each (range outlineBolts)}}
-        <i class="bi bi-lightning-charge bolt-outline"></i>
-      {{/each}}
-    </span>
-  </div>
-  <div class="completion-message">
-    {{#if leveledUp}}
-    🎉 <strong>{{t 'query_complete.level_up'}}</strong> 🎉
-    {{else}}
-      {{#if (eq performanceMessageKey 'query_complete.perfect')}}
-      ⚡ <strong>{{t 'query_complete.perfect'}}</strong> ⚡
-      {{else if (eq performanceMessageKey 'query_complete.excellent')}}
-      🌟 <strong>{{t 'query_complete.excellent'}}</strong> 🌟
-      {{else if (eq performanceMessageKey 'query_complete.great_job')}}
-      🎯 <strong>{{t 'query_complete.great_job'}}</strong> 🎯
-      {{else if (eq performanceMessageKey 'query_complete.good_work')}}
-      👍 <strong>{{t 'query_complete.good_work'}}</strong> 👍
-      {{else if (eq performanceMessageKey 'query_complete.nice_try')}}
-      💪 <strong>{{t 'query_complete.nice_try'}}</strong> 💪
-      {{else}}
-      🔥 <strong>{{t 'query_complete.keep_going'}}</strong> 🔥
-      {{/if}}
-    {{/if}}
-  </div>
-  <div class="points-earned">
-    <span>{{t 'query_complete.weekly_points'}}: <strong>{{weeklyScore}}</strong> <span class="points-gain">+{{score}}</span></span>
-  </div>
-  <div class="points-bar-container" 
-       data-percent="{{expBarPercent}}" 
-       data-percent-prev="{{expBarPercentPrev}}"
-       data-leveled-up="{{leveledUp}}">
-    <div class="points-bar-bg">
-      <div class="points-bar-fill points-bar-fill-prev" id="points-bar-fill-prev"></div>
-      <div class="points-bar-fill points-bar-fill-new" id="points-bar-fill-new"></div>
+          <!-- Performance bolts -->
+          <div class="d-flex justify-content-center gap-1 mb-3" id="performance-row">
+            <span class="performance-bolts fs-3">
+              {{#each (range filledBolts)}}
+                <i class="bi bi-lightning-charge-fill bolt-lightning"></i>
+              {{/each}}
+              {{#each (range outlineBolts)}}
+                <i class="bi bi-lightning-charge bolt-outline"></i>
+              {{/each}}
+            </span>
+          </div>
+
+          <!-- Performance message -->
+          <div class="fs-5 fw-semibold mb-0">
+            {{#if leveledUp}}
+              🎉 <strong>{{t 'query_complete.level_up'}}</strong> 🎉
+            {{else}}
+              {{#if (eq performanceMessageKey 'query_complete.perfect')}}
+                ⚡ <strong>{{t 'query_complete.perfect'}}</strong> ⚡
+              {{else if (eq performanceMessageKey 'query_complete.excellent')}}
+                🌟 <strong>{{t 'query_complete.excellent'}}</strong> 🌟
+              {{else if (eq performanceMessageKey 'query_complete.great_job')}}
+                🎯 <strong>{{t 'query_complete.great_job'}}</strong> 🎯
+              {{else if (eq performanceMessageKey 'query_complete.good_work')}}
+                👍 <strong>{{t 'query_complete.good_work'}}</strong> 👍
+              {{else if (eq performanceMessageKey 'query_complete.nice_try')}}
+                💪 <strong>{{t 'query_complete.nice_try'}}</strong> 💪
+              {{else}}
+                🔥 <strong>{{t 'query_complete.keep_going'}}</strong> 🔥
+              {{/if}}
+            {{/if}}
+          </div>
+
+        </div>
+      </section>
     </div>
+
+    <!-- SCORE + EXP BAR -->
+    <div class="col-12 col-lg-6">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-4">
+
+          <!-- Weekly points -->
+          <div class="d-flex align-items-center gap-3">
+            <span class="halo-section-icon bg-light-warning text-warning">
+              <i class="ti ti-trophy"></i>
+            </span>
+            <div class="flex-grow-1">
+              <p class="mb-1 text-muted small">{{t 'query_complete.weekly_points'}}</p>
+              <div class="d-flex align-items-center gap-2">
+                <span class="fw-bold fs-4">{{weeklyScore}}</span>
+                <span class="badge bg-success-subtle text-success fw-semibold">+{{score}}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- EXP bar -->
+          <div>
+            <p class="mb-2 text-muted small fw-medium">{{t 'query_complete.experience'}}</p>
+            <div class="points-bar-container"
+              data-percent="{{expBarPercent}}"
+              data-percent-prev="{{expBarPercentPrev}}"
+              data-leveled-up="{{leveledUp}}">
+              <div class="points-bar-bg">
+                <div class="points-bar-fill points-bar-fill-prev" id="points-bar-fill-prev"></div>
+                <div class="points-bar-fill points-bar-fill-new" id="points-bar-fill-new"></div>
+              </div>
+            </div>
+            {{#if leveledUp}}
+              <p class="mt-2 small text-success fw-semibold">{{t 'query_complete.levelup'}}</p>
+            {{/if}}
+          </div>
+
+          <div class="mt-auto">
+            <a href="/practice-plus" class="btn btn-primary w-100 py-2 fw-semibold">
+              <i class="ti ti-arrow-right me-2"></i>{{t 'query_complete.continue_btn'}}
+            </a>
+          </div>
+
+        </div>
+      </section>
+    </div>
+
   </div>
-  <a href="/practice-plus" class="red-button-inverse btn">{{t 'query_complete.continue_btn'}}</a>
 </div>
+
 <audio id="completion-jingle" src="/sounds/complete-jingle.mp3"></audio>
 <audio id="level-up-sound" src="/sounds/level-up.mp3"></audio>
 <script src="/js/utils/fireworks.js"></script>
