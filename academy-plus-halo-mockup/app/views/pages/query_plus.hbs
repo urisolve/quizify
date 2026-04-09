@@ -34,6 +34,11 @@
               <i class="ti ti-list-check"></i>
             </span>
             <h2 class="card-title fw-semibold mb-0 fs-5">{{ t 'query_plus.answers_label' }}</h2>
+
+            <span class="ms-auto d-inline-flex align-items-center gap-1 bg-success text-white px-3 py-1 rounded-pill fw-semibold small flex-shrink-0" style="width: 100px; justify-content: center;">
+              <i class="ti ti-clock"></i>
+              <span id="question-timer">0s</span>
+            </span>
           </div>
 
 
@@ -50,8 +55,6 @@
             <img id="question-img" src="{{question.image}}" alt="Question image"
               class="img-fluid rounded-3 mb-2" style="max-height: 220px; object-fit: contain;">
           {{/if}}
-
-          
 
           <form id="answer-form" autocomplete="off">
             <div id="answers-area" class="d-grid gap-2">
