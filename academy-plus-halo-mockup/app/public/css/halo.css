@@ -240,3 +240,7 @@ body {
   background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
   box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
 }
+
+.progress-bar {
+  background-color: #9d12d9;
+}

@@ -47,6 +47,27 @@
         "experience": "Experience Progress:",
         "levelup": "🎉 Level Up!"
     },
+    "header": {
+        "logout": "Logout",
+        "login": "Login",
+        "settings": "Settings",
+        "level": "Level",
+        "stars": "Stars",
+        "statistics": "Statistics",
+        "guest": "Guest"
+    },
+    "sidebar": {
+        "home": "Home",
+        "learningarea": "Learning Area",
+        "ailearningarea": "AI Learning Path",
+        "playground": "Playground",
+        "chatbot": "Chatbot",
+        "aboutus": "About Us",
+        "abouthalo": "About HALO",
+        "contributors": "Contributors",
+        "publications": "Publications",
+        "contactus": "Contact Us"
+    },
     "statistics": {
         "statistics": "Statistics",
         "general_performance": "General Performance",
@@ -62,6 +83,7 @@
         "radial_graph_placeholder": "Radial Graph Placeholder",
         "badges_and_conquests": "Badges and Conquests",
         "badges": "Badges",
+        "nobadges": "No badges earned yet. Keep learning!",
         "conquests": "Conquests",
         "earned_on": "Earned on",
         "leaderboard": "Leaderboard",
