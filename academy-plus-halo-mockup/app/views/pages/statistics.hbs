@@ -1,69 +1,100 @@
-<div class="statistics-container">
-  <div class="statistics-cards">
-    <div class="statistics-flex">
-      <!-- LEFT COLUMN: Performance -->
-      <div class="card performance-summary">
-        <!-- Weekly Points and Leaderboard Button -->
-        <div class="weekly-points-leaderboard">
-          <div class="weekly-points-label">
-            {{t 'statistics.weekly_points'}}:
-            <span class="weekly-points-value">{{userWeeklyScore}}</span>
+<div class="container-fluid">
+  <div class="row g-4">
+
+    <!-- HERO -->
+    <div class="col-12">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-4 p-lg-5">
+          <div class="d-flex align-items-center gap-4 flex-wrap">
+            <h1 class="display-5 fw-semibold me-5">{{ t 'statistics.statistics' }}</h1>
+            <div class="d-flex align-items-center gap-4">
+              <span class="halo-section-icon bg-light-warning text-warning">
+                <i class="ti ti-trophy"></i>
+              </span>
+              <div>
+                <p class="mb-0 text-muted small">{{ t 'statistics.weekly_points' }}</p>
+                <span class="fw-bold fs-4">{{userWeeklyScore}}</span>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-4">
+              <span class="halo-section-icon bg-light-warning text-warning">
+                <i class="ti ti-bolt"></i>
+              </span>
+              <div>
+                <p class="mb-0 text-muted small">{{ t 'statistics.general_performance' }}</p>
+                <span class="performance-bolts fs-5">
+                  {{#each (range generalPerformanceBolts)}}
+                    <i class="ti ti-bolt" style="color:#fbc02d;"></i>
+                  {{/each}}
+                  {{#each (range generalOutlineBolts)}}
+                    <i class="ti ti-bolt" style="color:#e0e0e0;"></i>
+                  {{/each}}
+                </span>
+              </div>
+            </div>
+            <a href="/leaderboard" class="btn btn-outline-primary px-4 py-2 ms-auto">
+              <i class="ti ti-list-numbers me-2"></i>{{ t 'statistics.leaderboard' }}
+            </a>
           </div>
-          <a href="/leaderboard" class="red-button leaderboard-button">
-            {{t 'statistics.leaderboard'}}
-          </a>
         </div>
-        <h3>{{t 'statistics.general_performance'}}</h3>
-        <div class="general-performance-bolts">
-          <span class="performance-bolts">
-            {{#each (range generalPerformanceBolts)}}
-            <i class="bi bi-lightning-charge-fill" style="color:#fbc02d;"></i>
-            {{/each}}
-            {{#each (range generalOutlineBolts)}}
-            <i class="bi bi-lightning-charge" style="color:#ccc;"></i>
-            {{/each}}
-          </span>
-        </div>
-        <h3>{{t 'statistics.performance_by_topic'}}</h3>
-        <div class="performance-table-wrapper">
-          <div class="table-scroll">
-            <table class="topic-performance-table">
-              <thead>
+      </section>
+    </div>
+
+    <!-- TOPIC PERFORMANCE TABLE -->
+    <div class="col-12 col-xl-8">
+      <section class="card h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-chart-bar"></i>
+            </span>
+            <div>
+              <h2 class="card-title fw-semibold mb-0">{{ t 'statistics.performance_by_topic' }}</h2>
+            </div>
+          </div>
+
+          <div class="table-responsive">
+            <table class="table table-hover align-middle">
+              <thead class="table-light">
                 <tr>
-                  <th>{{t 'statistics.topic'}}</th>
-                  <th>{{t 'statistics.progress'}}</th>
-                  <th>{{t 'statistics.subtopics'}}</th>
-                  <th>{{t 'statistics.performance'}}</th>
+                  <th>{{ t 'statistics.topic' }}</th>
+                  <th>{{ t 'statistics.progress' }}</th>
+                  <th>{{ t 'statistics.subtopics' }}</th>
+                  <th>{{ t 'statistics.performance' }}</th>
                 </tr>
               </thead>
               <tbody>
                 {{#each topicStats}}
                 <tr>
-                  <td>
-                    <a href="#" class="topic-link" data-topic-id="{{this.id}}">{{this.name}}</a>
-                  </td>
-                  <td>
-                    <div class="topic-progress-bar-bg">
-                      <div class="topic-progress-bar-fill" style="width: {{this.averageProgress}}%;"></div>
+                  <td class="fw-medium">{{topicT this.id 'name'}}</td>
+                  <td style="min-width: 160px;">
+                    <div class="d-flex align-items-center gap-2">
+                      <div class="progress flex-grow-1" style="height: 6px;">
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{this.averageProgress}}%"></div>
+                      </div>
+                      <span class="small text-muted">{{this.averageProgress}}%</span>
                     </div>
-                    <span style="margin-left:8px;">{{this.averageProgress}}%</span>
                   </td>
-                  <td>{{this.completedSubtopics}} / {{this.totalSubtopics}}</td>
+                  <td>
+                    <span class="badge bg-primary-subtle text-primary">
+                      {{this.completedSubtopics}} / {{this.totalSubtopics}}
+                    </span>
+                  </td>
                   <td>
                     <span class="performance-bolts">
                       {{#each (range this.performanceBolts)}}
-                      <i class="bi bi-lightning-charge-fill" style="color:#fbc02d;"></i>
+                        <i class="ti ti-bolt" style="color:#fbc02d;"></i>
                       {{/each}}
                       {{#each (range this.outlineBolts)}}
-                      <i class="bi bi-lightning-charge" style="color:#ccc;"></i>
+                        <i class="ti ti-bolt" style="color:#ccc;"></i>
                       {{/each}}
                     </span>
                   </td>
                 </tr>
                 {{else}}
                 <tr>
-                  <td colspan="4" style="text-align: center; color: #999;">
-                    {{t 'statistics.no_topics_available'}}
+                  <td colspan="4" class="text-center text-muted py-4">
+                    {{ t 'statistics.no_topics_available' }}
                   </td>
                 </tr>
                 {{/each}}
@@ -71,61 +102,49 @@
             </table>
           </div>
         </div>
-      </div>
-      <!-- RIGHT COLUMN: Radial Graph + Activity Log -->
-      <div class="right-stack">
-        <div class="card radial-graph-card">
-          <div class="radial-graph-placeholder">
-            <span>{{t 'statistics.radial_graph_placeholder'}}</span>
+      </section>
+    </div>
+
+    <!-- BADGES -->
+    <div class="col-12 col-xl-4">
+      <section class="card h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="halo-section-icon bg-light-warning text-warning">
+              <i class="ti ti-award"></i>
+            </span>
+            <div>
+              <h2 class="card-title fw-semibold mb-0">{{ t 'statistics.badges_and_conquests' }}</h2>
+            </div>
           </div>
-        </div>
-        <div class="card activity-log">
-          <h3>{{t 'statistics.badges_and_conquests'}}</h3>
-          <div class="badges-conquests-wrapper">
-            {{#if userBadges}}
-            <div class="badges-grid compact-grid">
+
+          {{#if userBadges}}
+            <div class="d-flex flex-wrap gap-3">
               {{#each userBadges}}
-              <div class="badge-item compact-item"
-                title="{{this.name}}&#10;{{t 'statistics.earned_on'}}: {{formatDate this.date_earned}}">
-                <span class="badge-icon compact-icon">
-                  <img src="{{this.svg}}" alt="{{this.name}}" class="badge-img" />
-                </span>
-              </div>
+                <div class="d-flex flex-column align-items-center gap-1"
+                  title="{{this.name}} — {{formatDate this.date_earned}}">
+                  <span class="d-inline-flex align-items-center justify-content-center rounded-circle border"
+                    style="width: 48px; height: 48px; background: #fff3cd; border-color: #fbc02d !important;">
+                    <img src="{{this.svg}}" alt="{{this.name}}" style="width: 28px; height: 28px; object-fit: contain;">
+                  </span>
+                  <span class="small text-muted text-center" style="max-width: 60px; font-size: 0.7rem;">{{this.name}}</span>
+                </div>
               {{/each}}
             </div>
-            {{else}}
-            <div class="badges-grid compact-grid">
-              <div class="badge-item compact-item">
-                <span class="badge-icon compact-icon"
-                  style="width:26px;height:26px;border-radius:50%;background:#ffe5e9;border:1.5px solid #a51c30;display:flex;align-items:center;justify-content:center;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#a51c30">
-                    <circle cx="12" cy="12" r="10" />
-                  </svg>
-                </span>
-              </div>
-              <div class="badge-item compact-item">
-                <span class="badge-icon compact-icon"
-                  style="width:26px;height:26px;border-radius:50%;background:#e8f5e9;border:1.5px solid #43a047;display:flex;align-items:center;justify-content:center;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#43a047">
-                    <rect x="4" y="4" width="16" height="16" rx="4" />
-                  </svg>
-                </span>
-              </div>
-              <div class="badge-item compact-item">
-                <span class="badge-icon compact-icon"
-                  style="width:26px;height:26px;border-radius:50%;background:#fffde7;border:1.5px solid #fbc02d;display:flex;align-items:center;justify-content:center;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#fbc02d">
-                    <polygon points="12,2 15,8 22,9 17,14 18,21 12,18 6,21 7,14 2,9 9,8" />
-                  </svg>
-                </span>
-              </div>
+          {{else}}
+            <div class="d-flex flex-column align-items-center justify-content-center py-4 text-muted">
+              <span class="halo-section-icon bg-light-warning text-warning mb-3">
+                <i class="ti ti-award-off"></i>
+              </span>
+              <p class="mb-0 small text-center">{{ t 'statistics.nobadges' }}</p>
             </div>
-            {{/if}}
-          </div>
+          {{/if}}
+
         </div>
-      </div>
+      </section>
     </div>
+
   </div>
 </div>
-</div>
+
 <script src="/js/pages/statistics.js"></script>

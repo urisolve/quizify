@@ -15,13 +15,13 @@ function initPracticePlus() {
       selectorBtns.forEach(b => {
         b.classList.remove('btn-primary');
         b.classList.add('btn-outline-secondary');
-        b.querySelector('.progress-bar').classList.remove('bg-white', 'bg-opacity-50');
-        b.querySelector('.progress-bar').classList.add('bg-primary');
+        // b.querySelector('.progress-bar').classList.remove('bg-white', 'bg-opacity-50');
+        // b.querySelector('.progress-bar').classList.add('bg-primary');
       });
       this.classList.remove('btn-outline-secondary');
       this.classList.add('btn-primary');
-      this.querySelector('.progress-bar').classList.remove('bg-primary');
-      this.querySelector('.progress-bar').classList.add('bg-white', 'bg-opacity-50');
+      // this.querySelector('.progress-bar').classList.remove('bg-primary');
+      // this.querySelector('.progress-bar').classList.add('bg-white', 'bg-opacity-50');
 
       // Show correct content block
       topicBlocks.forEach((block, bidx) => {

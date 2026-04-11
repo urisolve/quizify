@@ -12,6 +12,7 @@ const i18next = require('i18next');
 const i18nMiddleware = require('i18next-http-middleware');
 const i18nBackend = require('i18next-fs-backend');
 const session = require('express-session');
+const db = require('./config/db');
 
 //* Initialize express variable
 const app = express();
@@ -177,8 +178,23 @@ const { initUserSubtopicProgressTable } = require('./models/UserSubtopicProgress
 const { initUsersTable } = require('./models/User');
 
 // Initialize all tables before starting the server
+async function waitForDB(retries = 10, delay = 3000) {
+  for (let i = 0; i < retries; i++) {
+    try {
+      await db.query('SELECT 1');
+      console.log('Database connection established.');
+      return true;
+    } catch (err) {
+      console.log(`Database not ready, retrying in ${delay/1000}s... (${i + 1}/${retries})`);
+      await new Promise(resolve => setTimeout(resolve, delay));
+    }
+  }
+  throw new Error('Could not connect to database after multiple retries.');
+}
+
 (async () => {
   try {
+    await waitForDB();
     await initUsersTable();
     await initTopicsTable();
     await initSubtopicsTable();

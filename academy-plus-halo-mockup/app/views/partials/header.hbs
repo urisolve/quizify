@@ -34,11 +34,11 @@
             aria-labelledby="languageDropdown">
             <a href="/lang?lng=pt" class="dropdown-item d-flex align-items-center gap-2 py-2">
               <img src="/assets/images/flags/pt.png" alt="Portuguese" width="22" height="16" class="rounded-1 border">
-              <span>Portuguese</span>
+              <span>PT</span>
             </a>
             <a href="/lang?lng=en" class="dropdown-item d-flex align-items-center gap-2 py-2">
               <img src="/assets/images/flags/gb.png" alt="English" width="22" height="16" class="rounded-1 border">
-              <span>English</span>
+              <span>EN</span>
             </a>
           </div>
         </div>
@@ -60,7 +60,7 @@
               class="rounded-circle border"
               style="object-fit: cover;"
             >
-            <span class="d-none d-md-inline text-dark fw-medium">{{#if user}}{{user.username}}{{else}}Guest{{/if}}</span>
+            <span class="d-none d-md-inline text-dark fw-medium">{{#if user}}{{user.username}}{{else}}{{ t 'header.guest' }}{{/if}}</span>
             <i class="ti ti-chevron-down fs-4"></i>
           </a>
 
@@ -69,28 +69,28 @@
             {{#if user}}
               <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2" id="profile-logout">
                 <i class="ti ti-logout fs-5 text-danger"></i>
-                <span>Logout</span>
+                <span>{{ t 'header.logout' }}</span>
               </a>
               <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
                 <i class="ti ti-settings fs-5 text-primary"></i>
-                <span>Settings</span>
+                <span>{{ t 'header.settings' }}</span>
               </a>
               <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
                 <i class="ti ti-badge fs-5 text-warning"></i>
-                <span>Level</span>
+                <span>{{ t 'header.level' }}</span>
               </a>
               <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
                 <i class="ti ti-star fs-5 text-warning"></i>
-                <span>Stars</span>
+                <span>{{ t 'header.stars' }}</span>
               </a>
-              <a href="#" class="dropdown-item d-flex align-items-center gap-2 py-2">
+              <a href="/statistics" class="dropdown-item d-flex align-items-center gap-2 py-2">
                 <i class="ti ti-chart-bar fs-5 text-info"></i>
-                <span>Statistics</span>
+                <span>{{ t 'header.statistics' }}</span>
               </a>
             {{else}}
               <a href="/login" class="dropdown-item d-flex align-items-center gap-2 py-2">
                 <i class="ti ti-login fs-5 text-primary"></i>
-                <span>Login</span>
+                <span>{{ t 'header.login' }}</span>
               </a>
             {{/if}}
 

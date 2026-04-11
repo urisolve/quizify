@@ -6,6 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Progress bar initialized with:', progressBar.style.width);
   }
 
+  // Timer
+  let seconds = 0;
+  const timerEl = document.getElementById('question-timer');
+  const timerInterval = setInterval(() => {
+    seconds++;
+    if (timerEl) timerEl.textContent = seconds < 60
+      ? `${seconds}s`
+      : `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
+  }, 1000);
+
   // Highlight selected answer
   document.querySelectorAll('.answer-option').forEach(label => {
     label.addEventListener('click', function () {
@@ -45,30 +55,33 @@ document.addEventListener('DOMContentLoaded', () => {
       const data = await res.json();
 
       const selectedLabel = selected ? selected.parentElement : null;
+
       // Remove previous feedback classes
       document.querySelectorAll('.answer-option').forEach(label => {
         label.classList.remove('answer-correct', 'answer-incorrect');
       });
+
       if (data.correct) {
+        clearInterval(timerInterval);
         if (selectedLabel) selectedLabel.classList.add('answer-correct');
         // Update progress bar
         if (typeof data.progress === 'number') {
           const progressBar = document.querySelector('.query-progress-fill');
           if (progressBar) progressBar.style.width = `${data.progress}%`;
         }
-    // Play correct answer sound
-    const correctAudio = document.getElementById('correct-sound');
-    if (correctAudio) {
-      correctAudio.volume = 0.15;
-      correctAudio.play();
-    }
-    setTimeout(() => {
-      if (data.complete) {
-        window.location.href = '/query-complete';
-      } else {
-        window.location.reload();
-      }
-    }, 1000);
+        // Play correct answer sound
+        const correctAudio = document.getElementById('correct-sound');
+        if (correctAudio) {
+          correctAudio.volume = 0.15;
+          correctAudio.play();
+        }
+        setTimeout(() => {
+          if (data.complete) {
+            window.location.href = '/query-complete';
+          } else {
+            window.location.reload();
+          }
+        }, 1000);
       } else {
         if (selectedLabel) selectedLabel.classList.add('answer-incorrect');
         // Update progress bar
@@ -117,5 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  
   
 });

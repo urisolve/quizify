@@ -176,6 +176,34 @@ body {
   border-color: white !important;
 }
 
+.answer-option.answer-correct,
+.btn.answer-option.answer-correct {
+  background-color: #d4edda !important;
+  border-color: #28a745 !important;
+  color: #155724 !important;
+  transition: background 0.2s, border 0.2s, color 0.2s;
+}
+
+.answer-option.answer-correct span,
+.btn.answer-option.answer-correct span {
+  color: #155724 !important;
+  border-color: #28a745 !important;
+}
+
+.answer-option.answer-incorrect,
+.btn.answer-option.answer-incorrect {
+  background-color: #f8d7da !important;
+  border-color: #dc3545 !important;
+  color: #721c24 !important;
+  transition: background 0.2s, border 0.2s, color 0.2s;
+}
+
+.answer-option.answer-incorrect span,
+.btn.answer-option.answer-incorrect span {
+  color: #721c24 !important;
+  border-color: #dc3545 !important;
+}
+
 .points-bar-bg {
   background: #ffe082;
   border-radius: 8px;
@@ -211,4 +239,8 @@ body {
 .points-bar-fill-new.level-up {
   background: linear-gradient(90deg, #22c55e 0%, #4ade80 100%);
   box-shadow: 0 0 16px rgba(34, 197, 94, 0.4);
+}
+
+.progress-bar {
+  background-color: #9d12d9;
 }

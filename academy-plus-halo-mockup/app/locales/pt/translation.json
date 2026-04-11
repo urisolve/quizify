@@ -48,6 +48,27 @@
         "experience": "O teu progresso:",
         "levelup": "🎉 Subiu de nível!"
     },
+    "header": {
+        "logout": "Sair",
+        "login": "Entrar",
+        "settings": "Definições",
+        "level": "Nível",
+        "stars": "Estrelas",
+        "statistics": "Estatísticas",
+        "guest": "Convidado"
+    },
+    "sidebar": {
+        "home": "Home",
+        "learningarea": "Área de aprendizagem",
+        "ailearningarea": "Aprendizagem com IA",
+        "playground": "Treino",
+        "chatbot": "Chatbot",
+        "aboutus": "Sobre nós",
+        "abouthalo": "Sobre o HALO",
+        "contributors": "Contribuições",
+        "publications": "Publicações",
+        "contactus": "Contacto"
+    },
     "statistics": {
         "statistics": "Estatísticas",
         "general_performance": "Desempenho Geral",
@@ -63,6 +84,7 @@
         "radial_graph_placeholder": "Espaço Reservado para Gráfico Radial",
         "badges_and_conquests": "Conquistas",
         "badges": "Distintivos",
+        "nobadges": "Ainda não ganhou nenhum distintivo. Continua a aprender!",
         "conquests": "Conquistas",
         "earned_on": "Obtido em",
         "leaderboard": "Classificação",
