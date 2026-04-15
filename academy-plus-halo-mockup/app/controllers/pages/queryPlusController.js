@@ -85,6 +85,7 @@ const queryPlusController = async (req, res) => {
     question: questionData,
     answers,
     progress,
+    round: query.round || 1,
     user: req.session.user
   });
 };

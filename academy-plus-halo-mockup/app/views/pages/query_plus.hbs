@@ -62,10 +62,6 @@
                 <label class="answer-option btn btn-outline-secondary text-start px-3 py-2 d-flex align-items-center gap-2" 
                   style="cursor: pointer;">
                   <input type="radio" name="answer" value="{{@index}}" hidden>
-                  <span class="d-inline-flex align-items-center justify-content-center rounded-circle border flex-shrink-0"
-                    style="width: 28px; height: 28px; font-size: 0.8rem; pointer-events: none;">
-                    {{letterIndex @index}}
-                  </span>
                   <span style="pointer-events: none;">{{this.text}}</span>
                 </label>
               {{/each}}
@@ -73,14 +69,16 @@
           </form>
 
           <!-- Feedback -->
-          <div class="floating-feedback" id="floating-feedback" style="display:none;">
-            <div class="d-flex align-items-center gap-3" id="floating-feedback-message" role="alert">
-              <span class="halo-section-icon bg-light-warning text-warning flex-shrink-0" id="feedback-fab" style="cursor: pointer;">
-                <i class="ti ti-info-circle"></i>
-              </span>
-              <div id="feedback-fab-tooltip" class="fw-medium"></div>
+          {{#if (eq round 2)}}
+            <div class="floating-feedback" id="floating-feedback">
+              <div class="d-flex align-items-center gap-3" id="floating-feedback-message" role="alert">
+                <span class="halo-section-icon bg-light-warning text-warning flex-shrink-0">
+                  <i class="ti ti-info-circle"></i>
+                </span>
+                <div id="feedback-fab-tooltip" class="fw-medium">{{question.feedback}}</div>
+              </div>
             </div>
-          </div>
+          {{/if}}
 
           <div class="mt-auto">
             <button type="submit" form="answer-form" class="btn btn-primary w-100 py-2 fw-semibold">

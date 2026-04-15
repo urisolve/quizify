@@ -27,14 +27,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  function showFloatingFeedback(message) {
-    const floating = document.getElementById('floating-feedback');
-    const tooltip = document.getElementById('feedback-fab-tooltip');
-    
-    if (floating && tooltip) {
-      tooltip.textContent = message;
-      floating.style.display = 'flex';
-    }
+  function showRoundUpBanner() {
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed; inset: 0; z-index: 9999;
+      background: rgba(0,0,0,0.65);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: white; text-align: center;
+    `;
+    overlay.innerHTML = `
+      <div style="font-size: 3rem; margin-bottom: 0.5rem;">🔁</div>
+      <h2 style="font-weight: 700; font-size: 1.75rem; margin-bottom: 0.5rem;">Round 2</h2>
+      <p style="opacity: 0.85; font-size: 1rem;">Let's revisit the ones you missed!</p>
+    `;
+    document.body.appendChild(overlay);
+    setTimeout(() => {
+      overlay.style.transition = 'opacity 0.3s ease';
+      overlay.style.opacity = '0';
+      setTimeout(() => window.location.reload(), 350);
+    }, 2200);
   }
  
   // Handle form submission
@@ -75,6 +87,12 @@ document.addEventListener('DOMContentLoaded', () => {
           correctAudio.volume = 0.15;
           correctAudio.play();
         }
+
+        if (data.roundUp) {
+          setTimeout(() => showRoundUpBanner(), 800);
+          return;
+        }
+
         setTimeout(() => {
           if (data.complete) {
             window.location.href = '/query-complete';
@@ -83,17 +101,25 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }, 1000);
       } else {
+        clearInterval(timerInterval);
         if (selectedLabel) selectedLabel.classList.add('answer-incorrect');
         // Update progress bar
         if (typeof data.progress === 'number') {
           const progressBar = document.querySelector('.query-progress-fill');
           if (progressBar) progressBar.style.width = `${data.progress}%`;
         }
-        // Show feedback from backend if available, otherwise default
-        const msg = data.feedback ? `Dica: ${data.feedback}` : 'Incorrect. Try again!';
-        showFloatingFeedback(msg);
+        
+        if (data.roundUp) {
+          setTimeout(() => showRoundUpBanner(), 1500);
+          return;
+        }
+
         setTimeout(() => {
-          if (selectedLabel) selectedLabel.classList.remove('answer-incorrect');
+          if (data.complete) {
+            window.location.href = '/query-complete';
+          } else {
+            window.location.reload();
+          }
         }, 2000);
       }
     });

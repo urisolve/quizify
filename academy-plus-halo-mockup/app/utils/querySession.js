@@ -16,6 +16,8 @@ function initializeQuerySession(type, { topicId, subtopicId, questionIds, userPr
     questionIds,
     current: 0,
     score: 0,
+    round: 1,
+    missedIds: [],
     questionTries: Array(questionIds.length).fill(0),
     userPrevExp: userPrevExp || 0,
     weekStart: getWeekStart(),
