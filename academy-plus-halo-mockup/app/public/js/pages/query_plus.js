@@ -6,16 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Progress bar initialized with:', progressBar.style.width);
   }
 
-  // Timer
-  let seconds = 0;
-  const timerEl = document.getElementById('question-timer');
-  const timerInterval = setInterval(() => {
-    seconds++;
-    if (timerEl) timerEl.textContent = seconds < 60
-      ? `${seconds}s`
-      : `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
-  }, 1000);
-
   // Highlight selected answer
   document.querySelectorAll('.answer-option').forEach(label => {
     label.addEventListener('click', function () {
@@ -52,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (data.correct) {
-        clearInterval(timerInterval);
         if (selectedLabel) selectedLabel.classList.add('answer-correct');
         // Update progress bar
         if (typeof data.progress === 'number') {
@@ -79,7 +68,6 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }, 1000);
       } else {
-        clearInterval(timerInterval);
         if (selectedLabel) selectedLabel.classList.add('answer-incorrect');
         // Update progress bar
         if (typeof data.progress === 'number') {
