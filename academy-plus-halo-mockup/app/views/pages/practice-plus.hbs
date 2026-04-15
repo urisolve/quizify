@@ -8,7 +8,7 @@
             {{#each topics}}
             <li>
               <button
-                class="btn w-100 text-start topic-selector-btn {{#if @first}}btn-primary{{else}}btn-outline-secondary{{/if}}"
+                class="btn w-100 text-start topic-selector-btn {{#if (eq @index ../defaultTopicIndex)}}btn-primary{{else}}btn-outline-secondary{{/if}}"
                 data-topic-index="{{@index}}"
               >
                 <span class="d-block fw-medium">{{topicT id 'name'}}</span>
@@ -28,7 +28,7 @@
 
     <div class="col-12 col-xl-9">
       {{#each topics}}
-      <div class="topic-content-block" data-topic-id="{{id}}" style="{{#unless @first}}display:none;{{/unless}}">
+      <div class="topic-content-block" data-topic-id="{{id}}" style="{{#unless (eq @index ../defaultTopicIndex)}}display:none;{{/unless}}">
         <div class="row g-4">
 
           <!-- Topic intro card -->

@@ -4,6 +4,8 @@ function initPracticePlus() {
   const selectorBtns = document.querySelectorAll('.topic-selector-btn');
   const topicBlocks = document.querySelectorAll('.topic-content-block');
 
+  const defaultIndex = parseInt(document.querySelector('.topic-selector-btn.btn-primary')?.dataset.topicIndex || '0');
+
   console.log('Selector buttons found:', selectorBtns.length);
   console.log('Topic blocks found:', topicBlocks.length);
 
