@@ -86,6 +86,12 @@ document.addEventListener('DOMContentLoaded', () => {
           const progressBar = document.querySelector('.query-progress-fill');
           if (progressBar) progressBar.style.width = `${data.progress}%`;
         }
+
+        const wrongAudio = document.getElementById('wrong-sound');
+        if (wrongAudio) {
+          wrongAudio.volume = 0.35;
+          wrongAudio.play();
+        }
         
         if (data.roundUp) {
           setTimeout(() => window.location.reload(), 2000);
