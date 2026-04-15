@@ -6,16 +6,6 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Progress bar initialized with:', progressBar.style.width);
   }
 
-  // Timer
-  let seconds = 0;
-  const timerEl = document.getElementById('question-timer');
-  const timerInterval = setInterval(() => {
-    seconds++;
-    if (timerEl) timerEl.textContent = seconds < 60
-      ? `${seconds}s`
-      : `${Math.floor(seconds / 60)}m ${seconds % 60}s`;
-  }, 1000);
-
   // Highlight selected answer
   document.querySelectorAll('.answer-option').forEach(label => {
     label.addEventListener('click', function () {
@@ -26,16 +16,6 @@ document.addEventListener('DOMContentLoaded', () => {
       if (radio) radio.checked = true;
     });
   });
-
-  function showFloatingFeedback(message) {
-    const floating = document.getElementById('floating-feedback');
-    const tooltip = document.getElementById('feedback-fab-tooltip');
-    
-    if (floating && tooltip) {
-      tooltip.textContent = message;
-      floating.style.display = 'flex';
-    }
-  }
  
   // Handle form submission
   const form = document.getElementById('answer-form');
@@ -62,7 +42,6 @@ document.addEventListener('DOMContentLoaded', () => {
       });
 
       if (data.correct) {
-        clearInterval(timerInterval);
         if (selectedLabel) selectedLabel.classList.add('answer-correct');
         // Update progress bar
         if (typeof data.progress === 'number') {
@@ -75,6 +54,12 @@ document.addEventListener('DOMContentLoaded', () => {
           correctAudio.volume = 0.15;
           correctAudio.play();
         }
+
+        if (data.roundUp) {
+          setTimeout(() => window.location.reload(), 2000);
+          return;
+        }
+
         setTimeout(() => {
           if (data.complete) {
             window.location.href = '/query-complete';
@@ -89,11 +74,24 @@ document.addEventListener('DOMContentLoaded', () => {
           const progressBar = document.querySelector('.query-progress-fill');
           if (progressBar) progressBar.style.width = `${data.progress}%`;
         }
-        // Show feedback from backend if available, otherwise default
-        const msg = data.feedback ? `Dica: ${data.feedback}` : 'Incorrect. Try again!';
-        showFloatingFeedback(msg);
+
+        const wrongAudio = document.getElementById('wrong-sound');
+        if (wrongAudio) {
+          wrongAudio.volume = 0.35;
+          wrongAudio.play();
+        }
+        
+        if (data.roundUp) {
+          setTimeout(() => window.location.reload(), 2000);
+          return;
+        }
+
         setTimeout(() => {
-          if (selectedLabel) selectedLabel.classList.remove('answer-incorrect');
+          if (data.complete) {
+            window.location.href = '/query-complete';
+          } else {
+            window.location.reload();
+          }
         }, 2000);
       }
     });

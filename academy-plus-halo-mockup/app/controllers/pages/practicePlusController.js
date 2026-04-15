@@ -3,6 +3,7 @@ const {getTopics, getSubtopics, getUserSubtopicProgress} = require('../../models
 
 async function practicePlusPage(req, res) {
   try {
+    delete req.session.queryComplete;
     const userId = req.session.user?.id;
 
     // Fetch user info (adjust fields as needed)
@@ -46,6 +47,10 @@ async function practicePlusPage(req, res) {
       ? Math.round(topicsWithSubs.reduce((sum, t) => sum + (t.progress || 0), 0) / topicsWithSubs.length)
       : 0;
 
+    // First Incomplete Topic Index
+    const firstIncompleteIndex = topicsWithSubs.findIndex(t => t.progress < 100);
+    const defaultTopicIndex = firstIncompleteIndex !== -1 ? firstIncompleteIndex : 0;
+
     res.renderPage('practice-plus', {
       layout: 'main',
       headerTitle: 'Practice Plus',
@@ -54,6 +59,7 @@ async function practicePlusPage(req, res) {
       generalProgress: totalProgress,
       userAvatar: req.session.user?.avatar_url || null,
       userLevel: req.session.user?.level || 1,
+      defaultTopicIndex
      /*  userBadges: badges */
     });
   } catch (err) {

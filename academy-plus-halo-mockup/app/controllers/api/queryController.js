@@ -11,6 +11,12 @@ exports.submitAnswer = async (req, res) => {
   const userId = req.session.user?.id;
   const query = req.session.query;
 
+  // Calculate time spent on this question
+  const now = Date.now();
+  const questionTime = Math.round((now - (query.questionStartTime || now)) / 1000);
+  query.totalTime = (query.totalTime || 0) + questionTime;
+  query.questionStartTime = now; // reset for next question
+
   if (!query) {
     return res.status(400).json({ correct: false, message: 'No active query session.' });
   }
@@ -34,10 +40,57 @@ exports.submitAnswer = async (req, res) => {
     const newTries = (currentDone?.tries ?? 0) + 1;
     const completed = currentDone?.completed ?? 0;
     await updateWeeklyTraining(userId, questionId, weekStart, { tries: newTries, completed });
-    // Save session state
+
+    // Track missed question for round 2
+    query.missedIds = query.missedIds || [];
+    if (!query.missedIds.includes(questionId)) {
+      query.missedIds.push(questionId);
+    }
+
+    // Store result for review
+    query.results = query.results || [];
+    const existingIndex = query.results.findIndex(r => r.questionId === questionId);
+    const result = {
+        questionId,
+        questionText: question.question_text,
+        correctAnswer: question.correct_answer,
+        userAnswer: answer.trim(),
+        correct: false,
+        feedback: question.feedback || null,
+        timeSeconds: questionTime
+    };
+
+    if (existingIndex !== -1) {
+      result.timeSeconds = (query.results[existingIndex].timeSeconds || 0) + questionTime; // add up
+      query.results[existingIndex] = result;
+    } else {
+        query.results.push(result);
+    }
+
+    // Advance to next question
+    query.current += 1;
     req.session.query = query;
-    // Send feedback message from the question (if available)
-    return res.json({ correct: false, feedback: question.feedback || null });
+
+    const questionNumber = query.current;
+    const totalQuestions = query.questionIds.length;
+    const progressPercent = Math.round((questionNumber / totalQuestions) * 100);
+
+    if (query.current >= query.questionIds.length) {
+      // Round 1 ended on a wrong answer — check if round 2 needed
+      if (query.round === 1 && query.missedIds.length > 0) {
+        query.questionIds = query.missedIds;
+        query.current = 0;
+        query.round = 2;
+        query.missedIds = [];
+        query.questionTries = Array(query.questionIds.length).fill(0);
+        query.roundUp = true;
+        req.session.query = query;
+        return res.json({ correct: false, complete: false, roundUp: true, progress: 100, feedback: question.feedback || null, round: query.round });
+      }
+      return res.json({ correct: false, complete: true, progress: 100, feedback: question.feedback || null, round: query.round });
+    }
+
+    return res.json({ correct: false, complete: false, progress: progressPercent, feedback: question.feedback || null, round: query.round });
   }
 
   // ---Scoring logic ---
@@ -73,6 +126,26 @@ exports.submitAnswer = async (req, res) => {
   const progressPercent = Math.round((questionNumber / totalQuestions) * 100);
   console.log(`Progress: ${progressPercent}% (${questionNumber}/${totalQuestions})`);
 
+  // Store result for review
+  query.results = query.results || [];
+  const existingIndex = query.results.findIndex(r => r.questionId === questionId);
+  const result = {
+      questionId,
+      questionText: question.question_text,
+      correctAnswer: question.correct_answer,
+      userAnswer: answer.trim(),
+      correct: true,  
+      feedback: question.feedback || null,
+      timeSeconds: questionTime
+  };
+
+  if (existingIndex !== -1) {
+    result.timeSeconds = (query.results[existingIndex].timeSeconds || 0) + questionTime; // add up
+    query.results[existingIndex] = result;
+  } else {
+      query.results.push(result);
+  }
+
   // Advance to next question
   query.current += 1;
   req.session.query = query;
@@ -80,6 +153,20 @@ exports.submitAnswer = async (req, res) => {
 
   // If all questions answered, handle completion based on query type
   if (query.current >= query.questionIds.length) {
+
+    // Round 1 ended on a correct answer and check if round 2 needed
+    if (query.round === 1 && query.missedIds && query.missedIds.length > 0) {
+      query.questionIds = query.missedIds;
+      query.current = 0;
+      query.round = 2;
+      query.missedIds = [];
+      query.questionTries = Array(query.questionIds.length).fill(0);
+      query.roundUp = true;
+      req.session.query = query;
+      return res.json({ correct: true, complete: false, roundUp: true, progress: 100 });
+    }
+
+    // Completed Quiz
     if (query.type === 'subtopic' && query.subtopicId) {
       await setUserSubtopicProgress(userId, query.subtopicId, 100);
 
