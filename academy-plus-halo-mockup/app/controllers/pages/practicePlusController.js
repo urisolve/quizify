@@ -3,6 +3,7 @@ const {getTopics, getSubtopics, getUserSubtopicProgress} = require('../../models
 
 async function practicePlusPage(req, res) {
   try {
+    delete req.session.queryComplete;
     const userId = req.session.user?.id;
 
     // Fetch user info (adjust fields as needed)
