@@ -28,64 +28,78 @@
     <div class="col-12 mt-0">
       <section class="card h-100">
         <div class="card-body p-4 d-flex flex-column gap-3">
-          <!-- ANSWERS -->
-          <div class="d-flex align-items-center gap-3 mb-2">
-            <span class="halo-section-icon bg-light-success text-success">
-              <i class="ti ti-list-check"></i>
-            </span>
-            <h2 class="card-title fw-semibold mb-0 fs-5">{{ t 'query_plus.answers_label' }}</h2>
 
-            <span class="ms-auto d-inline-flex align-items-center gap-1 bg-success text-white px-3 py-1 rounded-pill fw-semibold small flex-shrink-0" style="width: 100px; justify-content: center;">
-              <i class="ti ti-clock"></i>
-              <span id="question-timer">0s</span>
-            </span>
-          </div>
-
-
-          <div class="d-flex align-items-center gap-3 mb-2">
-            <span class="halo-section-icon bg-light-primary text-primary">
-              <i class="ti ti-question-mark"></i>
-            </span>
-            <p id="question-text" class="fs-5 mb-0" style="text-align: justify;">
-              {{question.question_text}}
-            </p>
-          </div>
-
-          {{#if question.image}}
-            <img id="question-img" src="{{question.image}}" alt="Question image"
-              class="img-fluid rounded-3 mb-2" style="max-height: 220px; object-fit: contain;">
-          {{/if}}
-
-          <form id="answer-form" autocomplete="off">
-            <div id="answers-area" class="d-grid gap-2">
-              {{#each answers}}
-                <label class="answer-option btn btn-outline-secondary text-start px-3 py-2 d-flex align-items-center gap-2" 
-                  style="cursor: pointer;">
-                  <input type="radio" name="answer" value="{{@index}}" hidden>
-                  <span style="pointer-events: none;">{{this.text}}</span>
-                </label>
-              {{/each}}
+          {{#if roundUp}}
+            <div class="d-flex flex-column align-items-center justify-content-center text-center gap-3 py-4">
+              <span class="halo-section-icon bg-light-warning text-warning" style="width:56px;height:56px;font-size:1.75rem;">
+                <i class="ti ti-refresh"></i>
+              </span>
+              <h2 class="fw-bold fs-4 mb-0">{{ t 'query_plus.round' }}</h2>
+              <p class="text-muted mb-0">{{ t 'query_plus.revisit' }}</p>
+              <div class="spinner-border spinner-border-sm text-primary mt-2" role="status"></div>
             </div>
-          </form>
+            <script>setTimeout(() => window.location.reload(), 2000);</script>
+          {{else}}
 
-          <!-- Feedback -->
-          {{#if (eq round 2)}}
-            <div class="floating-feedback" id="floating-feedback">
-              <div class="d-flex align-items-center gap-3" id="floating-feedback-message" role="alert">
-                <span class="halo-section-icon bg-light-warning text-warning flex-shrink-0">
-                  <i class="ti ti-info-circle"></i>
-                </span>
-                <div id="feedback-fab-tooltip" class="fw-medium">{{question.feedback}}</div>
+            <!-- ANSWERS -->
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <span class="halo-section-icon bg-light-success text-success">
+                <i class="ti ti-list-check"></i>
+              </span>
+              <h2 class="card-title fw-semibold mb-0 fs-5">{{ t 'query_plus.answers_label' }}</h2>
+
+              <span class="ms-auto d-inline-flex align-items-center gap-1 bg-success text-white px-3 py-1 rounded-pill fw-semibold small flex-shrink-0" style="width: 100px; justify-content: center;">
+                <i class="ti ti-clock"></i>
+                <span id="question-timer">0s</span>
+              </span>
+            </div>
+
+
+            <div class="d-flex align-items-center gap-3 mb-2">
+              <span class="halo-section-icon bg-light-primary text-primary">
+                <i class="ti ti-question-mark"></i>
+              </span>
+              <p id="question-text" class="fs-5 mb-0" style="text-align: justify;">
+                {{question.question_text}}
+              </p>
+            </div>
+
+            {{#if question.image}}
+              <img id="question-img" src="{{question.image}}" alt="Question image"
+                class="img-fluid rounded-3 mb-2" style="max-height: 220px; object-fit: contain;">
+            {{/if}}
+
+            <form id="answer-form" autocomplete="off">
+              <div id="answers-area" class="d-grid gap-2">
+                {{#each answers}}
+                  <label class="answer-option btn btn-outline-secondary text-start px-3 py-2 d-flex align-items-center gap-2" 
+                    style="cursor: pointer;">
+                    <input type="radio" name="answer" value="{{@index}}" hidden>
+                    <span style="pointer-events: none;">{{this.text}}</span>
+                  </label>
+                {{/each}}
               </div>
+            </form>
+
+            <!-- Feedback -->
+            {{#if (eq round 2)}}
+              <div class="floating-feedback" id="floating-feedback">
+                <div class="d-flex align-items-center gap-3" id="floating-feedback-message" role="alert">
+                  <span class="halo-section-icon bg-light-warning text-warning flex-shrink-0">
+                    <i class="ti ti-info-circle"></i>
+                  </span>
+                  <div id="feedback-fab-tooltip" class="fw-medium">{{question.feedback}}</div>
+                </div>
+              </div>
+            {{/if}}
+
+            <div class="mt-auto">
+              <button type="submit" form="answer-form" class="btn btn-primary w-100 py-2 fw-semibold">
+                <i class="ti ti-send me-2"></i>{{ t 'query_plus.submit_btn' }}
+              </button>
             </div>
+
           {{/if}}
-
-          <div class="mt-auto">
-            <button type="submit" form="answer-form" class="btn btn-primary w-100 py-2 fw-semibold">
-              <i class="ti ti-send me-2"></i>{{ t 'query_plus.submit_btn' }}
-            </button>
-          </div>
-
         </div>
       </section>
     </div>

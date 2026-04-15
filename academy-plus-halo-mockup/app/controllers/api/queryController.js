@@ -83,6 +83,7 @@ exports.submitAnswer = async (req, res) => {
         query.round = 2;
         query.missedIds = [];
         query.questionTries = Array(query.questionIds.length).fill(0);
+        query.roundUp = true;
         req.session.query = query;
         return res.json({ correct: false, complete: false, roundUp: true, progress: 100, feedback: question.feedback || null, round: query.round });
       }
@@ -160,6 +161,7 @@ exports.submitAnswer = async (req, res) => {
       query.round = 2;
       query.missedIds = [];
       query.questionTries = Array(query.questionIds.length).fill(0);
+      query.roundUp = true;
       req.session.query = query;
       return res.json({ correct: true, complete: false, roundUp: true, progress: 100 });
     }

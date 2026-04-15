@@ -108,7 +108,9 @@
     },
     "query_plus": {
         "submit_btn": "Submit Answer",
-        "answers_label": "Select the Correct Answer"
+        "answers_label": "Select the Correct Answer",
+        "round": "Round 2",
+        "revisit": "Let's try again the questions you got wrong!"
     },
     "practice_plus": {
         "practiceplus": "Practice Plus",

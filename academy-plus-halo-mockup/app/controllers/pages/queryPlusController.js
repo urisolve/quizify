@@ -18,6 +18,10 @@ const queryPlusController = async (req, res) => {
   }
 
   const query = req.session.query;
+  const roundUp = query.roundUp || false;
+  query.roundUp = false;
+  req.session.query = query; 
+
   let headerTitle = 'Practice Question';
   
   // Get title based on query type
@@ -86,6 +90,7 @@ const queryPlusController = async (req, res) => {
     answers,
     progress,
     round: query.round || 1,
+    roundUp,
     user: req.session.user
   });
 };
