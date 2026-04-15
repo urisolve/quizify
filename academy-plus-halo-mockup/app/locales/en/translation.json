@@ -45,7 +45,11 @@
         "nice_try": "NICE TRY!",
         "keep_going": "KEEP GOING!",
         "experience": "Experience Progress:",
-        "levelup": "🎉 Level Up!"
+        "levelup": "🎉 Level Up!",
+        "totaltime":"Total time:",
+        "useranswer":"Your answer:",
+        "correctanswer":"Correct answer:",
+        "review_title":"Review"
     },
     "header": {
         "logout": "Logout",

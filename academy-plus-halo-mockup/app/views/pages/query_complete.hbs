@@ -90,6 +90,56 @@
       </section>
     </div>
 
+    <!-- QUESTION REVIEW -->
+    <div class="col-12">
+      <section class="card">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3 mb-4">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-list-check"></i>
+            </span>
+            <h2 class="card-title fw-semibold mb-0 fs-5">{{t 'query_complete.review_title'}}</h2>
+            <div class="d-flex align-items-center gap-2 text-muted small">
+              <i class="ti ti-clock"></i>
+              <span>{{t 'query_complete.totaltime'}} <strong>{{totalTimeFormatted}}</strong></span>
+            </div>
+          </div>
+
+          <div class="d-flex flex-column gap-3">
+            {{#each results}}
+              <div class="p-3 rounded-3 border {{#if this.correct}}border-success bg-success-subtle{{else}}border-danger bg-danger-subtle{{/if}}">
+                <div class="d-flex align-items-start gap-2 mb-2">
+                  <i class="ti {{#if this.correct}}ti-circle-check text-success{{else}}ti-circle-x text-danger{{/if}} fs-5 flex-shrink-0 mt-1"></i>
+                  <p class="mb-0 fw-medium">{{this.questionText}}</p>
+                  {{#if this.timeSeconds}}
+                    <p class="mb-0 text-muted small">
+                      <i class="ti ti-clock me-1"></i>{{this.timeSeconds}}s
+                    </p>
+                  {{/if}}
+                </div>
+                <div class="ms-4 small">
+                  {{#unless this.correct}}
+                    <p class="mb-1 text-danger">
+                      <span class="fw-semibold">{{t 'query_complete.useranswer'}}</span> {{this.userAnswer}}
+                    </p>
+                  {{/unless}}
+                  <p class="mb-1 text-success">
+                    <span class="fw-semibold">{{t 'query_complete.correctanswer'}}</span> {{this.correctAnswer}}
+                  </p>
+                  {{#if this.feedback}}
+                    <p class="mb-0 text-muted fst-italic">
+                      <i class="ti ti-info-circle me-1"></i>{{this.feedback}}
+                    </p>
+                  {{/if}}
+                </div>
+              </div>
+            {{/each}}
+          </div>
+
+        </div>
+      </section>
+    </div>
+
   </div>
 </div>
 

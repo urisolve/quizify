@@ -11,6 +11,12 @@ exports.submitAnswer = async (req, res) => {
   const userId = req.session.user?.id;
   const query = req.session.query;
 
+  // Calculate time spent on this question
+  const now = Date.now();
+  const questionTime = Math.round((now - (query.questionStartTime || now)) / 1000);
+  query.totalTime = (query.totalTime || 0) + questionTime;
+  query.questionStartTime = now; // reset for next question
+
   if (!query) {
     return res.status(400).json({ correct: false, message: 'No active query session.' });
   }
@@ -39,6 +45,26 @@ exports.submitAnswer = async (req, res) => {
     query.missedIds = query.missedIds || [];
     if (!query.missedIds.includes(questionId)) {
       query.missedIds.push(questionId);
+    }
+
+    // Store result for review
+    query.results = query.results || [];
+    const existingIndex = query.results.findIndex(r => r.questionId === questionId);
+    const result = {
+        questionId,
+        questionText: question.question_text,
+        correctAnswer: question.correct_answer,
+        userAnswer: answer.trim(),
+        correct: false,
+        feedback: question.feedback || null,
+        timeSeconds: questionTime
+    };
+
+    if (existingIndex !== -1) {
+      result.timeSeconds = (query.results[existingIndex].timeSeconds || 0) + questionTime; // add up
+      query.results[existingIndex] = result;
+    } else {
+        query.results.push(result);
     }
 
     // Advance to next question
@@ -98,6 +124,26 @@ exports.submitAnswer = async (req, res) => {
   const totalQuestions = query.questionIds.length;
   const progressPercent = Math.round((questionNumber / totalQuestions) * 100);
   console.log(`Progress: ${progressPercent}% (${questionNumber}/${totalQuestions})`);
+
+  // Store result for review
+  query.results = query.results || [];
+  const existingIndex = query.results.findIndex(r => r.questionId === questionId);
+  const result = {
+      questionId,
+      questionText: question.question_text,
+      correctAnswer: question.correct_answer,
+      userAnswer: answer.trim(),
+      correct: true,  
+      feedback: question.feedback || null,
+      timeSeconds: questionTime
+  };
+
+  if (existingIndex !== -1) {
+    result.timeSeconds = (query.results[existingIndex].timeSeconds || 0) + questionTime; // add up
+    query.results[existingIndex] = result;
+  } else {
+      query.results.push(result);
+  }
 
   // Advance to next question
   query.current += 1;

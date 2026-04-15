@@ -39,14 +39,18 @@
         "weekly_points": "Pontuação Semanal",
         "level_up": "SUBIU DE NÍVEL!",
         "perfect": "PERFEITO!",
-        "continue_btn": "Continuar",
         "excellent": "EXCELENTE!",
+        "continue_btn": "Continuar",
         "great_job": "MUITO BEM!",
         "good_work": "BOM TRABALHO!",
         "nice_try": "BOA TENTATIVA!",
         "keep_going": "CONTINUE!",
         "experience": "O teu progresso:",
-        "levelup": "🎉 Subiu de nível!"
+        "levelup": "🎉 Subiu de nível!",
+        "totaltime":"Tempo total:",
+        "useranswer":"A tua resposta:",
+        "correctanswer":"Resposta correta:",
+        "review_title":"Revisão"
     },
     "header": {
         "logout": "Sair",

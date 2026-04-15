@@ -8,6 +8,11 @@ const queryCompleteController = async (req, res) => {
     const quiz = req.session.query;
     const userId = req.session.user?.id;
 
+    const totalTime = quiz?.totalTime || 0;
+    const totalTimeFormatted = totalTime < 60
+        ? `${totalTime}s`
+        : `${Math.floor(totalTime / 60)}m ${totalTime % 60}s`;
+
     let score = 0;
     let maxScore = 0;
     let tries = 0;
@@ -35,6 +40,8 @@ const queryCompleteController = async (req, res) => {
         maxScore = 10 * quiz.questionIds.length; // or your baseScore logic
         tries = getTotalTries(quiz);
     }
+
+    const results = quiz?.results || [];
 
     // Now it's safe to clear the session
     delete req.session.query;
@@ -70,7 +77,9 @@ const queryCompleteController = async (req, res) => {
         filledBolts,
         outlineBolts,
         leveledUp,
-        performanceMessageKey
+        performanceMessageKey,
+        results,
+        totalTimeFormatted
     });
 };
 
