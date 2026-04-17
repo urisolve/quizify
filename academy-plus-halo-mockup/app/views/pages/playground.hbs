@@ -1,0 +1,85 @@
+<div class="container-fluid">
+  <div class="row g-4">
+ 
+    <!-- Hero -->
+    <div class="col-12">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-rocket"></i>
+            </span>
+            <div>
+              <h2 class="card-title fw-semibold mb-0">Playground</h2>
+              <p class="mb-0 text-muted small">Generate new content for the platform.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+ 
+    <!-- Flash banner -->
+    {{#if flash}}
+      <div class="col-12">
+        <div class="alert alert-{{flash.type}} d-flex align-items-center gap-2 mb-0" role="alert">
+          <i class="ti {{#if (eq flash.type 'success')}}ti-circle-check{{else}}ti-alert-circle{{/if}} fs-5"></i>
+          <div>{{flash.message}}</div>
+        </div>
+      </div>
+    {{/if}}
+ 
+    <!-- Action cards -->
+    <div class="col-12 col-lg-6">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-success text-success">
+              <i class="ti ti-file-description"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">Create PMB</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                Generate a new PMB entry and store it in the database.
+              </p>
+            </div>
+          </div>
+ 
+          <div class="mt-auto">
+            <form method="POST" action="/playground/create-pmb">
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
+                <i class="ti ti-plus me-2"></i>Create PMB
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+ 
+    <div class="col-12 col-lg-6">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-warning text-warning">
+              <i class="ti ti-list-check"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">Create Questions</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                Generate new questions and store them in the database.
+              </p>
+            </div>
+          </div>
+ 
+          <div class="mt-auto">
+            <form method="POST" action="/playground/create-questions">
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
+                <i class="ti ti-plus me-2"></i>Create Questions
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+ 
+  </div>
+</div>

@@ -61,7 +61,7 @@ function getQuestionById(questionId) {
 }
 
 // Add a new question
-function addQuestion({
+function createQuestion({
   subtopic_id,
   rag_document_id = null,
   question_type = 'EM',
@@ -76,8 +76,14 @@ function addQuestion({
   invalidations = 0
 }) {
   // Ensure at least 3 incorrect answers
-  if (!Array.isArray(incorrect_answer) || incorrect_answer.length < 3) {
-    throw new Error("Validation Error: At least 3 incorrect answers are required.");
+  if (
+    !Array.isArray(incorrect_answer) ||
+    incorrect_answer.length !== 2 ||
+    !incorrect_answer.every(arr => Array.isArray(arr) && arr.length >= 3)
+  ) {
+    throw new Error(
+      "Validation Error: incorrect_answer must be [[PT...], [EN...]] with at least 3 items in each language."
+    );
   }
 
   // Prepare data for JSON columns
@@ -153,7 +159,7 @@ module.exports = {
   initQuestionsTable,
   getQuestionsBySubtopic,
   getQuestionById,
-  addQuestion,
+  createQuestion,
   deleteQuestion,
   updateQuestion,
   getRandomQuestionBySubtopic,

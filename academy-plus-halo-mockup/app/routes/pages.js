@@ -28,6 +28,11 @@ router.get('/user', requireAuthentication, userController);
 const { practicePlusPage } = require('../controllers/pages/practicePlusController');
 router.get('/practice-plus', requireAuthentication, practicePlusPage);
 
+const playgroundController = require('../controllers/pages/playgroundController.js');
+router.get('/playground', requireAuthentication, playgroundController.showPlayground);
+router.post('/playground/create-pmb', requireAuthentication, playgroundController.createPmb);
+router.post('/playground/create-questions', requireAuthentication, playgroundController.createQuestions);
+
 const leaderboardPageController = require('../controllers/pages/leaderboardController');
 router.get('/leaderboard', requireAuthentication, leaderboardPageController);
 
