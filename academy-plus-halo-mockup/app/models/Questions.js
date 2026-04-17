@@ -1,5 +1,74 @@
 const db = require('../config/db');
 
+function normalizeTextValue(value, label) {
+  if (Array.isArray(value)) {
+    const candidate = value.find((entry) => typeof entry === 'string' && entry.trim());
+    if (candidate) return candidate.trim();
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim();
+  }
+
+  throw new Error(`Validation Error: ${label} must be a non-empty string.`);
+}
+
+function normalizeLocalizedText(value, label) {
+  const text = normalizeTextValue(value, label);
+  return [text, text];
+}
+
+function normalizeDistractorList(value) {
+  if (Array.isArray(value)) {
+    if (value.length === 2 && value.every(Array.isArray)) {
+      const candidate = value.find((items) =>
+        Array.isArray(items) && items.filter((entry) => typeof entry === 'string' && entry.trim()).length >= 3
+      );
+
+      if (candidate) {
+        const items = candidate.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+        return [items, items];
+      }
+    }
+
+    const items = value
+      .filter((entry) => typeof entry === 'string' && entry.trim())
+      .map((entry) => entry.trim());
+
+    if (items.length >= 3) return [items, items];
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    const items = value
+      .split(/\n|;|\r|\t/)
+      .map((entry) => entry.replace(/^[-*\d.\s]+/, '').trim())
+      .filter(Boolean);
+
+    if (items.length >= 3) return [items, items];
+  }
+
+  throw new Error(
+    'Validation Error: incorrect_answer must contain at least 3 distractors and can be provided as PT-only or bilingual arrays.'
+  );
+}
+
+function normalizeQuestionPayload({
+  question_text,
+  correct_answer,
+  incorrect_answer,
+  feedback
+}) {
+  return {
+    question_text: normalizeLocalizedText(question_text, 'question_text'),
+    correct_answer: normalizeLocalizedText(correct_answer, 'correct_answer'),
+    incorrect_answer: normalizeDistractorList(incorrect_answer),
+    feedback:
+      feedback == null
+        ? null
+        : normalizeLocalizedText(feedback, 'feedback')
+  };
+}
+
 // Initialize the questions table if it doesn't exist
 async function initQuestionsTable() {
   try {
@@ -75,22 +144,18 @@ function createQuestion({
   number_corrects = 0,
   invalidations = 0
 }) {
-  // Ensure at least 3 incorrect answers
-  if (
-    !Array.isArray(incorrect_answer) ||
-    incorrect_answer.length !== 2 ||
-    !incorrect_answer.every(arr => Array.isArray(arr) && arr.length >= 3)
-  ) {
-    throw new Error(
-      "Validation Error: incorrect_answer must be [[PT...], [EN...]] with at least 3 items in each language."
-    );
-  }
+  const normalized = normalizeQuestionPayload({
+    question_text,
+    correct_answer,
+    incorrect_answer,
+    feedback
+  });
 
   // Prepare data for JSON columns
-  const question_text_s = JSON.stringify(question_text);
-  const correct_answer_s = JSON.stringify(correct_answer);
-  const incorrect_answer_s = JSON.stringify(incorrect_answer);
-  const feedback_s = feedback ? JSON.stringify(feedback) : null;
+  const question_text_s = JSON.stringify(normalized.question_text);
+  const correct_answer_s = JSON.stringify(normalized.correct_answer);
+  const incorrect_answer_s = JSON.stringify(normalized.incorrect_answer);
+  const feedback_s = normalized.feedback ? JSON.stringify(normalized.feedback) : null;
 
   return db.query(
     `INSERT INTO questions

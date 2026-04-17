@@ -26,30 +26,26 @@ Generate ONE multiple-choice question for engineering students based strictly on
 Requirements:
 - The question must test conceptual understanding of a specific idea from that section (not a generic circuits question).
 - The correct answer must be clearly supported by the grounding document.
-- Provide at least 3 plausible but wrong distractors per language (common student misconceptions or close-but-wrong statements).
+- Provide at least 3 plausible but wrong distractors in Portuguese (common student misconceptions or close-but-wrong statements).
 - Feedback must briefly explain WHY the correct answer is correct, referencing the concept from the section.
-- Write everything bilingually in Portuguese (PT) and English (EN); the PT version is the primary and must be pedagogically natural, the EN version is a faithful translation.
+- Write the content in Portuguese only; the application will duplicate it into English for storage.
 - Difficulty level: introductory (assumes the student has just finished this section).
 `.trim();
  
-// Strict schema instructions to force parseable JSON out of HALO
+// Keep the output easy to parse, but do not over-constrain the model on formatting.
 const JSON_SCHEMA_INSTRUCTIONS = `
-Return ONLY a JSON object matching this EXACT shape. No prose, no explanation, no markdown code fences, no comments. Just the raw JSON object:
+Return ONLY a JSON object. Use Portuguese-only content and keep the structure simple.
  
 {
-  "question_text": ["pergunta em PT", "question in EN"],
-  "correct_answer": ["resposta correta em PT", "correct answer in EN"],
-  "incorrect_answer": [
-    ["errada1 PT", "errada2 PT", "errada3 PT"],
-    ["wrong1 EN", "wrong2 EN", "wrong3 EN"]
-  ],
-  "feedback": ["feedback em PT", "feedback in EN"]
+  "question_text": "pergunta em PT",
+  "correct_answer": "resposta correta em PT",
+  "incorrect_answer": ["errada1", "errada2", "errada3"],
+  "feedback": "feedback em PT"
 }
  
 Constraints:
-- "question_text", "correct_answer", and "feedback" are arrays of exactly 2 strings: [Portuguese, English].
-- "incorrect_answer" is an array of exactly 2 arrays. The first sub-array is the Portuguese distractors, the second is the English distractors.
-- Each distractor array must contain at least 3 items (more is allowed).
+- "question_text", "correct_answer", and "feedback" should be plain strings in Portuguese.
+- "incorrect_answer" should be a flat array of at least 3 plain-text distractors in Portuguese.
 - All strings must be plain text, no JSON, no HTML.
 - Respond with ONLY the JSON object. No prefix, no suffix, no commentary.
 `.trim();
@@ -149,28 +145,64 @@ function extractJsonObject(rawText) {
   return JSON.parse(cleaned);
 }
  
-function validateQuestionShape(q) {
+function normalizeTextValue(value, label) {
+  if (Array.isArray(value)) {
+    const candidate = value.find((entry) => typeof entry === 'string' && entry.trim());
+    if (candidate) return candidate.trim();
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim();
+  }
+
+  throw new Error(`${label} must be a non-empty string.`);
+}
+
+function normalizeDistractors(value) {
+  if (Array.isArray(value)) {
+    if (value.length === 2 && value.every(Array.isArray)) {
+      const candidate = value.find((items) =>
+        Array.isArray(items) && items.filter((entry) => typeof entry === 'string' && entry.trim()).length >= 3
+      );
+      if (candidate) {
+        return candidate.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+      }
+    }
+
+    const items = value
+      .filter((entry) => typeof entry === 'string' && entry.trim())
+      .map((entry) => entry.trim());
+
+    if (items.length >= 3) return items;
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    const items = value
+      .split(/\n|;|\r|\t/)
+      .map((entry) => entry.replace(/^[-*\d.\s]+/, '').trim())
+      .filter(Boolean);
+
+    if (items.length >= 3) return items;
+  }
+
+  throw new Error('incorrect_answer must contain at least 3 distractors.');
+}
+
+function normalizeQuestionShape(q) {
   if (!q || typeof q !== 'object' || Array.isArray(q)) {
     throw new Error('Response is not a JSON object.');
   }
- 
-  const pair = (arr) =>
-    Array.isArray(arr) && arr.length === 2 && arr.every((s) => typeof s === 'string' && s.trim());
- 
-  if (!pair(q.question_text)) throw new Error('question_text must be [PT, EN] non-empty strings.');
-  if (!pair(q.correct_answer)) throw new Error('correct_answer must be [PT, EN] non-empty strings.');
-  if (!pair(q.feedback)) throw new Error('feedback must be [PT, EN] non-empty strings.');
- 
-  if (!Array.isArray(q.incorrect_answer) || q.incorrect_answer.length !== 2) {
-    throw new Error('incorrect_answer must be [[PT...], [EN...]].');
-  }
-  const [pt, en] = q.incorrect_answer;
-  if (!Array.isArray(pt) || pt.length < 3 || !pt.every((s) => typeof s === 'string' && s.trim())) {
-    throw new Error('incorrect_answer[0] must have at least 3 non-empty PT distractors.');
-  }
-  if (!Array.isArray(en) || en.length < 3 || !en.every((s) => typeof s === 'string' && s.trim())) {
-    throw new Error('incorrect_answer[1] must have at least 3 non-empty EN distractors.');
-  }
+
+  return {
+    question_text: normalizeTextValue(q.question_text, 'question_text'),
+    correct_answer: normalizeTextValue(q.correct_answer, 'correct_answer'),
+    incorrect_answer: normalizeDistractors(q.incorrect_answer),
+    feedback: normalizeTextValue(q.feedback, 'feedback')
+  };
+}
+
+function validateQuestionShape(q) {
+  normalizeQuestionShape(q);
 }
  
 async function showPlayground(req, res) {
@@ -223,7 +255,7 @@ async function createQuestions(req, res) {
     console.log(`[playground] createQuestions — raw response length: ${rawText.length}`);
     console.log('[playground] createQuestions — raw response:\n' + rawText); 
  
-    const question = extractJsonObject(rawText);
+    const question = normalizeQuestionShape(extractJsonObject(rawText));
     console.log('[playground] createQuestions — parsed question:', JSON.stringify(question, null, 2));
     validateQuestionShape(question);
  
@@ -245,7 +277,8 @@ async function createQuestions(req, res) {
  
     req.session.flash = {
       type: 'success',
-      message: 'Question created successfully.'
+      message: 'Question created successfully and is shown below.',
+      generatedQuestion: question
     };
   } catch (err) {
     console.error('[playground] createQuestions failed:', err);
