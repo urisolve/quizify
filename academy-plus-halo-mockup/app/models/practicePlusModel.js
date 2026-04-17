@@ -58,7 +58,7 @@ function setUserConquests(userId, conquestJson) {
 }
 
 function getSubtopicById(subtopicId) { 
-  return db.query('SELECT topic_id, title, num_questions, weight FROM subtopics WHERE id = ?', [subtopicId]); 
+  return db.query('SELECT topic_id, title, number_questions FROM subtopics WHERE id = ?', [subtopicId]); 
 }
 
 module.exports = {

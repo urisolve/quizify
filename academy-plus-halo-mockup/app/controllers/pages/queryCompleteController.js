@@ -1,4 +1,4 @@
-const {getUserWeeklyScoreSum} = require('../../models/WeeklyTraining');
+const {getUserWeeklyStats} = require('../../models/Training');
 const getWeekStart = require('../../utils/getWeekStart');
 const { getLevelProgressPercent, getLevelFromScore } = require('../../utils/level');
 const { calculatePerformanceBolts } = require('../../utils/performanceCalculator');
@@ -12,7 +12,8 @@ const queryCompleteController = async (req, res) => {
         const quiz = req.session.query;
 
         const weekStart = quiz?.weekStart || getWeekStart(); // Use session weekStart if available
-        let weeklyScore = await getUserWeeklyScoreSum(userId, weekStart);
+        const weeklyStats = await getUserWeeklyStats(userId, weekStart);
+        let weeklyScore = weeklyStats?.totalScore || 0;
 
         // Calculate exp bar fill: previous percent and new percent (after this session)
         const userExpBefore = req.session.query?.userPrevExp;

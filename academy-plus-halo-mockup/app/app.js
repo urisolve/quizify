@@ -1,7 +1,7 @@
-// Add this import at the top with other model initializations
-//? Main file of the application
 
 //* Import required modules
+const { pickLocale, pickLocaleArray } = require('./utils/localize');
+
 const express = require('express');
 const path = require('path');
 const dotenv = require('dotenv');
@@ -27,6 +27,8 @@ const seedDatabase = require('../db/seed');
 const topicsPath = path.join(__dirname, '../db/insert_topics.sql');
 const subtopicsPath = path.join(__dirname, '../db/insert_subtopics.sql');
 const questionsPath = path.join(__dirname, '../db/insert_questions.sql');
+const usersPath = path.join(__dirname, '../db/insert_users.sql');
+const docsPath = path.join(__dirname, '../db/insert_docs.sql');
 
 //* i18next configuration
 i18next
@@ -91,6 +93,18 @@ const hbsHelpers = {
     }
     // Fallback if i18n is not found in the context
     return key;
+  },
+
+  // Pick the localized string from a JSON [PT, EN] column
+  loc: function (value, options) {
+    const lang = options.data.root.i18n?.language;
+    return pickLocale(value, lang);
+  },
+
+  // Pick the localized array from a JSON [[PT...], [EN...]] column (incorrect_answer)
+  locArr: function (value, options) {
+    const lang = options.data.root.i18n?.language;
+    return pickLocaleArray(value, lang);
   },
 
   topicT: function(id, field, options) {
@@ -172,10 +186,10 @@ app.use('/api', apiRoutes);
 const { initTopicsTable } = require('./models/Topic');
 const { initSubtopicsTable } = require('./models/Subtopic');
 const { initQuestionsTable } = require('./models/Questions');
-const { initBadgesTable } = require('./models/userBadges');
-const { initWeeklyTrainingTable } = require('./models/WeeklyTraining');
+const { initTrainingTable } = require('./models/Training');
 const { initUserSubtopicProgressTable } = require('./models/UserSubtopicProgress');
 const { initUsersTable } = require('./models/User');
+const { initRagTable } = require('./models/Documents');
 
 // Initialize all tables before starting the server
 async function waitForDB(retries = 10, delay = 3000) {
@@ -195,15 +209,15 @@ async function waitForDB(retries = 10, delay = 3000) {
 (async () => {
   try {
     await waitForDB();
-    await initUsersTable();
     await initTopicsTable();
     await initSubtopicsTable();
+    await initRagTable();
+    await initUsersTable();
     await initQuestionsTable();
-    await initBadgesTable();
-    await initWeeklyTrainingTable();
+    await initTrainingTable();
     await initUserSubtopicProgressTable();
     console.log('All tables ensured/created.');
-    await seedDatabase([topicsPath, subtopicsPath, questionsPath]);
+    await seedDatabase([topicsPath, subtopicsPath, docsPath, questionsPath, usersPath]);
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

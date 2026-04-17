@@ -55,7 +55,7 @@
                 <i class="ti ti-question-mark"></i>
               </span>
               <p id="question-text" class="fs-5 mb-0" style="text-align: justify;">
-                {{question.question_text}}
+                {{loc question.question_text}}
               </p>
             </div>
 
@@ -78,13 +78,13 @@
 
             <!-- Feedback -->
             {{#if (eq round 2)}}
-              {{#if question.feedback}}
+              {{#if (loc question.feedback)}}
                 <div class="floating-feedback" id="floating-feedback">
                   <div class="d-flex align-items-center gap-3" id="floating-feedback-message" role="alert">
                     <span class="halo-section-icon bg-light-warning text-warning flex-shrink-0">
                       <i class="ti ti-info-circle"></i>
                     </span>
-                    <div id="feedback-fab-tooltip" class="fw-medium">{{question.feedback}}</div>
+                    <div id="feedback-fab-tooltip" class="fw-medium">{{loc question.feedback}}</div>
                   </div>
                 </div>
               {{/if}}

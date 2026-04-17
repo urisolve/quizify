@@ -2,23 +2,20 @@ const db = require('../config/db');
 
 // Initialize the topics table if it doesn't exist
 async function initTopicsTable() {
-  await db.query(`
-    CREATE TABLE IF NOT EXISTS topics (
-      id INT PRIMARY KEY AUTO_INCREMENT,
-      name VARCHAR(255) NOT NULL,
-      description TEXT,
-      badge JSON
-    )
-  `);
-}
-async function initTopicsTable() {
   try {
     await db.query(`
       CREATE TABLE IF NOT EXISTS topics (
-        id INT PRIMARY KEY AUTO_INCREMENT,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        badge JSON
+        id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+        title VARCHAR(255) NOT NULL,
+        description TEXT DEFAULT NULL,
+        badge JSON DEFAULT NULL,
+        locked BOOLEAN NOT NULL DEFAULT TRUE,
+        date_unlock TIMESTAMP DEFAULT NULL,
+        number_subtopics INT NOT NULL DEFAULT 0,
+        number_questions INT DEFAULT 0,
+        number_tries INT DEFAULT 0,
+        number_correct INT DEFAULT 0,
+        time_spent INT DEFAULT 0
       )
     `);
     console.log('Topics table ensured/created.');
@@ -27,36 +24,83 @@ async function initTopicsTable() {
   }
 }
 
-// --- TOPICS ---
+// Get all topics
 async function getAllTopics() {
   const [rows] = await db.query('SELECT * FROM topics ORDER BY id');
   return rows;
 }
 
+// Get topic by id
 async function getTopicById(id) {
   const [rows] = await db.query('SELECT * FROM topics WHERE id = ?', [id]);
   return rows[0];
 }
 
-async function createTopic({ name, description, badge }) {
+// Create topic
+async function createTopic({ 
+  title, 
+  description = null, 
+  badge = null, 
+  locked = true, 
+  date_unlock = null 
+}) {
   const [result] = await db.query(
-    'INSERT INTO topics (name, description, badge) VALUES (?, ?, ?)',
-    [name, description, badge ? JSON.stringify(badge) : null]
+    `INSERT INTO topics 
+      (title, description, badge, locked, date_unlock) 
+     VALUES (?, ?, ?, ?, ?)`,
+    [
+      title, 
+      description, 
+      badge ? JSON.stringify(badge) : null, 
+      locked, 
+      date_unlock
+    ]
   );
   return result.insertId;
 }
 
-async function updateTopic(id, { name, description, badge }) {
+// Update topic
+async function updateTopic(id, updates) {
+  const allowedFields = [
+    'title', 'description', 'badge', 'locked', 'date_unlock',
+    'number_subtopics', 'number_questions', 'number_tries', 
+    'number_correct', 'time_spent'
+  ];
+
+  // Filter fields and handle JSON conversion
+  const fields = Object.keys(updates).filter(f => allowedFields.includes(f));
+  if (fields.length === 0) return;
+
+  const setClause = fields.map(f => `${f} = ?`).join(', ');
+  const values = fields.map(f => {
+    const val = updates[f];
+    // Stringify badge if it's an object/array
+    if (f === 'badge' && val !== null) return JSON.stringify(val);
+    return val;
+  });
+
+  values.push(id);
+  await db.query(`UPDATE topics SET ${setClause} WHERE id = ?`, values);
+}
+
+// Increment topic stats
+async function incrementTopicStats(id, { tries = 0, correct = 0, time = 0 }) {
   await db.query(
-    'UPDATE topics SET name = ?, description = ?, badge = ? WHERE id = ?',
-    [name, description, badge ? JSON.stringify(badge) : null, id]
+    `UPDATE topics SET 
+     number_tries = number_tries + ?, 
+     number_correct = number_correct + ?, 
+     time_spent = time_spent + ? 
+     WHERE id = ?`,
+    [tries, correct, time, id]
   );
 }
 
+// Delete topic
 async function deleteTopic(id) {
   await db.query('DELETE FROM topics WHERE id = ?', [id]);
 }
 
+// Export
 module.exports = {
   getAllTopics,
   getTopicById,
@@ -64,4 +108,5 @@ module.exports = {
   updateTopic,
   deleteTopic,
   initTopicsTable,
+  incrementTopicStats
 };

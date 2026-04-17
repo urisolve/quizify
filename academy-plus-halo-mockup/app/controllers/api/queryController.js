@@ -1,21 +1,18 @@
 const User = require('../../models/User');
 const Questions = require('../../models/Questions');
 const { getSubtopicById, setUserSubtopicProgress, getTopicBadge } = require('../../models/practicePlusModel');
-const { getUserQuestionWeeklyTraining, updateWeeklyTraining } = require('../../models/WeeklyTraining');
-const { checkAndAwardTopicBadge } = require('../../models/userBadges');
+const { logTrainingAttempt, getUserWeeklyStats} = require('../../models/Training');
+const { checkAndAwardTopicBadge } = require('../../models/User');
 const { calculateQuestionScore } = require('../../utils/scoreCalculator');
 const { incrementQuestionTries } = require('../../utils/querySession');
+const getWeekStart = require('../../utils/getWeekStart');
+const { pickLocale } = require('../../utils/localize');
 
 exports.submitAnswer = async (req, res) => {
   const { answer } = req.body;
   const userId = req.session.user?.id;
   const query = req.session.query;
-
-  // Calculate time spent on this question
-  const now = Date.now();
-  const questionTime = Math.round((now - (query.questionStartTime || now)) / 1000);
-  query.totalTime = (query.totalTime || 0) + questionTime;
-  query.questionStartTime = now; // reset for next question
+  const lang = req.language;
 
   if (!query) {
     return res.status(400).json({ correct: false, message: 'No active query session.' });
@@ -28,18 +25,35 @@ exports.submitAnswer = async (req, res) => {
   // Get the current week start from session (set when query started)
   const weekStart = req.session.query.weekStart;
 
+  // Calculate time spent on this question
+  const now = Date.now();
+  const questionTime = Math.round((now - (query.questionStartTime || now)) / 1000);
+  query.totalTime = (query.totalTime || 0) + questionTime;
+  query.questionStartTime = now; // reset for next question
+
+
   // Fetch current training row for this user/question/week
-  const [[currentDone]] = await getUserQuestionWeeklyTraining(userId, questionId, weekStart);
+  // const [[currentDone]] = await getUserQuestionWeeklyTraining(userId, questionId, weekStart);
 
   // --- Increment tries for current question in session ---
   const tries = incrementQuestionTries(query);
 
   // Handle incorrect answer first
-  if (answer.trim() !== question.correct_answer.trim()) {
+  const correctAnswer = pickLocale(question.correct_answer, lang);
+  if (answer.trim() !== correctAnswer.trim()) {
+    await logTrainingAttempt({
+      userId,
+      questionId,
+      tries: 1,
+      success: false,
+      score: 0,
+      time: questionTime
+    });
+
     // For incorrect answer: increment tries only, do not change completed
-    const newTries = (currentDone?.tries ?? 0) + 1;
-    const completed = currentDone?.completed ?? 0;
-    await updateWeeklyTraining(userId, questionId, weekStart, { tries: newTries, completed });
+    // const newTries = (currentDone?.tries ?? 0) + 1;
+    // const completed = currentDone?.completed ?? 0;
+    // await updateWeeklyTraining(userId, questionId, weekStart, { tries: newTries, completed });
 
     // Track missed question for round 2
     query.missedIds = query.missedIds || [];
@@ -52,16 +66,18 @@ exports.submitAnswer = async (req, res) => {
     const existingIndex = query.results.findIndex(r => r.questionId === questionId);
     const result = {
         questionId,
-        questionText: question.question_text,
-        correctAnswer: question.correct_answer,
+        questionText: pickLocale(question.question_text, lang),
+        correctAnswer: pickLocale(question.correct_answer, lang),
         userAnswer: answer.trim(),
         correct: false,
         feedback: question.feedback || null,
-        timeSeconds: questionTime
+        timeSeconds: existingIndex !== -1
+        ? (query.results[existingIndex].timeSeconds || 0) + questionTime
+        : questionTime
     };
 
     if (existingIndex !== -1) {
-      result.timeSeconds = (query.results[existingIndex].timeSeconds || 0) + questionTime; // add up
+      //result.timeSeconds = (query.results[existingIndex].timeSeconds || 0) + questionTime; // add up
       query.results[existingIndex] = result;
     } else {
         query.results.push(result);
@@ -71,9 +87,9 @@ exports.submitAnswer = async (req, res) => {
     query.current += 1;
     req.session.query = query;
 
-    const questionNumber = query.current;
-    const totalQuestions = query.questionIds.length;
-    const progressPercent = Math.round((questionNumber / totalQuestions) * 100);
+    //const questionNumber = query.current;
+    //const totalQuestions = query.questionIds.length;
+    const progressPercent = Math.round((query.current / query.questionIds.length) * 100);
 
     if (query.current >= query.questionIds.length) {
       // Round 1 ended on a wrong answer — check if round 2 needed
@@ -104,11 +120,20 @@ exports.submitAnswer = async (req, res) => {
   const score = calculateQuestionScore(weight, tries);
   query.score += score;
 
+   await logTrainingAttempt({
+      userId,
+      questionId,
+      tries: 1,
+      success: true,
+      score,
+      time: questionTime
+    });
+
   // On correct answer: increment tries and completed, update score
-  const newTries = (currentDone?.tries ?? 0) + 1;
-  const newCompleted = (currentDone?.completed ?? 0) + 1;
-  const newScore = (currentDone?.score ?? 0) + score;
-  await updateWeeklyTraining(userId, questionId, weekStart, { tries: newTries, score: newScore, completed: newCompleted });
+  // const newTries = (currentDone?.tries ?? 0) + 1;
+  // const newCompleted = (currentDone?.completed ?? 0) + 1;
+  // const newScore = (currentDone?.score ?? 0) + score;
+  // await updateWeeklyTraining(userId, questionId, weekStart, { tries: newTries, score: newScore, completed: newCompleted });
 
   // Also add the score earned for this question to the user's total score
   await User.incrementUserExp(userId, score);
@@ -120,11 +145,8 @@ exports.submitAnswer = async (req, res) => {
   req.session.user.level = getLevelFromScore(req.session.user.exp || 0);
   req.session.user.levelProgress = getLevelProgressPercent(req.session.user.exp || 0);
   console.log(`Nível: ${req.session.user.level}, Progresso: ${req.session.user.levelProgress}%`);
-  // Query progress
-  const questionNumber = query.current + 1;
-  const totalQuestions = query.questionIds.length;
-  const progressPercent = Math.round((questionNumber / totalQuestions) * 100);
-  console.log(`Progress: ${progressPercent}% (${questionNumber}/${totalQuestions})`);
+  
+  
 
   // Store result for review
   query.results = query.results || [];
@@ -136,15 +158,23 @@ exports.submitAnswer = async (req, res) => {
       userAnswer: answer.trim(),
       correct: true,  
       feedback: question.feedback || null,
-      timeSeconds: questionTime
+      timeSeconds: existingIndex !== -1
+        ? (query.results[existingIndex].timeSeconds || 0) + questionTime
+        : questionTime
   };
 
   if (existingIndex !== -1) {
-    result.timeSeconds = (query.results[existingIndex].timeSeconds || 0) + questionTime; // add up
+    //result.timeSeconds = (query.results[existingIndex].timeSeconds || 0) + questionTime; // add up
     query.results[existingIndex] = result;
   } else {
       query.results.push(result);
   }
+
+  // Query progress
+  const questionNumber = query.current + 1;
+  const totalQuestions = query.questionIds.length;
+  const progressPercent = Math.round((questionNumber / totalQuestions) * 100);
+  console.log(`Progress: ${progressPercent}% (${questionNumber}/${totalQuestions})`);
 
   // Advance to next question
   query.current += 1;

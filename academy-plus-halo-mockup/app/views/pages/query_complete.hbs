@@ -110,7 +110,7 @@
               <div class="p-3 rounded-3 border {{#if this.correct}}border-success bg-success-subtle{{else}}border-danger bg-danger-subtle{{/if}}">
                 <div class="d-flex align-items-start gap-2 mb-2">
                   <i class="ti {{#if this.correct}}ti-circle-check text-success{{else}}ti-circle-x text-danger{{/if}} fs-5 flex-shrink-0 mt-1"></i>
-                  <p class="mb-0 fw-medium">{{this.questionText}}</p>
+                  <p class="mb-0 fw-medium">{{loc this.questionText}}</p>
                   {{#if this.timeSeconds}}
                     <p class="mb-0 text-muted small">
                       <i class="ti ti-clock me-1"></i>{{this.timeSeconds}}s
@@ -124,11 +124,11 @@
                     </p>
                   {{/unless}}
                   <p class="mb-1 text-success">
-                    <span class="fw-semibold">{{t 'query_complete.correctanswer'}}</span> {{this.correctAnswer}}
+                    <span class="fw-semibold">{{t 'query_complete.correctanswer'}}</span> {{loc this.correctAnswer}}
                   </p>
-                  {{#if this.feedback}}
+                  {{#if (loc this.feedback)}}
                     <p class="mb-0 text-muted fst-italic">
-                      <i class="ti ti-info-circle me-1"></i>{{this.feedback}}
+                      <i class="ti ti-info-circle me-1"></i>{{loc this.feedback}}
                     </p>
                   {{/if}}
                 </div>

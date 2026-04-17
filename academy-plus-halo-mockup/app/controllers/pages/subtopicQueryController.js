@@ -10,7 +10,7 @@ const subtopicQueryController = async (req, res) => {
   const [[subtopic]] = await getSubtopicById(subtopicId);
   if (!subtopic) return res.redirect('/practice-plus');
 
-  const numQuestions = subtopic?.num_questions || 1;
+  const numQuestions = subtopic?.number_questions || 1;
 console.log(`Subtópico ${subtopicId}: configurado para ${numQuestions} questões`);
   
 // Get questions for this subtopic
