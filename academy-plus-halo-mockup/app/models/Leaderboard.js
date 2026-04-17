@@ -26,7 +26,7 @@ async function getUserWeeklyPosition(userId) {
 
   // Get user's weekly score
   const [[user]] = await db.query(
-    `SELECT COALESCE(SUM(score),0) AS weeklyScore FROM weekly_training WHERE user_id = ? AND week_start = ?`,
+    `SELECT COALESCE(SUM(score),0) AS weeklyScore FROM training WHERE user_id = ? AND week_start = ?`,
     [userId, weekStart]
   );
   if (!user) return null;
@@ -35,7 +35,7 @@ async function getUserWeeklyPosition(userId) {
   const [[{ position }]] = await db.query(
     `SELECT COUNT(*) + 1 AS position FROM (
         SELECT user_id, COALESCE(SUM(score),0) AS weeklyScore
-        FROM weekly_training
+        FROM training
         WHERE week_start = ?
         GROUP BY user_id
     ) t WHERE weeklyScore > ?`,
@@ -63,7 +63,7 @@ async function getTopUsers(sort, limit) {
     const [rows] = await db.query(
       `SELECT u.username, u.exp, u.avatar_url as avatar, COALESCE(SUM(wt.score),0) AS weeklyScore
        FROM users u
-       LEFT JOIN weekly_training wt ON u.id = wt.user_id AND wt.week_start = ?
+       LEFT JOIN training wt ON u.id = wt.user_id AND wt.week_start = ?
        GROUP BY u.id
        ORDER BY u.exp DESC
        LIMIT ?`,
@@ -75,7 +75,7 @@ async function getTopUsers(sort, limit) {
     const [rows] = await db.query(
       `SELECT u.username, u.exp, u.avatar_url as avatar, COALESCE(SUM(wt.score),0) AS weeklyScore
        FROM users u
-       LEFT JOIN weekly_training wt ON u.id = wt.user_id AND wt.week_start = ?
+       LEFT JOIN training wt ON u.id = wt.user_id AND wt.week_start = ?
        GROUP BY u.id
        ORDER BY weeklyScore DESC
        LIMIT ?`,

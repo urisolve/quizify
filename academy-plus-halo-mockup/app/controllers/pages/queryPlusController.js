@@ -1,6 +1,6 @@
 const {getSubtopicById, getTopics} = require('../../models/practicePlusModel');
 const {getQuestionById} = require('../../models/Questions');
-const {initWeeklyTrainingEntry} = require('../../models/WeeklyTraining');
+const { pickLocale, pickLocaleArray } = require('../../utils/localize');
 
 
 function shuffle(array) {
@@ -21,6 +21,8 @@ const queryPlusController = async (req, res) => {
   const roundUp = query.roundUp || false;
   query.roundUp = false;
   req.session.query = query; 
+
+  const lang = req.language;
 
   let headerTitle = 'Practice Question';
   
@@ -51,26 +53,20 @@ const queryPlusController = async (req, res) => {
   }
 
   // --- Always ensure a weekly_training entry exists for this user/question/week ---
-  if (req.session.user && req.session.user.id && currentQuestionId) {
-    const userId = req.session.user.id;
-    await initWeeklyTrainingEntry(userId, currentQuestionId);
-  }
+  //if (req.session.user && req.session.user.id && currentQuestionId) {
+  //  const userId = req.session.user.id;
+    //await initWeeklyTrainingEntry(userId, currentQuestionId);
+  //}
 
   // Prepare answers (shuffle correct + 3 random incorrect)
-  const incorrects = [
-    questionData.incorrect_answer1,
-    questionData.incorrect_answer2,
-    questionData.incorrect_answer3,
-    questionData.incorrect_answer4,
-    questionData.incorrect_answer5,
-    questionData.incorrect_answer6
-  ].filter(ans => ans && ans.trim() !== '');
+  const incorrects = pickLocaleArray(questionData.incorrect_answer, lang)
+    .filter(ans => ans && String(ans).trim() !== '');
 
   shuffle(incorrects);
   const selectedIncorrects = incorrects.slice(0, 3);
 
   const answers = shuffle([
-    { text: questionData.correct_answer },
+    { text: pickLocale(questionData.correct_answer, lang) },
     ...selectedIncorrects.map(ans => ({ text: ans }))
   ]);
 

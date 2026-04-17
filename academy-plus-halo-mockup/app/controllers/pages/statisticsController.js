@@ -1,8 +1,8 @@
 const { getTopics } = require('../../models/practicePlusModel');
 const { getTriesAndCompletedPerTopic, getTopicAverageProgress, getSubtopicCompletionStats } = require('../../models/Statistics');
 const { calculatePerformanceBolts } = require('../../utils/performanceCalculator');
-const { getUserWeeklyScoreSum } = require('../../models/WeeklyTraining');
-const { getUserBadges } = require('../../models/userBadges');
+const { getUserWeeklyStats } = require('../../models/Training');
+const { getUserBadges } = require('../../models/User');
 const weekStart = require('../../utils/getWeekStart')();
 
 const statisticsController = async (req, res) => {
@@ -18,7 +18,8 @@ const statisticsController = async (req, res) => {
         // Fetch user's subtopic completion stats per topic
         const subtopicStats = await getSubtopicCompletionStats(userId);
         // Fetch user's weekly score sum
-        const userWeeklyScore = await getUserWeeklyScoreSum(userId, weekStart);
+        const weeklyStats = await getUserWeeklyStats(userId, weekStart);
+        const userWeeklyScore = weeklyStats.totalScore || 0;
         // Fetch user's badges
         const userBadges = await getUserBadges(userId);
         // Map performance bolts, stats, progress, and subtopic completion for each topic
