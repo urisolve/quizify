@@ -74,6 +74,20 @@
                 </div>
               </div>
             </div>
+
+            {{#if flash.generatedQuestion.image}}
+              <div class="mt-3">
+                <div class="text-muted small mb-2">Circuit image selected by the model</div>
+                <div class="border rounded-3 p-3 bg-white">
+                  <img
+                    src="{{flash.generatedQuestion.image}}"
+                    alt="Circuit image selected by model"
+                    class="img-fluid rounded"
+                    style="max-height: 320px; object-fit: contain;"
+                  />
+                </div>
+              </div>
+            {{/if}}
           </div>
         </section>
       </div>
@@ -124,7 +138,20 @@
           </div>
  
           <div class="mt-auto">
-            <form method="POST" action="/playground/create-questions">
+            <form method="POST" action="/playground/create-questions" class="d-flex flex-column gap-3">
+              <input type="hidden" name="questionFocus" value="topology" />
+
+              <div>
+                <label class="form-label fw-semibold mb-1" for="topologyTarget">Topology focus</label>
+                <select class="form-select" id="topologyTarget" name="topologyTarget">
+                  <option value="any" selected>Any (Nós, Ramos, or Malhas)</option>
+                  <option value="nodes">Nós</option>
+                  <option value="branches">Ramos</option>
+                  <option value="meshes">Malhas</option>
+                </select>
+                <div class="form-text">The generated question will focus on topology counts or structure interpretation.</div>
+              </div>
+
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
                 <i class="ti ti-plus me-2"></i>Create Questions
               </button>

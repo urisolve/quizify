@@ -1,8 +1,10 @@
 // app/controllers/pages/playgroundController.js
  
 const dotenv = require('dotenv');
-const fs = require('fs').promises;
+const fs = require('fs');
 const path = require('path');
+
+const fsp = fs.promises;
  
 const db = require('../../config/db');
 const { createQuestion } = require('../../models/Questions');
@@ -12,6 +14,9 @@ dotenv.config();
 const HALO_URL = process.env.HALO_URL || 'http://cloud.microlumin.com';
 const HALO_PORT = process.env.HALO_PORT || 2020;
 const HALO_RAG_STREAM_URL = `${HALO_URL}:${HALO_PORT}/rag/stream`;
+const TOPOLOGY_TARGETS = new Set(['nodes', 'branches', 'meshes']);
+const DOC_IMAGES_BASE_RELATIVE = 'assets/files/docs/pmb_1';
+const DOC_IMAGES_BASE_PUBLIC = `/${DOC_IMAGES_BASE_RELATIVE}`;
  
 // Grounding document used for Create Questions
 const GROUNDING_DOC_PATH = path.join(
@@ -19,18 +24,48 @@ const GROUNDING_DOC_PATH = path.join(
   '../../public/assets/files/docs/pmb_1/lcm_pedagogical_solution_pt.md'
 );
  
-// Fixed user prompt
-const FIXED_USER_PROMPT = `
-Generate ONE multiple-choice question for engineering students based strictly on the section titled "Circuit Variable Analysis" (Análise de Variáveis de Circuito) in the attached pedagogical document.
+function selectTopologyTarget(requestedTarget) {
+  if (TOPOLOGY_TARGETS.has(requestedTarget)) return requestedTarget;
+
+  const targets = ['nodes', 'branches', 'meshes'];
+  const randomIndex = Math.floor(Math.random() * targets.length);
+  return targets[randomIndex];
+}
+
+function describeTopologyTarget(topologyTarget) {
+  if (topologyTarget === 'nodes') {
+    return 'número de nós elétricos (seção "Nós")';
+  }
+
+  if (topologyTarget === 'branches') {
+    return 'número de ramos e interpretação de noP/noN (seção "Ramos")';
+  }
+
+  return 'número e interpretação de malhas (seção "Malhas")';
+}
+
+function buildUserPrompt({ focus, topologyTarget }) {
+  const activeFocus = focus === 'topology' ? 'topology' : 'topology';
+  const targetDescriptor = describeTopologyTarget(topologyTarget);
+
+  const topologyPrompt = `
+Generate ONE multiple-choice question for engineering students strictly grounded in the section "Informações Topológicas" of the attached pedagogical document.
+
+The question must focus on ${targetDescriptor} and explicitly rely on one of these subsections: "Nós", "Ramos", or "Malhas".
 
 Requirements:
-- The question must test conceptual understanding of a specific idea from that section (not a generic circuits question).
-- The correct answer must be clearly supported by the grounding document.
-- Provide at least 3 plausible but wrong distractors in Portuguese (common student misconceptions or close-but-wrong statements).
-- Feedback must briefly explain WHY the correct answer is correct, referencing the concept from the section.
-- Write the content in Portuguese only; the application will duplicate it into English for storage.
-- Difficulty level: introductory (assumes the student has just finished this section).
+- Ask about topology (counting, identifying, or interpreting the circuit structure), not about full numeric KVL/KCL solving.
+- The correct answer must be directly supported by the grounding document.
+- Provide at least 3 plausible but incorrect distractors in Portuguese.
+- Feedback must briefly explain why the correct answer is correct and cite the relevant subsection name (Nós, Ramos, or Malhas).
+- Return an image path for the most relevant circuit figure from the same document (e.g., "circuit-png/00-combined.png", "node-exports/nodes-combined.png", "branch-exports/branches-combined.png", or a mesh image path).
+- The image should match the topology focus: if asking about mesh X, choose the figure that illustrates mesh X. 
+- Write all content in Portuguese only; the app will duplicate it for EN storage.
+- Difficulty level: introductory.
 `.trim();
+
+  return activeFocus === 'topology' ? topologyPrompt : topologyPrompt;
+}
  
 // Keep the output easy to parse, but do not over-constrain the model on formatting.
 const JSON_SCHEMA_INSTRUCTIONS = `
@@ -40,18 +75,21 @@ Return ONLY a JSON object. Use Portuguese-only content and keep the structure si
   "question_text": "pergunta em PT",
   "correct_answer": "resposta correta em PT",
   "incorrect_answer": ["errada1", "errada2", "errada3"],
-  "feedback": "feedback em PT"
+  "feedback": "feedback em PT",
+  "circuit_image": "caminho relativo da imagem no documento"
 }
  
 Constraints:
 - "question_text", "correct_answer", and "feedback" should be plain strings in Portuguese.
 - "incorrect_answer" should be a flat array of at least 3 plain-text distractors in Portuguese.
+- "circuit_image" must be a relative image path from the pedagogical document (for example: "circuit-png/00-combined.png", "node-exports/nodes-combined.png").
 - All strings must be plain text, no JSON, no HTML.
+- All the answers should contain only portuguese content based on the document.
 - Respond with ONLY the JSON object. No prefix, no suffix, no commentary.
 `.trim();
  
 async function buildRagPayload() {
-  const content = await fs.readFile(GROUNDING_DOC_PATH, 'utf8');
+  const content = await fsp.readFile(GROUNDING_DOC_PATH, 'utf8');
   const name = path.basename(GROUNDING_DOC_PATH);
  
   return {
@@ -75,6 +113,57 @@ async function buildRagPayload() {
       url: null
     }
   };
+}
+
+function normalizeDocImageRelativePath(value) {
+  const raw = typeof value === 'string' ? value.trim() : '';
+  if (!raw) return null;
+
+  const noQuotes = raw.replace(/^['"]|['"]$/g, '');
+  const cleaned = noQuotes.replace(/\\/g, '/').replace(/^\/+/, '');
+
+  if (cleaned.includes('..')) return null;
+
+  const lowered = cleaned.toLowerCase();
+  if (!(/\.(png|jpg|jpeg|webp|gif|svg)$/i.test(cleaned))) {
+    return null;
+  }
+
+  if (
+    lowered.startsWith('circuit-png/') ||
+    lowered.startsWith('node-exports/') ||
+    lowered.startsWith('branch-exports/') ||
+    lowered.startsWith('mesh-exports/') ||
+    lowered.startsWith('current-exports/')
+  ) {
+    return `${DOC_IMAGES_BASE_RELATIVE}/${cleaned}`;
+  }
+
+  if (lowered.startsWith('assets/files/docs/pmb_1/')) {
+    return cleaned;
+  }
+
+  if (cleaned.startsWith('/assets/files/docs/pmb_1/')) {
+    return cleaned.slice(1);
+  }
+
+  return null;
+}
+
+function fallbackImageByTopologyTarget(topologyTarget) {
+  if (topologyTarget === 'nodes') {
+    return `${DOC_IMAGES_BASE_RELATIVE}/node-exports/nodes-combined.png`;
+  }
+
+  if (topologyTarget === 'branches') {
+    return `${DOC_IMAGES_BASE_RELATIVE}/branch-exports/branches-combined.png`;
+  }
+
+  if (topologyTarget === 'meshes') {
+    return `${DOC_IMAGES_BASE_RELATIVE}/mesh-exports/04-selected-combined/selected-meshes.png`;
+  }
+
+  return `${DOC_IMAGES_BASE_RELATIVE}/circuit-png/00-combined.png`;
 }
  
 // Talk to HALO directly and accumulate the streamed content into one string.
@@ -197,7 +286,8 @@ function normalizeQuestionShape(q) {
     question_text: normalizeTextValue(q.question_text, 'question_text'),
     correct_answer: normalizeTextValue(q.correct_answer, 'correct_answer'),
     incorrect_answer: normalizeDistractors(q.incorrect_answer),
-    feedback: normalizeTextValue(q.feedback, 'feedback')
+    feedback: normalizeTextValue(q.feedback, 'feedback'),
+    circuit_image: normalizeDocImageRelativePath(q.circuit_image)
   };
 }
 
@@ -237,12 +327,23 @@ async function createPmb(req, res) {
 }
  
 async function createQuestions(req, res) {
+  let rawText = '';
+
   try {
+    const focus = String(req.body?.questionFocus || 'topology').toLowerCase();
+    const requestedTarget = String(req.body?.topologyTarget || 'any').toLowerCase();
+    const topologyTarget = selectTopologyTarget(requestedTarget);
+
+    const userPrompt = buildUserPrompt({
+      focus,
+      topologyTarget
+    });
+
     console.log('[playground] createQuestions — building RAG payload');
     const rag = await buildRagPayload();
  
     const haloPayload = {
-      prompt: `${FIXED_USER_PROMPT}\n\n${JSON_SCHEMA_INSTRUCTIONS}`,
+      prompt: `${userPrompt}\n\n${JSON_SCHEMA_INSTRUCTIONS}`,
       system: 'You are a question-generation assistant. Return only valid JSON matching the schema, no prose.',
       messages: [],
       model: null,
@@ -251,11 +352,15 @@ async function createQuestions(req, res) {
     };
  
     console.log('[playground] createQuestions — calling HALO RAG stream');
-    const rawText = await collectHaloRagResponse(haloPayload);
+    rawText = await collectHaloRagResponse(haloPayload);
     console.log(`[playground] createQuestions — raw response length: ${rawText.length}`);
     console.log('[playground] createQuestions — raw response:\n' + rawText); 
  
     const question = normalizeQuestionShape(extractJsonObject(rawText));
+    if (!question.circuit_image) {
+      question.circuit_image = fallbackImageByTopologyTarget(topologyTarget);
+    }
+
     console.log('[playground] createQuestions — parsed question:', JSON.stringify(question, null, 2));
     validateQuestionShape(question);
  
@@ -265,7 +370,7 @@ async function createQuestions(req, res) {
       rag_document_id: 1,
       question_type: 'EM',
       question_text: question.question_text,
-      image: null,
+      image: question.circuit_image,
       correct_answer: question.correct_answer,
       incorrect_answer: question.incorrect_answer,
       feedback: question.feedback,
@@ -277,14 +382,19 @@ async function createQuestions(req, res) {
  
     req.session.flash = {
       type: 'success',
-      message: 'Question created successfully and is shown below.',
-      generatedQuestion: question
+      message: 'Question created successfully and includes a circuit image returned by the model.',
+      generatedQuestion: {
+        ...question,
+        image: `/${question.circuit_image}`,
+        topologyTarget
+      }
     };
   } catch (err) {
     console.error('[playground] createQuestions failed:', err);
-    if (typeof rawText !== 'undefined') {
+    if (rawText) {
         console.error('[playground] raw HALO text was:\n' + rawText);
     }
+
     req.session.flash = {
       type: 'danger',
       message: `Failed to create question: ${err.message}`
