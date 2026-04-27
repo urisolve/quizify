@@ -32,6 +32,9 @@ const playgroundController = require('../controllers/pages/playgroundController.
 router.get('/playground', requireAuthentication, playgroundController.showPlayground);
 router.post('/playground/create-pmb', requireAuthentication, playgroundController.createPmb);
 router.post('/playground/create-questions', requireAuthentication, playgroundController.createQuestions);
+router.post('/playground/review-questions', requireAuthentication, playgroundController.reviewQuestions);
+router.post('/playground/invalidate-question', requireAuthentication, playgroundController.invalidateQuestion);
+router.post('/playground/clear-review', requireAuthentication, playgroundController.clearReview);
 
 const leaderboardPageController = require('../controllers/pages/leaderboardController');
 router.get('/leaderboard', requireAuthentication, leaderboardPageController);

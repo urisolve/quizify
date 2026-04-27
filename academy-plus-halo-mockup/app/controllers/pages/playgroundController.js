@@ -3,6 +3,7 @@
 const dotenv = require('dotenv');
 const fs = require('fs');
 const path = require('path');
+const { pickLocale, pickLocaleArray } = require('../../utils/localize');
 
 const fsp = fs.promises;
  
@@ -299,12 +300,15 @@ async function showPlayground(req, res) {
   try {
     const flash = req.session.flash;
     delete req.session.flash;
+
+    const reviewBatch = req.session.reviewBatch || null;
  
     res.renderPage('playground', {
       layout: 'main',
       headerTitle: 'Playground',
       user: req.session.user,
-      flash
+      flash,
+      reviewBatch
     });
   } catch (err) {
     console.error('Playground error:', err);
@@ -402,9 +406,99 @@ async function createQuestions(req, res) {
   }
   return res.redirect('/playground');
 }
+
+async function reviewQuestions(req, res) {
+  try {
+    const lang = req.language;
+    const batchSize = Math.min(parseInt(req.body.batchSize, 10) || 5, 50);
+
+    // Pick N random questions. ORDER BY RAND() is fine at this scale; if the
+    // questions table grows large, switch to a sampled-id approach.
+    const [rows] = await db.query(
+      `SELECT id, subtopic_id, rag_document_id, question_type,
+              question_text, image, correct_answer, incorrect_answer,
+              feedback, difficulty, number_tries, number_corrects, invalidations
+         FROM questions
+         ORDER BY RAND()
+         LIMIT ?`,
+      [batchSize]
+    );
+
+    const localized = rows.map(r => ({
+      id: r.id,
+      question_type: r.question_type,
+      difficulty: r.difficulty,
+      invalidations: r.invalidations,
+      image: r.image,
+      question_text: pickLocale(r.question_text, lang),
+      correct_answer: pickLocale(r.correct_answer, lang),
+      incorrect_answer: pickLocaleArray(r.incorrect_answer, lang),
+      feedback: pickLocale(r.feedback, lang)
+    }));
+
+    req.session.reviewBatch = localized;
+    req.session.flash = {
+      type: 'success',
+      message: `Loaded ${localized.length} question(s) for review.`
+    };
+  } catch (err) {
+    console.error('[playground] reviewQuestions failed:', err);
+    req.session.flash = {
+      type: 'danger',
+      message: `Failed to load questions: ${err.message}`
+    };
+  }
+  return res.redirect('/playground');
+}
+
+async function invalidateQuestion(req, res) {
+  try {
+    const questionId = parseInt(req.body.questionId, 10);
+    if (!questionId) throw new Error('Missing or invalid questionId.');
+
+    const [result] = await db.query(
+      `UPDATE questions
+          SET invalidations = invalidations + 1
+        WHERE id = ?`,
+      [questionId]
+    );
+
+    if (!result.affectedRows) {
+      throw new Error(`No question found with id ${questionId}.`);
+    }
+
+    // Update the in-session copy so the UI shows the new count
+    // (and so the user sees their click took effect).
+    if (Array.isArray(req.session.reviewBatch)) {
+      req.session.reviewBatch = req.session.reviewBatch.map(q =>
+        q.id === questionId ? { ...q, invalidations: (q.invalidations || 0) + 1 } : q
+      );
+    }
+
+    req.session.flash = {
+      type: 'success',
+      message: `Question #${questionId} flagged. Invalidation count incremented.`
+    };
+  } catch (err) {
+    console.error('[playground] invalidateQuestion failed:', err);
+    req.session.flash = {
+      type: 'danger',
+      message: `Failed to flag question: ${err.message}`
+    };
+  }
+  return res.redirect('/playground');
+}
+
+async function clearReview(req, res) {
+  delete req.session.reviewBatch;
+  return res.redirect('/playground');
+}
  
 module.exports = {
   showPlayground,
   createPmb,
-  createQuestions
+  createQuestions,
+  reviewQuestions,
+  invalidateQuestion,
+  clearReview
 };
