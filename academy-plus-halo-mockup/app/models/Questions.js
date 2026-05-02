@@ -86,7 +86,8 @@ async function initQuestionsTable() {
         difficulty TINYINT DEFAULT 1,
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
-        invalidations INT DEFAULT 0,
+        rating_sum_teacher INT DEFAULT 0,
+        rating_count_teacher INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (subtopic_id) REFERENCES subtopics(id) ON DELETE CASCADE,
         FOREIGN KEY (rag_document_id) REFERENCES rag_documents(id) ON DELETE CASCADE

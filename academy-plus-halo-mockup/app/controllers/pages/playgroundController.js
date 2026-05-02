@@ -407,98 +407,133 @@ async function createQuestions(req, res) {
   return res.redirect('/playground');
 }
 
-async function reviewQuestions(req, res) {
+// helper — same shuffle as queryPlusController
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+async function showReviewQuestion(req, res) {
   try {
     const lang = req.language;
-    const batchSize = Math.min(parseInt(req.body.batchSize, 10) || 5, 50);
 
-    // Pick N random questions. ORDER BY RAND() is fine at this scale; if the
-    // questions table grows large, switch to a sampled-id approach.
     const [rows] = await db.query(
       `SELECT id, subtopic_id, rag_document_id, question_type,
               question_text, image, correct_answer, incorrect_answer,
-              feedback, difficulty, number_tries, number_corrects, invalidations
+              feedback, difficulty, number_tries, number_corrects,
+              rating_sum_teacher, rating_count_teacher
          FROM questions
          ORDER BY RAND()
-         LIMIT ?`,
-      [batchSize]
+         LIMIT 1`
     );
 
-    const localized = rows.map(r => ({
-      id: r.id,
-      question_type: r.question_type,
-      difficulty: r.difficulty,
-      invalidations: r.invalidations,
-      image: r.image,
-      question_text: pickLocale(r.question_text, lang),
-      correct_answer: pickLocale(r.correct_answer, lang),
-      incorrect_answer: pickLocaleArray(r.incorrect_answer, lang),
-      feedback: pickLocale(r.feedback, lang)
-    }));
+    if (!rows.length) {
+      req.session.flash = { type: 'danger', message: 'No questions available to review.' };
+      return res.redirect('/playground');
+    }
 
-    req.session.reviewBatch = localized;
-    req.session.flash = {
-      type: 'success',
-      message: `Loaded ${localized.length} question(s) for review.`
-    };
+    const q = rows[0];
+
+    // Build answer options: 1 correct + 3 random incorrect, shuffled
+    const incorrects = pickLocaleArray(q.incorrect_answer, lang)
+      .filter(ans => ans && String(ans).trim())
+      .map(text => ({ text, correct: false }));
+
+    shuffle(incorrects);
+    const selectedIncorrects = incorrects.slice(0, 3);
+
+    const answers = shuffle([
+      { text: pickLocale(q.correct_answer, lang), correct: true },
+      ...selectedIncorrects
+    ]);
+
+    const flash = req.session.flash || null;
+    delete req.session.flash;
+
+    const ratingAvg = q.rating_count
+      ? (Number(q.rating_sum) / Number(q.rating_count)).toFixed(2)
+      : null;
+
+    const imagePath = q.image
+      ? (String(q.image).startsWith('/') ? q.image : `/${q.image}`)
+      : null;
+
+    res.renderPage('playground_review', {
+      layout: 'main',
+      headerTitle: 'Review Question',
+      user: req.session.user,
+      type: 'subtopic',
+      subtopicId: q.subtopic_id,
+      question: {
+        id: q.id,
+        question_type: q.question_type,
+        difficulty: q.difficulty,
+        invalidations: q.invalidations,
+        rating_count: q.rating_count,
+        rating_avg: ratingAvg,
+        image: imagePath,
+        question_text: pickLocale(q.question_text, lang),
+        feedback: pickLocale(q.feedback, lang)
+      },
+      answers,
+      flash
+    });
   } catch (err) {
-    console.error('[playground] reviewQuestions failed:', err);
-    req.session.flash = {
-      type: 'danger',
-      message: `Failed to load questions: ${err.message}`
-    };
+    console.error('[playground] showReviewQuestion failed:', err);
+    res.status(500).send('Internal Server Error');
   }
-  return res.redirect('/playground');
 }
 
-async function invalidateQuestion(req, res) {
+async function submitReviewRating(req, res) {
   try {
     const questionId = parseInt(req.body.questionId, 10);
-    if (!questionId) throw new Error('Missing or invalid questionId.');
+    const rating = parseInt(req.body.rating, 10);
 
-    const [result] = await db.query(
-      `UPDATE questions
-          SET invalidations = invalidations + 1
-        WHERE id = ?`,
-      [questionId]
-    );
+    if (!questionId) throw new Error('Missing questionId.');
+    if (!rating || rating < 1 || rating > 5) {
+      throw new Error('Rating must be between 1 and 5.');
+    }
 
+    // Always update rating_sum / rating_count.
+    // If the rating is 1 or 2 (the two "bad question" levels), also
+    // increment invalidations so the existing flag is still meaningful.
+    const sql = rating <= 2
+      ? `UPDATE questions
+            SET rating_sum_teacher   = rating_sum_teacher + ?,
+                rating_count_teacher = rating_count_teacher + 1
+          WHERE id = ?`
+      : `UPDATE questions
+            SET rating_sum_teacher   = rating_sum_teacher + ?,
+                rating_count_teacher = rating_count_teacher + 1
+          WHERE id = ?`;
+
+    const [result] = await db.query(sql, [rating, questionId]);
     if (!result.affectedRows) {
       throw new Error(`No question found with id ${questionId}.`);
     }
 
-    // Update the in-session copy so the UI shows the new count
-    // (and so the user sees their click took effect).
-    if (Array.isArray(req.session.reviewBatch)) {
-      req.session.reviewBatch = req.session.reviewBatch.map(q =>
-        q.id === questionId ? { ...q, invalidations: (q.invalidations || 0) + 1 } : q
-      );
-    }
-
     req.session.flash = {
       type: 'success',
-      message: `Question #${questionId} flagged. Invalidation count incremented.`
+      message: `Avaliação ${rating} guardada para a questão #${questionId}.`
     };
   } catch (err) {
-    console.error('[playground] invalidateQuestion failed:', err);
+    console.error('[playground] submitReviewRating failed:', err);
     req.session.flash = {
       type: 'danger',
-      message: `Failed to flag question: ${err.message}`
+      message: `Falha ao guardar avaliação: ${err.message}`
     };
   }
-  return res.redirect('/playground');
+  return res.redirect('/playground/review');
 }
 
-async function clearReview(req, res) {
-  delete req.session.reviewBatch;
-  return res.redirect('/playground');
-}
  
 module.exports = {
   showPlayground,
   createPmb,
   createQuestions,
-  reviewQuestions,
-  invalidateQuestion,
-  clearReview
+  showReviewQuestion,
+  submitReviewRating
 };

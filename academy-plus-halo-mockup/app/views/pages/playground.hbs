@@ -18,6 +18,100 @@
       </section>
     </div>
  
+    <!-- Action cards -->
+
+    <!-- Create PMB -->
+    <div class="col">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-success text-success">
+              <i class="ti ti-file-description"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">Create PMB</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                Generate a new PMB entry and store it in the database.
+              </p>
+            </div>
+          </div>
+ 
+          <div class="mt-auto">
+            <form method="POST" action="/playground/create-pmb">
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
+                <i class="ti ti-plus me-2"></i>Create PMB
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Create Questions --> 
+    <div class="col">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-warning text-warning">
+              <i class="ti ti-list-check"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">Create Questions</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                Generate new questions and store them in the database.
+              </p>
+            </div>
+          </div>
+ 
+          <div class="mt-auto">
+            <form method="POST" action="/playground/create-questions" class="d-flex flex-column gap-3">
+              <input type="hidden" name="questionFocus" value="topology" />
+
+              <div>
+                <label class="form-label fw-semibold mb-1" for="topologyTarget">Topology focus</label>
+                <select class="form-select" id="topologyTarget" name="topologyTarget">
+                  <option value="any" selected>Any (Nós, Ramos, or Malhas)</option>
+                  <option value="nodes">Nós</option>
+                  <option value="branches">Ramos</option>
+                  <option value="meshes">Malhas</option>
+                </select>
+                <div class="form-text">The generated question will focus on topology counts or structure interpretation.</div>
+              </div>
+
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
+                <i class="ti ti-plus me-2"></i>Create Questions
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Review Questions -->
+    <div class="col">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-info text-info">
+              <i class="ti ti-eye-check"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">Review Questions</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                Inspect a small batch of questions and flag any that look low quality.
+              </p>
+            </div>
+          </div>
+ 
+          <div class="mt-auto">
+            <a href="/playground/review" class="btn btn-primary w-100 py-2 fw-semibold">
+              <i class="ti ti-eye me-2"></i>Start review
+            </a>            
+          </div>
+        </div>
+      </section>
+    </div>
+
     <!-- Flash banner -->
     {{#if flash}}
       <div class="col-12">
@@ -94,210 +188,6 @@
         {{/if}}
       {{/if}}
     {{/if}}
- 
-    <!-- Action cards -->
-
-    <!-- Create PMB -->
-    <div class="col-12">
-      <section class="card h-100">
-        <div class="card-body p-4 d-flex flex-column gap-3">
-          <div class="d-flex align-items-start gap-3">
-            <span class="halo-section-icon bg-light-success text-success">
-              <i class="ti ti-file-description"></i>
-            </span>
-            <div class="flex-grow-1">
-              <h3 class="fs-5 fw-semibold mb-1">Create PMB</h3>
-              <p class="mb-0 text-muted small" style="text-align: justify;">
-                Generate a new PMB entry and store it in the database.
-              </p>
-            </div>
-          </div>
- 
-          <div class="mt-auto">
-            <form method="POST" action="/playground/create-pmb">
-              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
-                <i class="ti ti-plus me-2"></i>Create PMB
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Create Questions --> 
-    <div class="col-12">
-      <section class="card h-100">
-        <div class="card-body p-4 d-flex flex-column gap-3">
-          <div class="d-flex align-items-start gap-3">
-            <span class="halo-section-icon bg-light-warning text-warning">
-              <i class="ti ti-list-check"></i>
-            </span>
-            <div class="flex-grow-1">
-              <h3 class="fs-5 fw-semibold mb-1">Create Questions</h3>
-              <p class="mb-0 text-muted small" style="text-align: justify;">
-                Generate new questions and store them in the database.
-              </p>
-            </div>
-          </div>
- 
-          <div class="mt-auto">
-            <form method="POST" action="/playground/create-questions" class="d-flex flex-column gap-3">
-              <input type="hidden" name="questionFocus" value="topology" />
-
-              <div>
-                <label class="form-label fw-semibold mb-1" for="topologyTarget">Topology focus</label>
-                <select class="form-select" id="topologyTarget" name="topologyTarget">
-                  <option value="any" selected>Any (Nós, Ramos, or Malhas)</option>
-                  <option value="nodes">Nós</option>
-                  <option value="branches">Ramos</option>
-                  <option value="meshes">Malhas</option>
-                </select>
-                <div class="form-text">The generated question will focus on topology counts or structure interpretation.</div>
-              </div>
-
-              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
-                <i class="ti ti-plus me-2"></i>Create Questions
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <!-- Review Questions -->
-    <div class="col-12">
-      <section class="card h-100">
-        <div class="card-body p-4 d-flex flex-column gap-3">
-          <div class="d-flex align-items-start gap-3">
-            <span class="halo-section-icon bg-light-info text-info">
-              <i class="ti ti-eye-check"></i>
-            </span>
-            <div class="flex-grow-1">
-              <h3 class="fs-5 fw-semibold mb-1">Review Questions</h3>
-              <p class="mb-0 text-muted small" style="text-align: justify;">
-                Inspect a small batch of questions and flag any that look low quality.
-              </p>
-            </div>
-          </div>
- 
-          <div class="mt-auto">
-            <form method="POST" action="/playground/review-questions" class="d-flex flex-column gap-3">
-              <div>
-                <label class="form-label fw-semibold mb-1" for="reviewBatchSize">How many to load</label>
-                <select class="form-select" id="reviewBatchSize" name="batchSize">
-                  <option value="3">3 questions</option>
-                  <option value="5" selected>5 questions</option>
-                  <option value="10">10 questions</option>
-                </select>
-              </div>
- 
-              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
-                <i class="ti ti-refresh me-2"></i>Load batch
-              </button>
-            </form>
-          </div>
-        </div>
-      </section>
-    </div>
- 
-    <!-- Review batch panel (only shown when there is one in session) -->
-    {{#if reviewBatch}}
-      <div class="col-12">
-        <section class="card border-0 shadow-sm">
-          <div class="card-body p-4">
-            <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
-              <div>
-                <h3 class="fs-5 fw-semibold mb-1">Questions for review</h3>
-                <p class="mb-0 text-muted small">Click "Mark as not great" to increment the question's invalidation counter in the database.</p>
-              </div>
-              <span class="badge bg-light-info text-info">{{reviewBatch.length}} loaded</span>
-            </div>
- 
-            <div class="d-flex flex-column gap-3">
-              {{#each reviewBatch}}
-                <div class="border rounded-3 p-3">
-                  <div class="d-flex align-items-start justify-content-between gap-3 mb-2">
-                    <div>
-                      <span class="text-muted small me-2">#{{this.id}}</span>
-                      <span class="badge bg-light-secondary text-secondary me-1">type: {{this.question_type}}</span>
-                      <span class="badge bg-light-warning text-warning me-1">difficulty: {{this.difficulty}}</span>
-                      <span class="badge bg-light-danger text-danger">invalidations: {{this.invalidations}}</span>
-                    </div>
-                    <form method="POST" action="/playground/invalidate-question" class="m-0">
-                      <input type="hidden" name="questionId" value="{{this.id}}" />
-                      <button class="btn btn-outline-danger btn-sm fw-semibold" type="submit">
-                        <i class="ti ti-flag me-1"></i>Mark as not great
-                      </button>
-                    </form>
-                  </div>
- 
-                  <div class="border rounded-3 p-3 bg-light mb-3">
-                    <div class="text-muted small mb-1">Question</div>
-                    <div class="fw-semibold">{{this.question_text}}</div>
-                  </div>
- 
-                  <div class="row g-3">
-                    <div class="col-12 col-lg-4">
-                      <div class="border rounded-3 p-3 h-100 bg-white">
-                        <div class="text-muted small mb-1">Correct answer</div>
-                        <div>{{this.correct_answer}}</div>
-                      </div>
-                    </div>
-                    <div class="col-12 col-lg-4">
-                      <div class="border rounded-3 p-3 h-100 bg-white">
-                        <div class="text-muted small mb-1">Distractors</div>
-                        <div class="d-flex flex-column gap-2">
-                          {{#each this.incorrect_answer}}
-                            <div class="border rounded-3 px-3 py-2">
-                              <span class="text-muted small me-2">{{letterIndex @index}}.</span>
-                              <span>{{this}}</span>
-                            </div>
-                          {{/each}}
-                        </div>
-                      </div>
-                    </div>
-                    <div class="col-12 col-lg-4">
-                      <div class="border rounded-3 p-3 h-100 bg-white">
-                        <div class="text-muted small mb-1">Feedback</div>
-                        <div>{{this.feedback}}</div>
-                      </div>
-                    </div>
-                  </div>
- 
-                  {{#if this.image}}
-                    <div class="mt-3">
-                      <div class="text-muted small mb-2">Image</div>
-                      <div class="border rounded-3 p-3 bg-white">
-                        <img
-                          src="{{this.image}}"
-                          alt="Question image"
-                          class="img-fluid rounded"
-                          style="max-height: 240px; object-fit: contain;"
-                        />
-                      </div>
-                    </div>
-                  {{/if}}
-                </div>
-              {{/each}}
-            </div>
- 
-            <div class="mt-3 d-flex gap-2">
-              <form method="POST" action="/playground/review-questions" class="m-0">
-                <input type="hidden" name="batchSize" value="{{reviewBatch.length}}" />
-                <button class="btn btn-outline-primary btn-sm fw-semibold" type="submit">
-                  <i class="ti ti-refresh me-1"></i>Load a new batch
-                </button>
-              </form>
-              <form method="POST" action="/playground/clear-review" class="m-0">
-                <button class="btn btn-outline-secondary btn-sm fw-semibold" type="submit">
-                  <i class="ti ti-x me-1"></i>Close review
-                </button>
-              </form>
-            </div>
-          </div>
-        </section>
-      </div>
-    {{/if}}
- 
+  
   </div>
 </div>
