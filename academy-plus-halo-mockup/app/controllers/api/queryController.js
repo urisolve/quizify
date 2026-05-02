@@ -66,8 +66,8 @@ exports.submitAnswer = async (req, res) => {
     const existingIndex = query.results.findIndex(r => r.questionId === questionId);
     const result = {
         questionId,
-        questionText: pickLocale(question.question_text, lang),
-        correctAnswer: pickLocale(question.correct_answer, lang),
+        questionText: pickLocale(question.question_text),
+        correctAnswer: pickLocale(question.correct_answer),
         userAnswer: answer.trim(),
         correct: false,
         feedback: question.feedback || null,

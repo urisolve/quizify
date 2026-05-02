@@ -453,8 +453,8 @@ async function showReviewQuestion(req, res) {
     const flash = req.session.flash || null;
     delete req.session.flash;
 
-    const ratingAvg = q.rating_count
-      ? (Number(q.rating_sum) / Number(q.rating_count)).toFixed(2)
+    const ratingAvg = q.rating_count_teacher
+      ? (Number(q.rating_sum_teacher) / Number(q.rating_count_teacher)).toFixed(2)
       : null;
 
     const imagePath = q.image
@@ -498,17 +498,10 @@ async function submitReviewRating(req, res) {
     }
 
     // Always update rating_sum / rating_count.
-    // If the rating is 1 or 2 (the two "bad question" levels), also
-    // increment invalidations so the existing flag is still meaningful.
-    const sql = rating <= 2
-      ? `UPDATE questions
-            SET rating_sum_teacher   = rating_sum_teacher + ?,
-                rating_count_teacher = rating_count_teacher + 1
-          WHERE id = ?`
-      : `UPDATE questions
-            SET rating_sum_teacher   = rating_sum_teacher + ?,
-                rating_count_teacher = rating_count_teacher + 1
-          WHERE id = ?`;
+    const sql = `UPDATE questions
+                SET rating_sum_teacher   = rating_sum_teacher + ?,
+                    rating_count_teacher = rating_count_teacher + 1
+              WHERE id = ?`;
 
     const [result] = await db.query(sql, [rating, questionId]);
     if (!result.affectedRows) {

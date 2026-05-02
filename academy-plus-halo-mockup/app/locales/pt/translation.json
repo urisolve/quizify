@@ -50,7 +50,16 @@
         "totaltime":"Tempo total:",
         "useranswer":"A tua resposta:",
         "correctanswer":"Resposta correta:",
-        "review_title":"Revisão"
+        "review_title":"Revisão",
+        "rate_question_btn": "Avaliar esta questão",
+        "rate_question_title": "Como classificarias esta questão?",
+        "rate_1": "Questão totalmente incorreta e não deveria existir",
+        "rate_2": "Questão mal construída e confusa",
+        "rate_3": "Questão adequada, sem problemas relevantes",
+        "rate_4": "Questão interessante, promove reflexão",
+        "rate_5": "Questão excelente, proporciona nova perspectiva sobre o problema",
+        "submit_rating": "Submeter avaliação",
+        "rating_thanks": "Obrigada pela tua avaliação!"
     },
     "header": {
         "logout": "Sair",

@@ -45,7 +45,8 @@ const queryPlusController = require('../controllers/pages/queryPlusController');
 router.get('/query-plus', requireAuthentication, queryPlusController);
 
 const queryCompleteController = require('../controllers/pages/queryCompleteController');
-router.get('/query-complete', requireAuthentication, queryCompleteController);
+router.get('/query-complete', requireAuthentication, queryCompleteController.showQueryComplete);
+router.post('/query-complete/rate-question', requireAuthentication, queryCompleteController.rateQuestionByStudent);
 
 const topicQueryController = require('../controllers/pages/topicQueryController');
 router.get('/start-topic', requireAuthentication, topicQueryController);

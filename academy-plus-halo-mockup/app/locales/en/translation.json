@@ -49,7 +49,16 @@
         "totaltime":"Total time:",
         "useranswer":"Your answer:",
         "correctanswer":"Correct answer:",
-        "review_title":"Review"
+        "review_title":"Review",
+        "rate_question_btn": "Rate this question",
+        "rate_question_title": "How would you rate this question?",
+        "rate_1": "Completely incorrect — should not exist",
+        "rate_2": "Poorly constructed and confusing",
+        "rate_3": "Adequate question, no relevant issues",
+        "rate_4": "Interesting question, promotes reflection",
+        "rate_5": "Excellent question, gives new perspective on the problem",
+        "submit_rating": "Submit rating",
+        "rating_thanks": "Thanks for your rating!"
     },
     "header": {
         "logout": "Logout",
