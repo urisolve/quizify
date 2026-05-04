@@ -147,6 +147,20 @@
         "3": { "name": "Escrita de Equações", "description": "Construir as M equações de malha, com base na Lei das Malhas e considerando as correntes de malha que influenciam cada carga"},
         "4": { "name": "Cálculo das Correntes", "description": "Calcular as correntes nos ramos"}      
     },
+    "playground": {
+        "title": "Treino",
+        "subtitle": "Gerar novo conteúdo para a plataforma.",
+        "pmbtitle": "Criar PMB",
+        "pmbsubtitle": "Gerar uma nova entrada PMB e armazená-la na base de dados.",
+        "pmbbutton": "Criar PMB",
+        "questiontitle": "Criar Perguntas",
+        "questionsubtitle": "Gerar novas perguntas e armazená-las na base de dados.",
+        "questiondescription": "The generated question will focus on topology counts or structure interpretation.",
+        "questionbutton": "Criar Perguntas",
+        "reviewtitle": "Rever Perguntas",
+        "reviewsubtitle": "Rever um pequeno lote de perguntas e apontar aquelas que parecem de baixa qualidade.",
+        "reviewbutton": "Iniciar revisão"
+    },
     "auth": {
         "user_created": "Utilizador criado com sucesso",
         "user_exists": "O Utilizador já existe",

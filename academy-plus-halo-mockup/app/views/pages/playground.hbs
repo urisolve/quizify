@@ -10,8 +10,8 @@
               <i class="ti ti-rocket"></i>
             </span>
             <div>
-              <h2 class="card-title fw-semibold mb-0">Playground</h2>
-              <p class="mb-0 text-muted small">Generate new content for the platform.</p>
+              <h2 class="card-title fw-semibold mb-0">{{ t 'playground.title' }}</h2>
+              <p class="mb-0 text-muted small">{{ t 'playground.subtitle' }}</p>
             </div>
           </div>
         </div>
@@ -29,17 +29,15 @@
               <i class="ti ti-file-description"></i>
             </span>
             <div class="flex-grow-1">
-              <h3 class="fs-5 fw-semibold mb-1">Create PMB</h3>
-              <p class="mb-0 text-muted small" style="text-align: justify;">
-                Generate a new PMB entry and store it in the database.
-              </p>
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.pmbtitle' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">{{ t 'playground.pmbsubtitle' }}</p>
             </div>
           </div>
  
           <div class="mt-auto">
             <form method="POST" action="/playground/create-pmb">
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
-                <i class="ti ti-plus me-2"></i>Create PMB
+                <i class="ti ti-plus me-2"></i>{{ t 'playground.pmbbutton' }}
               </button>
             </form>
           </div>
@@ -56,10 +54,8 @@
               <i class="ti ti-list-check"></i>
             </span>
             <div class="flex-grow-1">
-              <h3 class="fs-5 fw-semibold mb-1">Create Questions</h3>
-              <p class="mb-0 text-muted small" style="text-align: justify;">
-                Generate new questions and store them in the database.
-              </p>
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.questiontitle' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">{{ t 'playground.questionsubtitle' }}</p>
             </div>
           </div>
  
@@ -75,11 +71,11 @@
                   <option value="branches">Ramos</option>
                   <option value="meshes">Malhas</option>
                 </select>
-                <div class="form-text">The generated question will focus on topology counts or structure interpretation.</div>
+                <div class="form-text">{{ t 'playground.questiondescription' }}</div>
               </div>
 
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
-                <i class="ti ti-plus me-2"></i>Create Questions
+                <i class="ti ti-plus me-2"></i>{{ t 'playground.questionbutton' }}
               </button>
             </form>
           </div>
@@ -96,16 +92,14 @@
               <i class="ti ti-eye-check"></i>
             </span>
             <div class="flex-grow-1">
-              <h3 class="fs-5 fw-semibold mb-1">Review Questions</h3>
-              <p class="mb-0 text-muted small" style="text-align: justify;">
-                Inspect a small batch of questions and flag any that look low quality.
-              </p>
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.reviewtitle' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">{{ t 'playground.reviewsubtitle' }}</p>
             </div>
           </div>
  
           <div class="mt-auto">
             <a href="/playground/review" class="btn btn-primary w-100 py-2 fw-semibold">
-              <i class="ti ti-eye me-2"></i>Start review
+              <i class="ti ti-eye me-2"></i>{{ t 'playground.reviewbutton' }}
             </a>            
           </div>
         </div>

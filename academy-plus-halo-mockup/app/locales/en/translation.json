@@ -138,6 +138,20 @@
         "3": { "name": "Equation Writing", "description": "Constructing the M loop equations, based on Loop Law and considering the loop currents that influence each load"},
         "4": { "name": "Current Calculation", "description": "Calculating the currents in the branches"}      
     },
+    "playground": {
+        "title": "Playground",
+        "subtitle": "Generate new content for the platform.",
+        "pmbtitle": "Create PMB",
+        "pmbsubtitle": "Generate a new PMB entry and store it in the database.",
+        "pmbbutton": "Create PMB",
+        "questiontitle": "Create Questions",
+        "questionsubtitle": "Generate new questions and store them in the database.",
+        "questiondescription": "The generated question will focus on topology counts or structure interpretation.",
+        "questionbutton": "Create Questions",
+        "reviewtitle": "Review Questions",
+        "reviewsubtitle": "Inspect a small batch of questions and flag any that look low quality.",
+        "reviewbutton": "Start review"
+    },
     "auth": {
         "user_created": "User created successfully",
         "user_exists": "User already exists",

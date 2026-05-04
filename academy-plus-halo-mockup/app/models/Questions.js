@@ -133,7 +133,7 @@ function getQuestionById(questionId) {
 }
 
 // Add a new question
-function createQuestion({
+async function createQuestion({
   subtopic_id,
   rag_document_id = null,
   question_type = 'EM',
@@ -142,36 +142,51 @@ function createQuestion({
   correct_answer = [],
   incorrect_answer = [],
   feedback = null,
-  difficulty = 1,
-  number_tries = 0,
-  number_corrects = 0,
-  invalidations = 0
+  difficulty = 1
 }) {
-  const normalized = normalizeQuestionPayload({
-    question_text,
-    correct_answer,
-    incorrect_answer,
-    feedback
-  });
+  // validation
+  if (!subtopic_id || !question_type) {
+    throw new Error('createQuestion: subtopic_id and question_type are required.');
+  }
+  if (!Array.isArray(question_text) || question_text.length !== 2) {
+    throw new Error('createQuestion: question_text must be [PT, EN].');
+  }
+  if (!Array.isArray(correct_answer) || correct_answer.length !== 2) {
+    throw new Error('createQuestion: correct_answer must be [PT, EN].');
+  }
+  if (
+    !Array.isArray(incorrect_answer) ||
+    incorrect_answer.length !== 2 ||
+    !incorrect_answer.every(arr => Array.isArray(arr) && arr.length >= 3)
+  ) {
+    throw new Error('createQuestion: incorrect_answer must be [[PT...], [EN...]] with ≥3 items each.');
+  }
+  if (feedback !== null && (!Array.isArray(feedback) || feedback.length !== 2)) {
+    throw new Error('createQuestion: feedback must be [PT, EN] or null.');
+  }
 
-  // Prepare data for JSON columns
-  const question_text_s = JSON.stringify(normalized.question_text);
-  const correct_answer_s = JSON.stringify(normalized.correct_answer);
-  const incorrect_answer_s = JSON.stringify(normalized.incorrect_answer);
-  const feedback_s = normalized.feedback ? JSON.stringify(normalized.feedback) : null;
+  const sql = `
+    INSERT INTO questions
+      (subtopic_id, rag_document_id, question_type, question_text, image,
+       correct_answer, incorrect_answer, feedback, difficulty,
+       number_tries, number_corrects)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
+  `;
 
-  return db.query(
-    `INSERT INTO questions
-      (subtopic_id, rag_document_id, question_type, question_text, image, 
-      correct_answer, incorrect_answer, feedback, difficulty, number_tries, 
-      number_corrects, invalidations)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      subtopic_id, rag_document_id, question_type, question_text_s, image, 
-      correct_answer_s, incorrect_answer_s, feedback_s, difficulty, number_tries, 
-      number_corrects, invalidations
-    ]
-  );
+  const params = [
+    subtopic_id,
+    rag_document_id,
+    question_type,
+    JSON.stringify(question_text),
+    image,
+    JSON.stringify(correct_answer),
+    JSON.stringify(incorrect_answer),
+    feedback === null ? null : JSON.stringify(feedback),
+    difficulty,
+  ];
+
+  const [result] = await db.query(sql, params);
+  return result.insertId;
 }
 
 // Delete a question
@@ -182,15 +197,24 @@ function deleteQuestion(questionId) {
 // Update a question (partial update)
 function updateQuestion(questionId, updates) {
   const allowedFields = [
-    'question_type','question_text', 'image', 'correct_answer',
-    'incorrect_answer', 'feedback', 'difficulty', 'number_tries',
-    'number_corrects', 'invalidations'
+    'question_type', 'question_text', 'image', 'correct_answer',
+    'incorrect_answer', 'feedback', 'difficulty',
+    'number_tries', 'number_corrects',
+    'rating_sum_teacher', 'rating_count_teacher',
+    'rating_sum_student', 'rating_count_student',
   ];
 
   // Validation for incorrect answers length
-  if (updates.incorrect_answer) {
-    if (!Array.isArray(updates.incorrect_answer) || updates.incorrect_answer.length < 3) {
-      throw new Error("Update failed: At least 3 incorrect answers are required.");
+  if (updates.incorrect_answer !== undefined) {
+    const ia = updates.incorrect_answer;
+    const valid =
+      Array.isArray(ia) &&
+      ia.length === 2 &&
+      ia.every(arr => Array.isArray(arr) && arr.length >= 3);
+    if (!valid) {
+      throw new Error(
+        'Update failed: incorrect_answer must be [[PT...], [EN...]] with ≥3 items per language.'
+      );
     }
   }
 
@@ -200,10 +224,17 @@ function updateQuestion(questionId, updates) {
 
   const setClause = fields.map(f => `${f} = ?`).join(', ');
 
+  const jsonColumns = new Set([
+    'question_text', 'correct_answer', 'incorrect_answer', 'feedback',
+  ]);
+
   const values = fields.map(f => {
     const val = updates[f];
     // Stringify arrays for JSON columns
-    return Array.isArray(val) ? JSON.stringify(val) : val;
+    if (jsonColumns.has(f)) {
+      return val === null ? null : JSON.stringify(val);
+    }
+    return val;
   });
   
   values.push(questionId);
@@ -211,14 +242,13 @@ function updateQuestion(questionId, updates) {
 }
 
 // Increment question stats
-async function incrementTopicStats(id, { tries = 0, correct = 0, invalidation = 0 }) {
+async function incrementQuestionStats(id, { tries = 0, correct = 0 } = {}) {
   await db.query(
-    `UPDATE questions SET 
-     number_tries = number_tries + ?, 
-     number_correct = number_correct + ?, 
-     invalidations = invalidations + ? 
-     WHERE id = ?`,
-    [tries, correct, invalidation, id]
+    `UPDATE questions
+        SET number_tries    = number_tries + ?,
+            number_corrects = number_corrects + ?
+      WHERE id = ?`,
+    [tries, correct, id]
   );
 }
 
@@ -231,5 +261,5 @@ module.exports = {
   deleteQuestion,
   updateQuestion,
   getRandomQuestionBySubtopic,
-  incrementTopicStats
+  incrementQuestionStats
 };

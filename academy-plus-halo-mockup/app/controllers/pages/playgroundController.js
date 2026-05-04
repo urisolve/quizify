@@ -18,6 +18,8 @@ const HALO_RAG_STREAM_URL = `${HALO_URL}:${HALO_PORT}/rag/stream`;
 const TOPOLOGY_TARGETS = new Set(['nodes', 'branches', 'meshes']);
 const DOC_IMAGES_BASE_RELATIVE = 'assets/files/docs/pmb_1';
 const DOC_IMAGES_BASE_PUBLIC = `/${DOC_IMAGES_BASE_RELATIVE}`;
+
+const dupBilingual = (v) => [v, v];
  
 // Grounding document used for Create Questions
 const GROUNDING_DOC_PATH = path.join(
@@ -373,15 +375,12 @@ async function createQuestions(req, res) {
       subtopic_id: 1,
       rag_document_id: 1,
       question_type: 'EM',
-      question_text: question.question_text,
-      image: question.circuit_image,
-      correct_answer: question.correct_answer,
-      incorrect_answer: question.incorrect_answer,
-      feedback: question.feedback,
-      difficulty: 1,
-      number_tries: 0,
-      number_corrects: 0,
-      invalidations: 0
+      question_text:    dupBilingual(question.question_text),
+      image:            question.circuit_image,
+      correct_answer:   dupBilingual(question.correct_answer),
+      incorrect_answer: dupBilingual(question.incorrect_answer),
+      feedback:         dupBilingual(question.feedback),
+      difficulty:       1,
     });
  
     req.session.flash = {
@@ -471,9 +470,8 @@ async function showReviewQuestion(req, res) {
         id: q.id,
         question_type: q.question_type,
         difficulty: q.difficulty,
-        invalidations: q.invalidations,
-        rating_count: q.rating_count,
-        rating_avg: ratingAvg,
+        rating_count_teacher: q.rating_count_teacher,
+        rating_avg_teacher: ratingAvg,
         image: imagePath,
         question_text: pickLocale(q.question_text, lang),
         feedback: pickLocale(q.feedback, lang)

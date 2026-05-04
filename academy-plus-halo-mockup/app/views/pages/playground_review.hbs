@@ -19,8 +19,10 @@
               <span class="text-muted">#{{question.id}}</span>
               <span class="badge bg-light-secondary text-secondary">type: {{question.question_type}}</span>
               <span class="badge bg-light-warning text-warning">difficulty: {{question.difficulty}}</span>
-              {{#if question.rating_count}}
-                <span class="badge bg-light-info text-info">avg: {{question.rating_avg}} ({{question.rating_count}})</span>
+              {{#if question.rating_count_teacher}}
+                <span class="badge bg-light-info text-info">
+                  teacher avg: {{question.rating_avg_teacher}} ({{question.rating_count_teacher}})
+                </span>
               {{/if}}
             </div>
           </div>
