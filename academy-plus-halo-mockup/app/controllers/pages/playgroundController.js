@@ -304,13 +304,19 @@ async function showPlayground(req, res) {
     delete req.session.flash;
 
     const reviewBatch = req.session.reviewBatch || null;
+
+    const [subtopicRows] = await db.query(
+      `SELECT id FROM subtopics ORDER BY id`
+    );
+    const subtopics = subtopicRows.map((s) => ({ id: s.id }));
  
     res.renderPage('playground', {
       layout: 'main',
       headerTitle: 'Playground',
       user: req.session.user,
       flash,
-      reviewBatch
+      reviewBatch,
+      subtopics
     });
   } catch (err) {
     console.error('Playground error:', err);
@@ -339,6 +345,19 @@ async function createQuestions(req, res) {
     const focus = String(req.body?.questionFocus || 'topology').toLowerCase();
     const requestedTarget = String(req.body?.topologyTarget || 'any').toLowerCase();
     const topologyTarget = selectTopologyTarget(requestedTarget);
+
+    // Read and validate the chosen subtopic.
+    const subtopicId = parseInt(req.body?.subtopicId, 10);
+    if (!Number.isInteger(subtopicId) || subtopicId <= 0) {
+      throw new Error('Invalid subtopic selected.');
+    }
+    const [subtopicCheck] = await db.query(
+      `SELECT id FROM subtopics WHERE id = ? LIMIT 1`,
+      [subtopicId]
+    );
+    if (!subtopicCheck.length) {
+      throw new Error(`Subtopic ${subtopicId} not found.`);
+    }
 
     const userPrompt = buildUserPrompt({
       focus,
@@ -372,7 +391,7 @@ async function createQuestions(req, res) {
  
     console.log('[playground] createQuestions — inserting row');
     await createQuestion({
-      subtopic_id: 1,
+      subtopic_id: subtopicId,
       rag_document_id: 1,
       question_type: 'EM',
       question_text:    dupBilingual(question.question_text),
@@ -389,7 +408,8 @@ async function createQuestions(req, res) {
       generatedQuestion: {
         ...question,
         image: `/${question.circuit_image}`,
-        topologyTarget
+        topologyTarget,
+        subtopicId
       }
     };
   } catch (err) {

@@ -155,7 +155,7 @@
         "pmbbutton": "Criar PMB",
         "questiontitle": "Criar Perguntas",
         "questionsubtitle": "Gerar novas perguntas e armazená-las na base de dados.",
-        "questiondescription": "The generated question will focus on topology counts or structure interpretation.",
+        "subtopic_label": "Escolha subtopico",
         "questionbutton": "Criar Perguntas",
         "reviewtitle": "Rever Perguntas",
         "reviewsubtitle": "Rever um pequeno lote de perguntas e apontar aquelas que parecem de baixa qualidade.",

@@ -64,14 +64,12 @@
               <input type="hidden" name="questionFocus" value="topology" />
 
               <div>
-                <label class="form-label fw-semibold mb-1" for="topologyTarget">Topology focus</label>
-                <select class="form-select" id="topologyTarget" name="topologyTarget">
-                  <option value="any" selected>Any (Nós, Ramos, or Malhas)</option>
-                  <option value="nodes">Nós</option>
-                  <option value="branches">Ramos</option>
-                  <option value="meshes">Malhas</option>
+                <label class="form-label fw-semibold mb-1" for="subtopicId"> {{t 'playground.subtopic_label'}}</label>
+                <select class="form-select" id="subtopicId" name="subtopicId" required>
+                  {{#each subtopics}}
+                    <option value="{{this.id}}">{{subtopicT this.id 'name'}}</option>
+                  {{/each}}
                 </select>
-                <div class="form-text">{{ t 'playground.questiondescription' }}</div>
               </div>
 
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
