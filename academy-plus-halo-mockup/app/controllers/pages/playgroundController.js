@@ -323,11 +323,11 @@ async function createPmb(req, res) {
     // TODO: insert PMB row(s) into the DB here.
     req.session.flash = {
       type: 'success',
-      message: 'Create PMB clicked (placeholder — no DB write yet).'
+      messageKey: 'flashes.pmb_placeholder'
     };
   } catch (err) {
     console.error('Playground createPmb error:', err);
-    req.session.flash = { type: 'danger', message: 'Failed to create PMB.' };
+    req.session.flash = { type: 'danger', messageKey: 'flashes.pmb_failed' };
   }
   return res.redirect('/playground');
 }
@@ -385,7 +385,7 @@ async function createQuestions(req, res) {
  
     req.session.flash = {
       type: 'success',
-      message: 'Question created successfully and includes a circuit image returned by the model.',
+      messageKey: 'flashes.question_created',
       generatedQuestion: {
         ...question,
         image: `/${question.circuit_image}`,
@@ -400,7 +400,8 @@ async function createQuestions(req, res) {
 
     req.session.flash = {
       type: 'danger',
-      message: `Failed to create question: ${err.message}`
+      messageKey: 'flashes.question_failed',
+      messageVars: { error: err.message }
     };
   }
   return res.redirect('/playground');
@@ -430,7 +431,7 @@ async function showReviewQuestion(req, res) {
     );
 
     if (!rows.length) {
-      req.session.flash = { type: 'danger', message: 'No questions available to review.' };
+      req.session.flash = { type: 'danger', messageKey: 'flashes.no_questions' };
       return res.redirect('/playground');
     }
 
@@ -508,13 +509,15 @@ async function submitReviewRating(req, res) {
 
     req.session.flash = {
       type: 'success',
-      message: `Avaliação ${rating} guardada para a questão #${questionId}.`
+      messageKey: 'flashes.rating_saved',
+      messageVars: { rating, questionId }
     };
   } catch (err) {
     console.error('[playground] submitReviewRating failed:', err);
     req.session.flash = {
       type: 'danger',
-      message: `Falha ao guardar avaliação: ${err.message}`
+      messageKey: 'flashes.rating_failed',
+      messageVars: { error: err.message }
     };
   }
   return res.redirect('/playground/review');

@@ -84,12 +84,18 @@ app.use(express.static(publicPath));
 
 // * Handlebars helpers
 const hbsHelpers = {
-  t: function (key, options) { // 't' means translate and is used to translate a key.
+  t: function (key, varsOrOptions, maybeOptions) { // 't' means translate and is used to translate a key.
     //console.log(options.data.root.i18n.t(key)); 
-    // Access the i18n instance 
+    // Access the i18n instance
+    const options = maybeOptions || varsOrOptions;
+    const vars =
+      maybeOptions && varsOrOptions && typeof varsOrOptions === 'object'
+        ? varsOrOptions
+        : {};
+
     const i18n = options.data.root.i18n;
     if (i18n) {
-      return i18n.t(key);
+      return i18n.t(key, vars);
     }
     // Fallback if i18n is not found in the context
     return key;

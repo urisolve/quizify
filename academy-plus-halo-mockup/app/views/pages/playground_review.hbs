@@ -11,18 +11,14 @@
             </span>
             <div class="flex-grow-1">
               <h2 class="fw-semibold mb-0 fs-4">{{subtopicT subtopicId 'name'}}</h2>
-              <p class="mb-0 text-muted small" style="text-align: justify;">
-                {{subtopicT subtopicId 'description'}}
-              </p>
+              <p class="mb-0 text-muted small" style="text-align: justify;">{{subtopicT subtopicId 'description'}}</p>
             </div>
             <div class="d-flex gap-2 small">
               <span class="text-muted">#{{question.id}}</span>
-              <span class="badge bg-light-secondary text-secondary">type: {{question.question_type}}</span>
-              <span class="badge bg-light-warning text-warning">difficulty: {{question.difficulty}}</span>
+              <span class="badge bg-light-secondary text-secondary">{{ t 'playgroundreview.type' }}{{question.question_type}}</span>
+              <span class="badge bg-light-warning text-warning">{{ t 'playgroundreview.difficulty' }}{{question.difficulty}}</span>
               {{#if question.rating_count_teacher}}
-                <span class="badge bg-light-info text-info">
-                  teacher avg: {{question.rating_avg_teacher}} ({{question.rating_count_teacher}})
-                </span>
+                <span class="badge bg-light-info text-info">{{ t 'playgroundreview.teacheravg' }}{{question.rating_avg_teacher}} ({{question.rating_count_teacher}})</span>
               {{/if}}
             </div>
           </div>
@@ -35,7 +31,13 @@
       <div class="col-12">
         <div class="alert alert-{{flash.type}} d-flex align-items-center gap-2 mb-0" role="alert">
           <i class="ti {{#if (eq flash.type 'success')}}ti-circle-check{{else}}ti-alert-circle{{/if}} fs-5"></i>
-          <div>{{flash.message}}</div>
+          <div>
+            {{#if flash.messageKey}}
+              {{t flash.messageKey flash.messageVars}}
+            {{else}}
+              {{flash.message}}
+            {{/if}}
+          </div>
         </div>
       </div>
     {{/if}}
@@ -75,7 +77,7 @@
           <!-- Reveal button -->
           <div id="reveal-actions" class="mt-3">
             <button id="reveal-btn" type="button" class="btn btn-primary py-2 fw-semibold">
-              <i class="ti ti-eye me-2"></i>Mostrar respostas certas e erradas
+              <i class="ti ti-eye me-2"></i>{{ t 'playgroundreview.showbutton' }}
             </button>
           </div>
   
@@ -85,7 +87,7 @@
               <span class="halo-section-icon bg-light-warning text-warning">
                 <i class="ti ti-star"></i>
               </span>
-              <h2 class="card-title fw-semibold mb-0 fs-5">Avaliação da questão</h2>
+              <h2 class="card-title fw-semibold mb-0 fs-5">{{ t 'playgroundreview.evaluation' }}</h2>
             </div>
  
             <form method="POST" action="/playground/review/rate" class="d-grid gap-2">
@@ -95,7 +97,7 @@
                 <input type="radio" name="rating" value="1" required class="mt-1">
                 <div>
                   <span class="badge bg-danger me-2">1</span>
-                  <span class="fw-semibold">Questão totalmente incorreta e não deveria existir</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scaleone' }}</span>
                 </div>
               </label>
  
@@ -103,7 +105,7 @@
                 <input type="radio" name="rating" value="2" required class="mt-1">
                 <div>
                   <span class="badge bg-warning text-dark me-2">2</span>
-                  <span class="fw-semibold">Questão mal construída e confusa</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scaletwo' }}</span>
                 </div>
               </label>
  
@@ -111,7 +113,7 @@
                 <input type="radio" name="rating" value="3" required class="mt-1">
                 <div>
                   <span class="badge bg-secondary me-2">3</span>
-                  <span class="fw-semibold">Questão adequada, sem problemas relevantes</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scalethree' }}</span>
                 </div>
               </label>
  
@@ -119,7 +121,7 @@
                 <input type="radio" name="rating" value="4" required class="mt-1">
                 <div>
                   <span class="badge bg-info me-2">4</span>
-                  <span class="fw-semibold">Questão interessante, promove reflexão</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scalefour' }}</span>
                 </div>
               </label>
  
@@ -127,16 +129,16 @@
                 <input type="radio" name="rating" value="5" required class="mt-1">
                 <div>
                   <span class="badge bg-success me-2">5</span>
-                  <span class="fw-semibold">Questão excelente, proporciona nova perspectiva sobre o problema</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scalefive' }}</span>
                 </div>
               </label>
  
               <div class="d-flex gap-2 mt-3">
                 <button type="submit" class="btn btn-primary py-2 fw-semibold flex-grow-1">
-                  <i class="ti ti-send me-2"></i>Submeter avaliação
+                  <i class="ti ti-send me-2"></i>{{ t 'playgroundreview.submiteval' }}
                 </button>
                 <a href="/playground/review" class="btn btn-outline-secondary py-2 fw-semibold">
-                  <i class="ti ti-player-skip-forward me-2"></i>Saltar
+                  <i class="ti ti-player-skip-forward me-2"></i>{{ t 'playgroundreview.jump' }}
                 </a>
               </div>
             </form>
@@ -145,10 +147,10 @@
           <!-- Bottom actions (always visible) -->
           <div class="mt-3 d-flex justify-content-between gap-2">
             <a href="/playground" class="btn btn-outline-secondary btn-sm">
-              <i class="ti ti-arrow-left me-1"></i>Voltar ao Playground
+              <i class="ti ti-arrow-left me-1"></i>{{ t 'playgroundreview.back' }}
             </a>
             <a href="/playground/review" class="btn btn-outline-primary btn-sm">
-              <i class="ti ti-refresh me-1"></i>Outra questão
+              <i class="ti ti-refresh me-1"></i>{{ t 'playgroundreview.otherquestion' }}
             </a>
           </div>
         </div>
