@@ -15,7 +15,7 @@ dotenv.config();
 const HALO_URL = process.env.HALO_URL || 'http://cloud.microlumin.com';
 const HALO_PORT = process.env.HALO_PORT || 2020;
 const HALO_RAG_STREAM_URL = `${HALO_URL}:${HALO_PORT}/rag/stream`;
-const TOPOLOGY_TARGETS = new Set(['nodes', 'branches', 'meshes']);
+
 const DOC_IMAGES_BASE_RELATIVE = 'assets/files/docs/pmb_1';
 const DOC_IMAGES_BASE_PUBLIC = `/${DOC_IMAGES_BASE_RELATIVE}`;
 
@@ -26,49 +26,6 @@ const GROUNDING_DOC_PATH = path.join(
   __dirname,
   '../../public/assets/files/docs/pmb_1/lcm_pedagogical_solution_pt.md'
 );
- 
-function selectTopologyTarget(requestedTarget) {
-  if (TOPOLOGY_TARGETS.has(requestedTarget)) return requestedTarget;
-
-  const targets = ['nodes', 'branches', 'meshes'];
-  const randomIndex = Math.floor(Math.random() * targets.length);
-  return targets[randomIndex];
-}
-
-function describeTopologyTarget(topologyTarget) {
-  if (topologyTarget === 'nodes') {
-    return 'número de nós elétricos (seção "Nós")';
-  }
-
-  if (topologyTarget === 'branches') {
-    return 'número de ramos e interpretação de noP/noN (seção "Ramos")';
-  }
-
-  return 'número e interpretação de malhas (seção "Malhas")';
-}
-
-function buildUserPrompt({ focus, topologyTarget }) {
-  const activeFocus = focus === 'topology' ? 'topology' : 'topology';
-  const targetDescriptor = describeTopologyTarget(topologyTarget);
-
-  const topologyPrompt = `
-Generate ONE multiple-choice question for engineering students strictly grounded in the section "Informações Topológicas" of the attached pedagogical document.
-
-The question must focus on ${targetDescriptor} and explicitly rely on one of these subsections: "Nós", "Ramos", or "Malhas".
-
-Requirements:
-- Ask about topology (counting, identifying, or interpreting the circuit structure), not about full numeric KVL/KCL solving.
-- The correct answer must be directly supported by the grounding document.
-- Provide at least 3 plausible but incorrect distractors in Portuguese.
-- Feedback must briefly explain why the correct answer is correct and cite the relevant subsection name (Nós, Ramos, or Malhas).
-- Return an image path for the most relevant circuit figure from the same document (e.g., "circuit-png/00-combined.png", "node-exports/nodes-combined.png", "branch-exports/branches-combined.png", or a mesh image path).
-- The image should match the topology focus: if asking about mesh X, choose the figure that illustrates mesh X. 
-- Write all content in Portuguese only; the app will duplicate it for EN storage.
-- Difficulty level: introductory.
-`.trim();
-
-  return activeFocus === 'topology' ? topologyPrompt : topologyPrompt;
-}
  
 // Keep the output easy to parse, but do not over-constrain the model on formatting.
 const JSON_SCHEMA_INSTRUCTIONS = `
@@ -153,20 +110,15 @@ function normalizeDocImageRelativePath(value) {
   return null;
 }
 
-function fallbackImageByTopologyTarget(topologyTarget) {
-  if (topologyTarget === 'nodes') {
-    return `${DOC_IMAGES_BASE_RELATIVE}/node-exports/nodes-combined.png`;
+function fallbackImageBySubtopic(subtopicId) {
+  switch (subtopicId) {
+    case 1: return `${DOC_IMAGES_BASE_RELATIVE}/circuit-png/00-combined.png`;
+    case 2: return `${DOC_IMAGES_BASE_RELATIVE}/mesh-exports/04-selected-combined/selected-meshes.png`;
+    case 3: return `${DOC_IMAGES_BASE_RELATIVE}/mesh-exports/04-selected-combined/selected-meshes.png`;
+    case 4: return `${DOC_IMAGES_BASE_RELATIVE}/branch-exports/branches-combined.png`;
+    default:
+      return `${DOC_IMAGES_BASE_RELATIVE}/circuit-png/00-combined.png`;
   }
-
-  if (topologyTarget === 'branches') {
-    return `${DOC_IMAGES_BASE_RELATIVE}/branch-exports/branches-combined.png`;
-  }
-
-  if (topologyTarget === 'meshes') {
-    return `${DOC_IMAGES_BASE_RELATIVE}/mesh-exports/04-selected-combined/selected-meshes.png`;
-  }
-
-  return `${DOC_IMAGES_BASE_RELATIVE}/circuit-png/00-combined.png`;
 }
  
 // Talk to HALO directly and accumulate the streamed content into one string.
@@ -342,27 +294,24 @@ async function createQuestions(req, res) {
   let rawText = '';
 
   try {
-    const focus = String(req.body?.questionFocus || 'topology').toLowerCase();
-    const requestedTarget = String(req.body?.topologyTarget || 'any').toLowerCase();
-    const topologyTarget = selectTopologyTarget(requestedTarget);
-
     // Read and validate the chosen subtopic.
     const subtopicId = parseInt(req.body?.subtopicId, 10);
     if (!Number.isInteger(subtopicId) || subtopicId <= 0) {
       throw new Error('Invalid subtopic selected.');
     }
-    const [subtopicCheck] = await db.query(
-      `SELECT id FROM subtopics WHERE id = ? LIMIT 1`,
+
+    const [subtopicRows] = await db.query(
+      `SELECT id, rag_prompt FROM subtopics WHERE id = ? LIMIT 1`,
       [subtopicId]
     );
-    if (!subtopicCheck.length) {
+    if (!subtopicRows.length) {
       throw new Error(`Subtopic ${subtopicId} not found.`);
     }
 
-    const userPrompt = buildUserPrompt({
-      focus,
-      topologyTarget
-    });
+    const userPrompt = (subtopicRows[0].rag_prompt || '').trim();
+    if (!userPrompt) {
+      throw new Error(`Subtopic ${subtopicId} has no rag_prompt configured.`);
+    }
 
     console.log('[playground] createQuestions — building RAG payload');
     const rag = await buildRagPayload();
@@ -383,7 +332,7 @@ async function createQuestions(req, res) {
  
     const question = normalizeQuestionShape(extractJsonObject(rawText));
     if (!question.circuit_image) {
-      question.circuit_image = fallbackImageByTopologyTarget(topologyTarget);
+      question.circuit_image = fallbackImageBySubtopic(subtopicId);
     }
 
     console.log('[playground] createQuestions — parsed question:', JSON.stringify(question, null, 2));
@@ -408,7 +357,6 @@ async function createQuestions(req, res) {
       generatedQuestion: {
         ...question,
         image: `/${question.circuit_image}`,
-        topologyTarget,
         subtopicId
       }
     };

@@ -16,10 +16,10 @@ async function initSubtopicsTable() {
         number_tries INT DEFAULT 0,
         number_correct INT DEFAULT 0,
         time_spent INT DEFAULT 0,
-        prompt TEXT DEFAULT NULL,
-        system TEXT DEFAULT NULL,
-        messages JSON DEFAULT NULL,
-        reference_documents JSON DEFAULT NULL,
+        rag_prompt TEXT DEFAULT NULL,
+        rag_system TEXT DEFAULT NULL,
+        rag_messages JSON DEFAULT NULL,
+        rag_reference_documents JSON DEFAULT NULL,
         FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
       )
     `);
