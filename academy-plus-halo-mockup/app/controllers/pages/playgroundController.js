@@ -16,7 +16,7 @@ const HALO_URL = process.env.HALO_URL || 'http://cloud.microlumin.com';
 const HALO_PORT = process.env.HALO_PORT || 2020;
 const HALO_RAG_STREAM_URL = `${HALO_URL}:${HALO_PORT}/rag/stream`;
 
-const DOC_IMAGES_BASE_RELATIVE = 'assets/files/docs/pmb_1';
+const DOC_IMAGES_BASE_RELATIVE = 'assets/files/docs/pmb_2';
 const DOC_IMAGES_BASE_PUBLIC = `/${DOC_IMAGES_BASE_RELATIVE}`;
 
 const dupBilingual = (v) => [v, v];
@@ -24,7 +24,7 @@ const dupBilingual = (v) => [v, v];
 // Grounding document used for Create Questions
 const GROUNDING_DOC_PATH = path.join(
   __dirname,
-  '../../public/assets/files/docs/pmb_1/lcm_pedagogical_solution_pt.md'
+  '../../public/assets/files/docs/pmb_2/lcm_pedagogical_solution_pt.md'
 );
  
 // Keep the output easy to parse, but do not over-constrain the model on formatting.
@@ -99,11 +99,11 @@ function normalizeDocImageRelativePath(value) {
     return `${DOC_IMAGES_BASE_RELATIVE}/${cleaned}`;
   }
 
-  if (lowered.startsWith('assets/files/docs/pmb_1/')) {
+  if (lowered.startsWith('assets/files/docs/pmb_2/')) {
     return cleaned;
   }
 
-  if (cleaned.startsWith('/assets/files/docs/pmb_1/')) {
+  if (cleaned.startsWith('/assets/files/docs/pmb_2/')) {
     return cleaned.slice(1);
   }
 
