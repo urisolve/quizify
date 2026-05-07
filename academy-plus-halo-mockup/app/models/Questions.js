@@ -1,5 +1,74 @@
 const db = require('../config/db');
 
+function normalizeTextValue(value, label) {
+  if (Array.isArray(value)) {
+    const candidate = value.find((entry) => typeof entry === 'string' && entry.trim());
+    if (candidate) return candidate.trim();
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    return value.trim();
+  }
+
+  throw new Error(`Validation Error: ${label} must be a non-empty string.`);
+}
+
+function normalizeLocalizedText(value, label) {
+  const text = normalizeTextValue(value, label);
+  return [text, text];
+}
+
+function normalizeDistractorList(value) {
+  if (Array.isArray(value)) {
+    if (value.length === 2 && value.every(Array.isArray)) {
+      const candidate = value.find((items) =>
+        Array.isArray(items) && items.filter((entry) => typeof entry === 'string' && entry.trim()).length >= 3
+      );
+
+      if (candidate) {
+        const items = candidate.filter((entry) => typeof entry === 'string' && entry.trim()).map((entry) => entry.trim());
+        return [items, items];
+      }
+    }
+
+    const items = value
+      .filter((entry) => typeof entry === 'string' && entry.trim())
+      .map((entry) => entry.trim());
+
+    if (items.length >= 3) return [items, items];
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    const items = value
+      .split(/\n|;|\r|\t/)
+      .map((entry) => entry.replace(/^[-*\d.\s]+/, '').trim())
+      .filter(Boolean);
+
+    if (items.length >= 3) return [items, items];
+  }
+
+  throw new Error(
+    'Validation Error: incorrect_answer must contain at least 3 distractors and can be provided as PT-only or bilingual arrays.'
+  );
+}
+
+function normalizeQuestionPayload({
+  question_text,
+  correct_answer,
+  incorrect_answer,
+  feedback
+}) {
+  return {
+    question_text: normalizeLocalizedText(question_text, 'question_text'),
+    correct_answer: normalizeLocalizedText(correct_answer, 'correct_answer'),
+    incorrect_answer: normalizeDistractorList(incorrect_answer),
+    feedback:
+      feedback == null
+        ? null
+        : normalizeLocalizedText(feedback, 'feedback')
+  };
+}
+
 // Initialize the questions table if it doesn't exist
 async function initQuestionsTable() {
   try {
@@ -17,7 +86,10 @@ async function initQuestionsTable() {
         difficulty TINYINT DEFAULT 1,
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
-        invalidations INT DEFAULT 0,
+        rating_sum_teacher INT DEFAULT 0,
+        rating_count_teacher INT DEFAULT 0,
+        rating_sum_student INT DEFAULT 0,
+        rating_count_student INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (subtopic_id) REFERENCES subtopics(id) ON DELETE CASCADE,
         FOREIGN KEY (rag_document_id) REFERENCES rag_documents(id) ON DELETE CASCADE
@@ -61,7 +133,7 @@ function getQuestionById(questionId) {
 }
 
 // Add a new question
-function addQuestion({
+async function createQuestion({
   subtopic_id,
   rag_document_id = null,
   question_type = 'EM',
@@ -70,34 +142,51 @@ function addQuestion({
   correct_answer = [],
   incorrect_answer = [],
   feedback = null,
-  difficulty = 1,
-  number_tries = 0,
-  number_corrects = 0,
-  invalidations = 0
+  difficulty = 1
 }) {
-  // Ensure at least 3 incorrect answers
-  if (!Array.isArray(incorrect_answer) || incorrect_answer.length < 3) {
-    throw new Error("Validation Error: At least 3 incorrect answers are required.");
+  // validation
+  if (!subtopic_id || !question_type) {
+    throw new Error('createQuestion: subtopic_id and question_type are required.');
+  }
+  if (!Array.isArray(question_text) || question_text.length !== 2) {
+    throw new Error('createQuestion: question_text must be [PT, EN].');
+  }
+  if (!Array.isArray(correct_answer) || correct_answer.length !== 2) {
+    throw new Error('createQuestion: correct_answer must be [PT, EN].');
+  }
+  if (
+    !Array.isArray(incorrect_answer) ||
+    incorrect_answer.length !== 2 ||
+    !incorrect_answer.every(arr => Array.isArray(arr) && arr.length >= 3)
+  ) {
+    throw new Error('createQuestion: incorrect_answer must be [[PT...], [EN...]] with ≥3 items each.');
+  }
+  if (feedback !== null && (!Array.isArray(feedback) || feedback.length !== 2)) {
+    throw new Error('createQuestion: feedback must be [PT, EN] or null.');
   }
 
-  // Prepare data for JSON columns
-  const question_text_s = JSON.stringify(question_text);
-  const correct_answer_s = JSON.stringify(correct_answer);
-  const incorrect_answer_s = JSON.stringify(incorrect_answer);
-  const feedback_s = feedback ? JSON.stringify(feedback) : null;
+  const sql = `
+    INSERT INTO questions
+      (subtopic_id, rag_document_id, question_type, question_text, image,
+       correct_answer, incorrect_answer, feedback, difficulty,
+       number_tries, number_corrects)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
+  `;
 
-  return db.query(
-    `INSERT INTO questions
-      (subtopic_id, rag_document_id, question_type, question_text, image, 
-      correct_answer, incorrect_answer, feedback, difficulty, number_tries, 
-      number_corrects, invalidations)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-    [
-      subtopic_id, rag_document_id, question_type, question_text_s, image, 
-      correct_answer_s, incorrect_answer_s, feedback_s, difficulty, number_tries, 
-      number_corrects, invalidations
-    ]
-  );
+  const params = [
+    subtopic_id,
+    rag_document_id,
+    question_type,
+    JSON.stringify(question_text),
+    image,
+    JSON.stringify(correct_answer),
+    JSON.stringify(incorrect_answer),
+    feedback === null ? null : JSON.stringify(feedback),
+    difficulty,
+  ];
+
+  const [result] = await db.query(sql, params);
+  return result.insertId;
 }
 
 // Delete a question
@@ -108,15 +197,24 @@ function deleteQuestion(questionId) {
 // Update a question (partial update)
 function updateQuestion(questionId, updates) {
   const allowedFields = [
-    'question_type','question_text', 'image', 'correct_answer',
-    'incorrect_answer', 'feedback', 'difficulty', 'number_tries',
-    'number_corrects', 'invalidations'
+    'question_type', 'question_text', 'image', 'correct_answer',
+    'incorrect_answer', 'feedback', 'difficulty',
+    'number_tries', 'number_corrects',
+    'rating_sum_teacher', 'rating_count_teacher',
+    'rating_sum_student', 'rating_count_student',
   ];
 
   // Validation for incorrect answers length
-  if (updates.incorrect_answer) {
-    if (!Array.isArray(updates.incorrect_answer) || updates.incorrect_answer.length < 3) {
-      throw new Error("Update failed: At least 3 incorrect answers are required.");
+  if (updates.incorrect_answer !== undefined) {
+    const ia = updates.incorrect_answer;
+    const valid =
+      Array.isArray(ia) &&
+      ia.length === 2 &&
+      ia.every(arr => Array.isArray(arr) && arr.length >= 3);
+    if (!valid) {
+      throw new Error(
+        'Update failed: incorrect_answer must be [[PT...], [EN...]] with ≥3 items per language.'
+      );
     }
   }
 
@@ -126,10 +224,17 @@ function updateQuestion(questionId, updates) {
 
   const setClause = fields.map(f => `${f} = ?`).join(', ');
 
+  const jsonColumns = new Set([
+    'question_text', 'correct_answer', 'incorrect_answer', 'feedback',
+  ]);
+
   const values = fields.map(f => {
     const val = updates[f];
     // Stringify arrays for JSON columns
-    return Array.isArray(val) ? JSON.stringify(val) : val;
+    if (jsonColumns.has(f)) {
+      return val === null ? null : JSON.stringify(val);
+    }
+    return val;
   });
   
   values.push(questionId);
@@ -137,14 +242,13 @@ function updateQuestion(questionId, updates) {
 }
 
 // Increment question stats
-async function incrementTopicStats(id, { tries = 0, correct = 0, invalidation = 0 }) {
+async function incrementQuestionStats(id, { tries = 0, correct = 0 } = {}) {
   await db.query(
-    `UPDATE questions SET 
-     number_tries = number_tries + ?, 
-     number_correct = number_correct + ?, 
-     invalidations = invalidations + ? 
-     WHERE id = ?`,
-    [tries, correct, invalidation, id]
+    `UPDATE questions
+        SET number_tries    = number_tries + ?,
+            number_corrects = number_corrects + ?
+      WHERE id = ?`,
+    [tries, correct, id]
   );
 }
 
@@ -153,9 +257,9 @@ module.exports = {
   initQuestionsTable,
   getQuestionsBySubtopic,
   getQuestionById,
-  addQuestion,
+  createQuestion,
   deleteQuestion,
   updateQuestion,
   getRandomQuestionBySubtopic,
-  incrementTopicStats
+  incrementQuestionStats
 };

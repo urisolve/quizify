@@ -1,0 +1,200 @@
+<div class="container-fluid">
+  <div class="row g-4">
+ 
+    <!-- Hero -->
+    <div class="col-12">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-rocket"></i>
+            </span>
+            <div>
+              <h2 class="card-title fw-semibold mb-0">{{ t 'playground.title' }}</h2>
+              <p class="mb-0 text-muted small">{{ t 'playground.subtitle' }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+ 
+    <!-- Action cards -->
+
+    <!-- Create PMB -->
+    <div class="col">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-success text-success">
+              <i class="ti ti-file-description"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.pmbtitle' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">{{ t 'playground.pmbsubtitle' }}</p>
+            </div>
+          </div>
+ 
+          <div class="mt-auto">
+            <form method="POST" action="/playground/create-pmb">
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
+                <i class="ti ti-plus me-2"></i>{{ t 'playground.pmbbutton' }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Create Questions --> 
+    <div class="col">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-warning text-warning">
+              <i class="ti ti-list-check"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.questiontitle' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">{{ t 'playground.questionsubtitle' }}</p>
+            </div>
+          </div>
+ 
+          <div class="mt-auto">
+            <form method="POST" action="/playground/create-questions" class="d-flex flex-column gap-3">
+              <input type="hidden" name="questionFocus" value="topology" />
+
+              <div>
+                <label class="form-label fw-semibold mb-1" for="subtopicId"> {{t 'playground.subtopic_label'}}</label>
+                <select class="form-select" id="subtopicId" name="subtopicId" required>
+                  {{#each subtopics}}
+                    <option value="{{this.id}}">{{subtopicT this.id 'name'}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
+                <i class="ti ti-plus me-2"></i>{{ t 'playground.questionbutton' }}
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Review Questions -->
+    <div class="col">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-info text-info">
+              <i class="ti ti-eye-check"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.reviewtitle' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">{{ t 'playground.reviewsubtitle' }}</p>
+            </div>
+          </div>
+ 
+          <div class="mt-auto d-grid gap-2">
+            <a href="/playground/review?mode=all"
+              class="btn btn-primary py-2 fw-semibold">
+              <i class="ti ti-eye me-2"></i>{{t 'playground.review_all'}}
+            </a>
+            <a href="/playground/review?mode=critical"
+              class="btn btn-outline-danger py-2 fw-semibold">
+              <i class="ti ti-alert-triangle me-2"></i>{{t 'playground.review_critical'}}
+            </a>
+            <a href="/playground/review?mode=unrated"
+              class="btn btn-outline-secondary py-2 fw-semibold">
+              <i class="ti ti-help-circle me-2"></i>{{t 'playground.review_unrated'}}
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Flash banner -->
+    {{#if flash}}
+      <div class="col-12">
+        <div class="alert alert-{{flash.type}} d-flex align-items-center gap-2 mb-0" role="alert">
+          <i class="ti {{#if (eq flash.type 'success')}}ti-circle-check{{else}}ti-alert-circle{{/if}} fs-5"></i>
+          <div>
+            {{#if flash.messageKey}}
+              {{t flash.messageKey flash.messageVars}}
+            {{else}}
+              {{flash.message}}
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    {{/if}}
+
+    {{#if flash}}
+      {{#if (eq flash.type 'success')}}
+        {{#if flash.generatedQuestion}}
+      <div class="col-12">
+        <section class="card border-0 shadow-sm">
+          <div class="card-body p-4">
+            <div class="d-flex align-items-center justify-content-between gap-3 mb-3">
+              <div>
+                <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.creationTitle' }}</h3>
+                <p class="mb-0 text-muted small">{{ t 'playground.creationsubTitle' }}</p>
+              </div>
+              <span class="badge bg-light-success text-success">{{ t 'playground.labelStatus' }}</span>
+            </div>
+
+            <div class="border rounded-3 p-3 bg-light mb-3">
+              <div class="text-muted small mb-1">{{ t 'playground.labelQuestion' }}</div>
+              <div class="fw-semibold">{{flash.generatedQuestion.question_text}}</div>
+            </div>
+
+            <div class="row g-3">
+              <div class="col-12 col-lg-4">
+                <div class="border rounded-3 p-3 h-100">
+                  <div class="text-muted small mb-1">{{ t 'playground.labelAnswer' }}</div>
+                  <div>{{flash.generatedQuestion.correct_answer}}</div>
+                </div>
+              </div>
+              <div class="col-12 col-lg-4">
+                <div class="border rounded-3 p-3 h-100">
+                  <div class="text-muted small mb-1">{{ t 'playground.labelDistractors' }}</div>
+                  <div class="d-flex flex-column gap-2">
+                    {{#each flash.generatedQuestion.incorrect_answer}}
+                      <div class="border rounded-3 bg-white px-3 py-2 shadow-sm">
+                        <span class="text-muted small me-2">{{letterIndex @index}}.</span>
+                        <span>{{this}}</span>
+                      </div>
+                    {{/each}}
+                  </div>
+                </div>
+              </div>
+              <div class="col-12 col-lg-4">
+                <div class="border rounded-3 p-3 h-100">
+                  <div class="text-muted small mb-1">{{ t 'playground.labelFeedback' }}</div>
+                  <div>{{flash.generatedQuestion.feedback}}</div>
+                </div>
+              </div>
+            </div>
+
+            {{#if flash.generatedQuestion.image}}
+              <div class="mt-3">
+                <div class="text-muted small mb-2">{{ t 'playground.labelImage' }}</div>
+                <div class="border rounded-3 p-3 bg-white">
+                  <img
+                    src="{{flash.generatedQuestion.image}}"
+                    alt="Circuit image selected by model"
+                    class="img-fluid rounded"
+                    style="max-height: 320px; object-fit: contain;"
+                  />
+                </div>
+              </div>
+            {{/if}}
+          </div>
+        </section>
+      </div>
+        {{/if}}
+      {{/if}}
+    {{/if}}
+  
+  </div>
+</div>

@@ -28,6 +28,13 @@ router.get('/user', requireAuthentication, userController);
 const { practicePlusPage } = require('../controllers/pages/practicePlusController');
 router.get('/practice-plus', requireAuthentication, practicePlusPage);
 
+const playgroundController = require('../controllers/pages/playgroundController.js');
+router.get('/playground', requireAuthentication, playgroundController.showPlayground);
+router.post('/playground/create-pmb', requireAuthentication, playgroundController.createPmb);
+router.post('/playground/create-questions', requireAuthentication, playgroundController.createQuestions);
+router.get ('/playground/review', requireAuthentication, playgroundController.showReviewQuestion);
+router.post('/playground/review/rate', requireAuthentication, playgroundController.submitReviewRating);
+
 const leaderboardPageController = require('../controllers/pages/leaderboardController');
 router.get('/leaderboard', requireAuthentication, leaderboardPageController);
 
@@ -38,7 +45,8 @@ const queryPlusController = require('../controllers/pages/queryPlusController');
 router.get('/query-plus', requireAuthentication, queryPlusController);
 
 const queryCompleteController = require('../controllers/pages/queryCompleteController');
-router.get('/query-complete', requireAuthentication, queryCompleteController);
+router.get('/query-complete', requireAuthentication, queryCompleteController.showQueryComplete);
+router.post('/query-complete/rate-question', requireAuthentication, queryCompleteController.rateQuestionByStudent);
 
 const topicQueryController = require('../controllers/pages/topicQueryController');
 router.get('/start-topic', requireAuthentication, topicQueryController);

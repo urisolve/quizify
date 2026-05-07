@@ -3,8 +3,9 @@ const getWeekStart = require('../../utils/getWeekStart');
 const { getLevelProgressPercent, getLevelFromScore } = require('../../utils/level');
 const { calculatePerformanceBolts } = require('../../utils/performanceCalculator');
 const { getTotalTries } = require('../../utils/querySession');
+const db = require('../../config/db');
 
-const queryCompleteController = async (req, res) => {
+async function showQueryComplete(req, res) {
     const userId = req.session.user?.id;
 
     // If coming fresh from a quiz, process and cache the result
@@ -91,4 +92,40 @@ const queryCompleteController = async (req, res) => {
     });
 };
 
-module.exports = queryCompleteController;
+// AJAX endpoint: student rates a question on the 1–5 Likert scale.
+// Increments rating_sum_student / rating_count_student on the questions row.
+async function rateQuestionByStudent(req, res) {
+    try {
+        const questionId = parseInt(req.body.questionId, 10);
+        const rating = parseInt(req.body.rating, 10);
+ 
+        if (!questionId) {
+            return res.status(400).json({ error: 'Missing questionId.' });
+        }
+        if (!rating || rating < 1 || rating > 5) {
+            return res.status(400).json({ error: 'Rating must be between 1 and 5.' });
+        }
+ 
+        const [result] = await db.query(
+            `UPDATE questions
+                SET rating_sum_student   = rating_sum_student + ?,
+                    rating_count_student = rating_count_student + 1
+              WHERE id = ?`,
+            [rating, questionId]
+        );
+ 
+        if (!result.affectedRows) {
+            return res.status(404).json({ error: `No question found with id ${questionId}.` });
+        }
+ 
+        return res.json({ success: true });
+    } catch (err) {
+        console.error('[query-complete] rateQuestionByStudent failed:', err);
+        return res.status(500).json({ error: err.message });
+    }
+}
+
+module.exports = {
+    showQueryComplete,
+    rateQuestionByStudent
+};

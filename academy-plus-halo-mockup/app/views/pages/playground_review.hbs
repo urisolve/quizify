@@ -1,0 +1,163 @@
+<div class="container-fluid">
+  <div class="row g-4">
+ 
+    <!-- Topic header -->
+    <div class="col-12 mb-0">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <span class="halo-section-icon bg-light-info text-info">
+              <i class="ti ti-eye-check"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h2 class="fw-semibold mb-0 fs-4">{{subtopicT subtopicId 'name'}}</h2>
+              <p class="mb-0 text-muted small" style="text-align: justify;">{{subtopicT subtopicId 'description'}}</p>
+            </div>
+            <div class="d-flex gap-2 small">
+              <span class="text-muted">#{{question.id}}</span>
+              <span class="badge bg-light-secondary text-secondary">{{ t 'playgroundreview.type' }}{{question.question_type}}</span>
+              <span class="badge bg-light-warning text-warning">{{ t 'playgroundreview.difficulty' }}{{question.difficulty}}</span>
+              <span class="badge bg-light-info text-info">{{ t 'playgroundreview.teacheravg' }}{{question.rating_avg_teacher}} ({{question.rating_count_teacher}})</span>
+              <span class="badge bg-light-info text-info">{{ t 'playgroundreview.studentravg' }}{{question.rating_avg_student}} ({{question.rating_count_student}})</span>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+ 
+    <!-- Flash banner -->
+    {{#if flash}}
+      <div class="col-12">
+        <div class="alert alert-{{flash.type}} d-flex align-items-center gap-2 mb-0" role="alert">
+          <i class="ti {{#if (eq flash.type 'success')}}ti-circle-check{{else}}ti-alert-circle{{/if}} fs-5"></i>
+          <div>
+            {{#if flash.messageKey}}
+              {{t flash.messageKey flash.messageVars}}
+            {{else}}
+              {{flash.message}}
+            {{/if}}
+          </div>
+        </div>
+      </div>
+    {{/if}}
+ 
+    <!-- QUESTION -->
+    <div class="col-12 mt-0">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+ 
+          <!-- Question text -->
+          <div class="d-flex align-items-start gap-3 mb-2">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-question-mark"></i>
+            </span>
+            <p id="question-text" class="fs-5 mb-0" style="text-align: justify;">
+              {{question.question_text}}
+            </p>
+          </div>
+ 
+          {{#if question.image}}
+            <img id="question-img" src="{{question.image}}" alt="Question image"
+              class="img-fluid rounded-3 mb-2" style="max-height: 450px; object-fit: contain;">
+          {{/if}}
+ 
+          <!-- Answers --> 
+          <div id="answers-area" class="d-grid gap-2">
+            {{#each answers}}
+              <label class="answer-option btn btn-outline-secondary text-start px-3 py-2 d-flex align-items-center gap-2"
+                data-correct="{{this.correct}}" style="cursor: pointer;">
+                <input type="radio" name="answer" value="{{@index}}" hidden>
+                <span class="text-muted small me-2">{{letterIndex @index}}.</span>
+                <span style="pointer-events: none;">{{this.text}}</span>
+              </label>
+            {{/each}}
+          </div>
+ 
+          <!-- Reveal button -->
+          <div id="reveal-actions" class="mt-3">
+            <button id="reveal-btn" type="button" class="btn btn-primary py-2 fw-semibold">
+              <i class="ti ti-eye me-2"></i>{{ t 'playgroundreview.showbutton' }}
+            </button>
+          </div>
+  
+          <!-- Likert scale (hidden until reveal) -->
+          <div id="likert-section" class="mt-3">
+            <div class="d-flex align-items-center gap-3 mb-3">
+              <span class="halo-section-icon bg-light-warning text-warning">
+                <i class="ti ti-star"></i>
+              </span>
+              <h2 class="card-title fw-semibold mb-0 fs-5">{{ t 'playgroundreview.evaluation' }}</h2>
+            </div>
+ 
+            <form method="POST" action="/playground/review/rate?mode={{mode}}" class="d-grid gap-2">
+              <input type="hidden" name="questionId" value="{{question.id}}">
+              <input type="hidden" name="mode" value="{{mode}}">
+ 
+              <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                <input type="radio" name="rating" value="1" required class="mt-1">
+                <div>
+                  <span class="badge bg-danger me-2">1</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scaleone' }}</span>
+                </div>
+              </label>
+ 
+              <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                <input type="radio" name="rating" value="2" required class="mt-1">
+                <div>
+                  <span class="badge bg-warning text-dark me-2">2</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scaletwo' }}</span>
+                </div>
+              </label>
+ 
+              <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                <input type="radio" name="rating" value="3" required class="mt-1">
+                <div>
+                  <span class="badge bg-secondary me-2">3</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scalethree' }}</span>
+                </div>
+              </label>
+ 
+              <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                <input type="radio" name="rating" value="4" required class="mt-1">
+                <div>
+                  <span class="badge bg-info me-2">4</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scalefour' }}</span>
+                </div>
+              </label>
+ 
+              <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                <input type="radio" name="rating" value="5" required class="mt-1">
+                <div>
+                  <span class="badge bg-success me-2">5</span>
+                  <span class="fw-semibold">{{ t 'playgroundreview.scalefive' }}</span>
+                </div>
+              </label>
+ 
+              <div class="d-flex gap-2 mt-3">
+                <button type="submit" class="btn btn-primary py-2 fw-semibold flex-grow-1">
+                  <i class="ti ti-send me-2"></i>{{ t 'playgroundreview.submiteval' }}
+                </button>
+                <a href="/playground/review?mode={{mode}}" class="btn btn-outline-secondary py-2 fw-semibold">
+                  <i class="ti ti-player-skip-forward me-2"></i>{{ t 'playgroundreview.jump' }}
+                </a>
+              </div>
+            </form>
+          </div>
+ 
+          <!-- Bottom actions (always visible) -->
+          <div class="mt-3 d-flex justify-content-between gap-2">
+            <a href="/playground" class="btn btn-outline-secondary btn-sm">
+              <i class="ti ti-arrow-left me-1"></i>{{ t 'playgroundreview.back' }}
+            </a>
+            <a href="/playground/review?mode={{mode}}" class="btn btn-outline-primary btn-sm">
+              <i class="ti ti-refresh me-1"></i>{{ t 'playgroundreview.otherquestion' }}
+            </a>
+          </div>
+        </div>
+      </section>
+    </div>
+ 
+  </div>
+</div>
+ 
+<script src="/js/pages/playground_review.js"></script>

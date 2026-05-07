@@ -97,19 +97,29 @@ const getUserExp = async (userId) => {
 
 // Award a badge
 const awardBadge = async (userId, badgeData) => {
-  // badgeData should be { name: '...', svg: '...' }
-  const newBadge = {
-    name: badgeData.name,
-    svg: badgeData.svg,
-    date_earned: new Date().toISOString().split('T')[0] // Format: 2026-04-16
-  };
 
+  if (!badgeData || !badgeData.name) {
+    console.warn('[awardBadge] missing badgeData.name; skipping. Got:', badgeData);
+    return;
+  }
+
+  const dateEarned = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD"
+
+  // badgeData should be { name: '...', svg: '...' }
   // Using MySQL's JSON_ARRAY_APPEND to safely add the new object to the list
   await db.query(
-    `UPDATE users 
-     SET badges = JSON_ARRAY_APPEND(IFNULL(badges, '[]'), '$', CAST(? AS JSON)) 
-     WHERE id = ?`,
-    [JSON.stringify(newBadge), userId]
+    `UPDATE users
+        SET badges = JSON_ARRAY_APPEND(
+                       IFNULL(badges, JSON_ARRAY()),
+                       '$',
+                       JSON_OBJECT(
+                         'name', ?,
+                         'svg', ?,
+                         'date_earned', ?
+                       )
+                     )
+      WHERE id = ?`,
+    [badgeData.name, badgeData.svg || '', dateEarned, userId]
   );
 };
 
@@ -128,8 +138,19 @@ async function checkAndAwardTopicBadge(userId, topicId) {
     const [topicRows] = await getTopicBadge(topicId);
     if (!topicRows.length || !topicRows[0].badge) return;
 
+    const rawBadge = topicRows[0].badge;
+    const parsed = typeof rawBadge === 'string' ? JSON.parse(rawBadge) : rawBadge;
+
     // Assuming topic.badge is stored as [{"name": "...", "svg": "..."}]
-    const topicBadgeInfo = JSON.parse(topicRows[0].badge)[0];
+    const topicBadgeInfo = Array.isArray(parsed) ? parsed[0] : parsed;
+
+    if (!topicBadgeInfo || !topicBadgeInfo.name) {
+      console.warn(
+        `[checkAndAwardTopicBadge] topic ${topicId} badge has no name; got:`,
+        parsed
+      );
+      return;
+    }
 
     // Check if they already have this specific badge name
     const alreadyHasBadge = currentBadges.some(b => b.name === topicBadgeInfo.name);
