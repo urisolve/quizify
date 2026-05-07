@@ -130,7 +130,7 @@
         "redo": "Redo"
     },
     "topics": {
-        "1": { "name": "MCM", "description": "Mesh Current Method" }
+        "1": { "name": "Loop Current Method", "description": "LCM" }
     },
     "subtopics": {
         "1": { "name": "Circuit Interpretation", "description": "Counting and Identifying the R branches, N nodes, and M main loops of the circuit"},
@@ -158,12 +158,16 @@
         "labelAnswer": "Correct answer",
         "labelDistractors": "Distractors",
         "labelFeedback": "Feedback",
-        "labelImage": "Circuit image selected by the model"
+        "labelImage": "Circuit image selected by the model",
+        "review_all": "General Review",
+        "review_critical": "Critical Questions",
+        "review_unrated": "Unrated Questions"
     },
     "playgroundreview": {
         "type": "type: ",
         "difficulty": "difficulty: ",
-        "teacheravg": "Average: ",
+        "teacheravg": "Teachers: ",
+        "studentravg": "Students: ",
         "showbutton": "Show correct and incorrect answers",
         "evaluation": "Question evaluation",
         "scaleone": "Completely incorrect question and should not exist",
@@ -183,7 +187,12 @@
         "question_failed": "Failed to create question: {{error}}",
         "no_questions": "No questions to review.",
         "rating_saved": "Rating {{rating}} saved for question #{{questionId}}.",
-        "rating_failed": "Failed to save rating: {{error}}"
+        "rating_failed": "Failed to save rating: {{error}}",
+        "no_critical_questions": "No critical questions to review.",
+        "no_unrated_questions": "No unrated questions to review.",
+        "review_done_all": "You've reviewed every available question. The queue has been reset.",
+        "review_done_critical": "You've reviewed every critical question. The queue has been reset.",
+        "review_done_unrated": "You've reviewed every unrated question. The queue has been reset."
     },
     "auth": {
         "user_created": "User created successfully",

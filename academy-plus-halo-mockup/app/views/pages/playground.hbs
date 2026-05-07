@@ -95,10 +95,19 @@
             </div>
           </div>
  
-          <div class="mt-auto">
-            <a href="/playground/review" class="btn btn-primary w-100 py-2 fw-semibold">
-              <i class="ti ti-eye me-2"></i>{{ t 'playground.reviewbutton' }}
-            </a>            
+          <div class="mt-auto d-grid gap-2">
+            <a href="/playground/review?mode=all"
+              class="btn btn-primary py-2 fw-semibold">
+              <i class="ti ti-eye me-2"></i>{{t 'playground.review_all'}}
+            </a>
+            <a href="/playground/review?mode=critical"
+              class="btn btn-outline-danger py-2 fw-semibold">
+              <i class="ti ti-alert-triangle me-2"></i>{{t 'playground.review_critical'}}
+            </a>
+            <a href="/playground/review?mode=unrated"
+              class="btn btn-outline-secondary py-2 fw-semibold">
+              <i class="ti ti-help-circle me-2"></i>{{t 'playground.review_unrated'}}
+            </a>
           </div>
         </div>
       </section>

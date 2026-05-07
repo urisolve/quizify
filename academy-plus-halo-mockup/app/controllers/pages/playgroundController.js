@@ -388,22 +388,77 @@ async function showReviewQuestion(req, res) {
   try {
     const lang = req.language;
 
+    const mode = ['all', 'critical', 'unrated'].includes(req.query.mode)
+      ? req.query.mode
+      : 'all';
+
+    // Per-mode session tracking — survives across rate/skip clicks,
+    // resets when the session ends.
+    if (!req.session.seenReviewQuestions) {
+      req.session.seenReviewQuestions = { all: [], critical: [], unrated: [] };
+    }
+    const seenIds = req.session.seenReviewQuestions[mode];
+
+    // Build WHERE incrementally so we can mix mode filter + exclusion
+    const whereParts = [];
+    const params = [];
+
+    if (mode === 'critical') {
+      whereParts.push(`(
+        (rating_count_teacher > 0
+           AND rating_sum_teacher / rating_count_teacher < 2.5)
+        OR (rating_count_student > 0
+           AND rating_sum_student / rating_count_student < 2.5)
+      )`);
+    } else if (mode === 'unrated') {
+      whereParts.push(`(rating_count_teacher = 0 AND rating_count_student = 0)`);
+    }
+
+    if (seenIds.length) {
+      whereParts.push(`id NOT IN (${seenIds.map(() => '?').join(',')})`);
+      params.push(...seenIds);
+    }
+
+    const whereClause = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
+
     const [rows] = await db.query(
       `SELECT id, subtopic_id, rag_document_id, question_type,
               question_text, image, correct_answer, incorrect_answer,
               feedback, difficulty, number_tries, number_corrects,
-              rating_sum_teacher, rating_count_teacher
+              rating_sum_teacher, rating_count_teacher,
+              rating_sum_student, rating_count_student
          FROM questions
+         ${whereClause}
          ORDER BY RAND()
-         LIMIT 1`
+         LIMIT 1`,
+      params
     );
 
     if (!rows.length) {
-      req.session.flash = { type: 'danger', messageKey: 'flashes.no_questions' };
+      // Either nothing matches the filter at all, or we've now seen them all.
+      const exhausted = seenIds.length > 0;
+
+      // Reset this mode so the teacher can start over later if they want.
+      req.session.seenReviewQuestions[mode] = [];
+
+      req.session.flash = {
+        type: exhausted ? 'success' : 'danger',
+        messageKey: exhausted
+          ? (mode === 'critical' ? 'flashes.review_done_critical'
+             : mode === 'unrated' ? 'flashes.review_done_unrated'
+             : 'flashes.review_done_all')
+          : (mode === 'critical' ? 'flashes.no_critical_questions'
+             : mode === 'unrated' ? 'flashes.no_unrated_questions'
+             : 'flashes.no_questions')
+      };
+
       return res.redirect('/playground');
     }
 
     const q = rows[0];
+
+    // Mark this question as seen so it won't be selected again this session.
+    seenIds.push(q.id);
 
     // Build answer options: 1 correct + 3 random incorrect, shuffled
     const incorrects = pickLocaleArray(q.incorrect_answer, lang)
@@ -421,8 +476,11 @@ async function showReviewQuestion(req, res) {
     const flash = req.session.flash || null;
     delete req.session.flash;
 
-    const ratingAvg = q.rating_count_teacher
+    const teacherAvg = q.rating_count_teacher
       ? (Number(q.rating_sum_teacher) / Number(q.rating_count_teacher)).toFixed(2)
+      : null;
+    const studentAvg = q.rating_count_student
+      ? (Number(q.rating_sum_student) / Number(q.rating_count_student)).toFixed(2)
       : null;
 
     const imagePath = q.image
@@ -435,12 +493,15 @@ async function showReviewQuestion(req, res) {
       user: req.session.user,
       type: 'subtopic',
       subtopicId: q.subtopic_id,
+      mode,
       question: {
         id: q.id,
         question_type: q.question_type,
         difficulty: q.difficulty,
         rating_count_teacher: q.rating_count_teacher,
-        rating_avg_teacher: ratingAvg,
+        rating_avg_teacher: teacherAvg,
+        rating_count_student: q.rating_count_student,
+        rating_avg_student: studentAvg,
         image: imagePath,
         question_text: pickLocale(q.question_text, lang),
         feedback: pickLocale(q.feedback, lang)
@@ -455,6 +516,11 @@ async function showReviewQuestion(req, res) {
 }
 
 async function submitReviewRating(req, res) {
+
+  const mode = ['all', 'critical', 'unrated'].includes(req.query.mode)
+      ? req.query.mode
+      : 'all';
+
   try {
     const questionId = parseInt(req.body.questionId, 10);
     const rating = parseInt(req.body.rating, 10);
@@ -465,12 +531,14 @@ async function submitReviewRating(req, res) {
     }
 
     // Always update rating_sum / rating_count.
-    const sql = `UPDATE questions
-                SET rating_sum_teacher   = rating_sum_teacher + ?,
-                    rating_count_teacher = rating_count_teacher + 1
-              WHERE id = ?`;
+    const [result] = await db.query(
+      `UPDATE questions
+          SET rating_sum_teacher   = rating_sum_teacher + ?,
+              rating_count_teacher = rating_count_teacher + 1
+        WHERE id = ?`,
+      [rating, questionId]
+    );
 
-    const [result] = await db.query(sql, [rating, questionId]);
     if (!result.affectedRows) {
       throw new Error(`No question found with id ${questionId}.`);
     }
@@ -488,7 +556,8 @@ async function submitReviewRating(req, res) {
       messageVars: { error: err.message }
     };
   }
-  return res.redirect('/playground/review');
+
+  return res.redirect(`/playground/review?mode=${encodeURIComponent(mode)}`);
 }
 
  

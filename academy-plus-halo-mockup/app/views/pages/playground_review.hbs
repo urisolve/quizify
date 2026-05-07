@@ -17,9 +17,8 @@
               <span class="text-muted">#{{question.id}}</span>
               <span class="badge bg-light-secondary text-secondary">{{ t 'playgroundreview.type' }}{{question.question_type}}</span>
               <span class="badge bg-light-warning text-warning">{{ t 'playgroundreview.difficulty' }}{{question.difficulty}}</span>
-              {{#if question.rating_count_teacher}}
-                <span class="badge bg-light-info text-info">{{ t 'playgroundreview.teacheravg' }}{{question.rating_avg_teacher}} ({{question.rating_count_teacher}})</span>
-              {{/if}}
+              <span class="badge bg-light-info text-info">{{ t 'playgroundreview.teacheravg' }}{{question.rating_avg_teacher}} ({{question.rating_count_teacher}})</span>
+              <span class="badge bg-light-info text-info">{{ t 'playgroundreview.studentravg' }}{{question.rating_avg_student}} ({{question.rating_count_student}})</span>
             </div>
           </div>
         </div>
@@ -90,8 +89,9 @@
               <h2 class="card-title fw-semibold mb-0 fs-5">{{ t 'playgroundreview.evaluation' }}</h2>
             </div>
  
-            <form method="POST" action="/playground/review/rate" class="d-grid gap-2">
+            <form method="POST" action="/playground/review/rate?mode={{mode}}" class="d-grid gap-2">
               <input type="hidden" name="questionId" value="{{question.id}}">
+              <input type="hidden" name="mode" value="{{mode}}">
  
               <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
                 <input type="radio" name="rating" value="1" required class="mt-1">
@@ -137,7 +137,7 @@
                 <button type="submit" class="btn btn-primary py-2 fw-semibold flex-grow-1">
                   <i class="ti ti-send me-2"></i>{{ t 'playgroundreview.submiteval' }}
                 </button>
-                <a href="/playground/review" class="btn btn-outline-secondary py-2 fw-semibold">
+                <a href="/playground/review?mode={{mode}}" class="btn btn-outline-secondary py-2 fw-semibold">
                   <i class="ti ti-player-skip-forward me-2"></i>{{ t 'playgroundreview.jump' }}
                 </a>
               </div>
@@ -149,7 +149,7 @@
             <a href="/playground" class="btn btn-outline-secondary btn-sm">
               <i class="ti ti-arrow-left me-1"></i>{{ t 'playgroundreview.back' }}
             </a>
-            <a href="/playground/review" class="btn btn-outline-primary btn-sm">
+            <a href="/playground/review?mode={{mode}}" class="btn btn-outline-primary btn-sm">
               <i class="ti ti-refresh me-1"></i>{{ t 'playgroundreview.otherquestion' }}
             </a>
           </div>

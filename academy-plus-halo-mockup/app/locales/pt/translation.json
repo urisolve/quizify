@@ -139,7 +139,7 @@
         "redo": "Repetir"
     },
     "topics": {
-        "1": { "name": "MCM", "description": "Método das Correntes nas Malhas" }
+        "1": { "name": "Método das Correntes nas Malhas", "description": "MCM" }
     },
     "subtopics": {
         "1": { "name": "Interpretação de Circuito", "description": "Contar e Identificar os R ramos, N nós e M malhas principais do circuito"},
@@ -167,12 +167,16 @@
         "labelAnswer": "Resposta correta",
         "labelDistractors": "Distratores",
         "labelFeedback": "Feedback",
-        "labelImage": "Imagem do circuito selecionada pelo modelo"
+        "labelImage": "Imagem do circuito selecionada pelo modelo",
+        "review_all": "Revisão Geral",
+        "review_critical": "Questões Críticas",
+        "review_unrated": "Sem Classificação"
     },
     "playgroundreview": {
         "type": "tipo: ",
         "difficulty": "dificuldade: ",
-        "teacheravg": "Média: ",
+        "teacheravg": "Docentes: ",
+        "studentravg": "Alunos: ",
         "showbutton": "Mostrar respostas certas e erradas",
         "evaluation": "Avaliação da questão",
         "scaleone": "Questão totalmente incorreta e não deveria existir",
@@ -192,7 +196,12 @@
         "question_failed": "Falha ao criar pergunta: {{error}}",
         "no_questions": "Sem perguntas para rever.",
         "rating_saved": "Avaliação {{rating}} guardada para a questão #{{questionId}}.",
-        "rating_failed": "Falha ao guardar avaliação: {{error}}"
+        "rating_failed": "Falha ao guardar avaliação: {{error}}",
+        "no_critical_questions": "Sem questões críticas para rever.",
+        "no_unrated_questions": "Sem questões por classificar.",
+        "review_done_all": "Já reviste todas as questões disponíveis. Lista reiniciada.",
+        "review_done_critical": "Já reviste todas as questões críticas. Lista reiniciada.",
+        "review_done_unrated": "Já reviste todas as questões sem classificação. Lista reiniciada."
     },
     "auth": {
         "user_created": "Utilizador criado com sucesso",
