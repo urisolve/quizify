@@ -190,8 +190,6 @@
         "otherquestion": "Outra questão"
     },
     "flashes": {
-        "pmb_placeholder": "PMB a ser criado",
-        "pmb_failed": "Falha ao criar PMB.",
         "question_created": "Pergunta criada com sucesso e inclui imagem do circuito.",
         "question_failed": "Falha ao criar pergunta: {{error}}",
         "no_questions": "Sem perguntas para rever.",
@@ -201,7 +199,10 @@
         "no_unrated_questions": "Sem questões por classificar.",
         "review_done_all": "Já reviste todas as questões disponíveis. Lista reiniciada.",
         "review_done_critical": "Já reviste todas as questões críticas. Lista reiniciada.",
-        "review_done_unrated": "Já reviste todas as questões sem classificação. Lista reiniciada."
+        "review_done_unrated": "Já reviste todas as questões sem classificação. Lista reiniciada.",
+        "pmb_placeholder": "PMB a ser criado",
+        "pmb_created": "PMB criado em pmb_{{pmbNumber}}/ped.zip ({{sizeKb}} KB).",
+        "pmb_failed": "Falha ao criar PMB: {{error}}"
     },
     "auth": {
         "user_created": "Utilizador criado com sucesso",

@@ -20,6 +20,33 @@ const DOC_IMAGES_BASE_RELATIVE = 'assets/files/docs/pmb_2';
 const DOC_IMAGES_BASE_PUBLIC = `/${DOC_IMAGES_BASE_RELATIVE}`;
 
 const dupBilingual = (v) => [v, v];
+
+const JSZip = require('jszip');
+const DATASET_BUILDER_URL = process.env.DATASET_BUILDER_URL || 'http://cloud.microlumin.com:5005';
+const PMB_BASE_DIR = path.join(__dirname, '../../public/assets/files/docs');
+
+// Default generation payload — sensible defaults for a random DC circuit.
+const DEFAULT_GENERATION_PAYLOAD = {
+  generation: {
+    circuitOption: 'random',
+    circuitType: 'dc',
+    Nodes: 'random',          NodesFixed: null,
+    Branches: 'random',       BranchesFixed: null,
+    Resistors: 'random',      ResistorsFixed: null,
+    ResistorsMinRange: 1,     ResistorsMaxRange: 1000,
+    Capacitors: 'random',     CapacitorsFixed: null,
+    CapacitorsMinRange: 10,   CapacitorsMaxRange: 1000,
+    Inductors: 'random',      InductorsFixed: null,
+    InductorsMinRange: 10,    InductorsMaxRange: 1000,
+    VoltageSources: 'random', VoltageSourcesFixed: null,
+    VoltageSourcesMinRange: 1, VoltageSourcesMaxRange: 30,
+    CurrentSources: 'random', CurrentSourcesFixed: null,
+    CurrentSourcesMinRange: 1, CurrentSourcesMaxRange: 30,
+  },
+  debug: false,
+  keep: false,
+  slowmo_s: 0,
+};
  
 // Grounding document used for Create Questions
 const GROUNDING_DOC_PATH = path.join(
@@ -275,18 +302,246 @@ async function showPlayground(req, res) {
     res.status(500).send('Internal Server Error');
   }
 }
- 
+
+// Find the next free pmb_N directory under PMB_BASE_DIR and create it.
+async function allocateNextPmbDir() {
+  const entries = await fsp.readdir(PMB_BASE_DIR, { withFileTypes: true });
+  let maxN = 0;
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const m = entry.name.match(/^pmb_(\d+)$/);
+    if (m) {
+      const n = parseInt(m[1], 10);
+      if (n > maxN) maxN = n;
+    }
+  }
+  const number = maxN + 1;
+  const dirPath = path.join(PMB_BASE_DIR, `pmb_${number}`);
+  await fsp.mkdir(dirPath, { recursive: true });
+  return { number, dirPath };
+}
+
+// Extract every file in `zipBuffer` into `targetDir`, preserving subfolders.
+async function extractZipSubfolder(zipBuffer, targetDir, subfolder) {
+  const prefix = subfolder.endsWith('/') ? subfolder : `${subfolder}/`;
+  const zip = await JSZip.loadAsync(zipBuffer);
+  const entries = Object.values(zip.files);
+
+  await Promise.all(
+    entries.map(async (entry) => {
+      const normalised = entry.name.replace(/\\/g, '/');
+      if (!normalised.startsWith(prefix)) return;
+
+      const relPath = normalised.slice(prefix.length);
+      if (!relPath) return; // the directory entry itself
+
+      if (relPath.includes('..')) {
+        throw new Error(`Refusing to extract suspicious path: ${entry.name}`);
+      }
+
+      const destPath = path.join(targetDir, relPath);
+
+      if (entry.dir) {
+        await fsp.mkdir(destPath, { recursive: true });
+        return;
+      }
+
+      await fsp.mkdir(path.dirname(destPath), { recursive: true });
+      const buf = await entry.async('nodebuffer');
+      await fsp.writeFile(destPath, buf);
+    })
+  );
+}
+
+// PK = 0x50 0x4B → real ZIP. Anything else means the API returned a JSON error.
+function assertZipBuffer(buffer, stage, status) {
+  const isZip = buffer.length >= 2 && buffer[0] === 0x50 && buffer[1] === 0x4b;
+  if (!isZip) {
+    const preview = buffer.toString('utf8').slice(0, 300);
+    throw new Error(`${stage} returned non-ZIP (HTTP ${status}): ${preview}`);
+  }
+  return buffer;
+}
+
+async function readZipFile(zipBuffer, name, mode = 'string') {
+  const zip = await JSZip.loadAsync(zipBuffer);
+  const file = zip.file(name);
+  if (!file) throw new Error(`Missing "${name}" in ZIP.`);
+  return file.async(mode);
+}
+
+async function stageGenerate() {
+  const res = await fetch(`${DATASET_BUILDER_URL}/api/generate`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Request-Id': `pmb-gen-${Date.now()}`,
+    },
+    body: JSON.stringify(DEFAULT_GENERATION_PAYLOAD),
+  });
+  const buf = Buffer.from(await res.arrayBuffer());
+  assertZipBuffer(buf, 'generate', res.status);
+
+  // Sanity check: netlist-raw.txt sometimes arrives as schematic JSON.
+  const raw = await readZipFile(buf, 'netlist-raw.txt');
+  if (raw.trim().startsWith('{')) {
+    throw new Error('generate produced an invalid netlist (looks like JSON). Retry.');
+  }
+  return buf;
+}
+
+async function stageFixNetlist(genZipBuffer) {
+  const raw = await readZipFile(genZipBuffer, 'netlist-raw.txt');
+
+  // Repack as a ZIP whose only file is netlist.txt (rename required by the API).
+  const inZip = new JSZip();
+  inZip.file('netlist.txt', raw);
+  const inBuf = await inZip.generateAsync({ type: 'nodebuffer' });
+
+  const res = await fetch(`${DATASET_BUILDER_URL}/api/fix-netlist`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/zip',
+      'X-Request-Id': `pmb-fix-${Date.now()}`,
+    },
+    body: inBuf,
+  });
+  return assertZipBuffer(Buffer.from(await res.arrayBuffer()), 'fix-netlist', res.status);
+}
+
+async function stageSimulate(fixedZipBuffer) {
+  const res = await fetch(
+    `${DATASET_BUILDER_URL}/api/simulate?methods=lcm&integral=1`,
+    {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/zip',
+        'X-Request-Id': `pmb-sim-${Date.now()}`,
+      },
+      body: fixedZipBuffer,
+    }
+  );
+  return assertZipBuffer(Buffer.from(await res.arrayBuffer()), 'simulate', res.status);
+}
+
+async function stageRender(genZipBuffer, simZipBuffer) {
+  const circuitJson = await readZipFile(genZipBuffer, 'circuit.json');
+  const lcmJson = await readZipFile(simZipBuffer, 'lcm-results.json');
+
+  const inZip = new JSZip();
+  inZip.file('circuit.json', circuitJson);
+  inZip.file('lcm-results.json', lcmJson);
+  const inBuf = await inZip.generateAsync({ type: 'nodebuffer' });
+
+  const form = new FormData();
+  form.append(
+    'zip',
+    new Blob([inBuf], { type: 'application/zip' }),
+    'render_in.zip'
+  );
+  form.append(
+    'options',
+    JSON.stringify({
+      meshes:   { show_arrows: true, show_label: true },
+      branches: { show: true, show_labels: true },
+      labels:   { mode: 'ref_v1' },
+    })
+  );
+
+  const res = await fetch(
+    `${DATASET_BUILDER_URL}/api/render?circuit=1&branches=1&meshes=1&nodes=1&currents=1`,
+    {
+      method: 'POST',
+      headers: { 'X-Request-Id': `pmb-ren-${Date.now()}` },
+      body: form,
+    }
+  );
+  return assertZipBuffer(Buffer.from(await res.arrayBuffer()), 'render', res.status);
+}
+
+async function stagePedagogical(genZipBuffer, simZipBuffer, renderZipBuffer) {
+  const circuitJson = await readZipFile(genZipBuffer, 'circuit.json');
+  const lcmJson = await readZipFile(simZipBuffer, 'lcm-results.json');
+  const renderZip = await JSZip.loadAsync(renderZipBuffer);
+
+  const inZip = new JSZip();
+  inZip.file('input/circuit.json', circuitJson);
+  inZip.file('input/lcm-results.json', lcmJson);
+
+  // Copy every rendered asset under output/<original-path>.
+  const outputFolder = inZip.folder('output');
+  const copies = [];
+  renderZip.forEach((relPath, file) => {
+    if (file.dir) return;
+    copies.push(
+      file.async('nodebuffer').then((buf) => outputFolder.file(relPath, buf))
+    );
+  });
+  await Promise.all(copies);
+
+  const inBuf = await inZip.generateAsync({ type: 'nodebuffer' });
+
+  const form = new FormData();
+  form.append(
+    'input_zip',
+    new Blob([inBuf], { type: 'application/zip' }),
+    'ped_in.zip'
+  );
+  form.append(
+    'options',
+    JSON.stringify({
+      lang: 'pt',
+      decimal_comma: true,
+      input_root: 'input',
+      output_root: 'output',
+    })
+  );
+
+  const res = await fetch(
+    `${DATASET_BUILDER_URL}/api/pedagogical-md/lcm`,
+    {
+      method: 'POST',
+      headers: { 'X-Request-Id': `pmb-ped-${Date.now()}` },
+      body: form,
+    }
+  );
+  return assertZipBuffer(Buffer.from(await res.arrayBuffer()), 'pedagogical', res.status);
+}
+
 async function createPmb(req, res) {
   try {
-    // TODO: insert PMB row(s) into the DB here.
+    console.log('[playground] createPmb — pipeline starting');
+
+    const genZip    = await stageGenerate();        console.log('[playground] generate ✓');
+    const fixedZip  = await stageFixNetlist(genZip); console.log('[playground] fix-netlist ✓');
+    const simZip    = await stageSimulate(fixedZip); console.log('[playground] simulate ✓');
+    const renderZip = await stageRender(genZip, simZip); console.log('[playground] render ✓');
+    const pedZip    = await stagePedagogical(genZip, simZip, renderZip); console.log('[playground] pedagogical ✓');
+
+    const { number, dirPath } = await allocateNextPmbDir();
+    await extractZipSubfolder(pedZip, dirPath, 'output');
+
+    console.log(
+      `[playground] createPmb — extracted ${pedZip.length} bytes to ${dirPath}`
+    );
+
     req.session.flash = {
       type: 'success',
-      messageKey: 'flashes.pmb_placeholder'
+      messageKey: 'flashes.pmb_created',
+      messageVars: {
+        pmbNumber: number,
+        sizeKb: Math.round(pedZip.length / 1024),
+      },
     };
   } catch (err) {
-    console.error('Playground createPmb error:', err);
-    req.session.flash = { type: 'danger', messageKey: 'flashes.pmb_failed' };
+    console.error('[playground] createPmb failed:', err);
+    req.session.flash = {
+      type: 'danger',
+      messageKey: 'flashes.pmb_failed',
+      messageVars: { error: err.message },
+    };
   }
+
   return res.redirect('/playground');
 }
  
