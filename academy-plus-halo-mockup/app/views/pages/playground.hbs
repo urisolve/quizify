@@ -35,9 +35,16 @@
           </div>
  
           <div class="mt-auto">
-            <form method="POST" action="/playground/create-pmb">
+            <form method="POST" action="/playground/create-pmb" data-disable-on-submit>
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
-                <i class="ti ti-plus me-2"></i>{{ t 'playground.pmbbutton' }}
+                <span class="btn-label">
+                  <i class="ti ti-plus me-2"></i>{{ t 'playground.pmbbutton' }}
+                </span>
+                <span class="btn-loading d-none">
+                  <span class="spinner-border spinner-border-sm me-2"
+                        role="status" aria-hidden="true"></span>
+                  {{ t 'playground.pmbloading' }}
+                </span>
               </button>
             </form>
           </div>
@@ -198,3 +205,5 @@
   
   </div>
 </div>
+
+<script src="/js/pages/playground.js"></script>

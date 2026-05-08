@@ -170,7 +170,8 @@
         "labelImage": "Imagem do circuito selecionada pelo modelo",
         "review_all": "Revisão Geral",
         "review_critical": "Questões Críticas",
-        "review_unrated": "Sem Classificação"
+        "review_unrated": "Sem Classificação",
+        "pmbloading": "A criar..."
     },
     "playgroundreview": {
         "type": "tipo: ",

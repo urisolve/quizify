@@ -161,7 +161,8 @@
         "labelImage": "Circuit image selected by the model",
         "review_all": "General Review",
         "review_critical": "Critical Questions",
-        "review_unrated": "Unrated Questions"
+        "review_unrated": "Unrated Questions",
+        "pmbloading": "Creating..."
     },
     "playgroundreview": {
         "type": "type: ",
