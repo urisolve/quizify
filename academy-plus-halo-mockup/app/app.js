@@ -26,9 +26,9 @@ const PORT = process.env.PORT;
 const seedDatabase = require('../db/seed');
 const topicsPath = path.join(__dirname, '../db/insert_topics.sql');
 const subtopicsPath = path.join(__dirname, '../db/insert_subtopics.sql');
-const questionsPath = path.join(__dirname, '../db/insert_questions.sql');
-const usersPath = path.join(__dirname, '../db/insert_users.sql');
-const docsPath = path.join(__dirname, '../db/insert_docs.sql');
+//const questionsPath = path.join(__dirname, '../db/insert_questions.sql');
+//const usersPath = path.join(__dirname, '../db/insert_users.sql');
+//const docsPath = path.join(__dirname, '../db/insert_docs.sql');
 
 //* i18next configuration
 i18next
@@ -223,7 +223,7 @@ async function waitForDB(retries = 10, delay = 3000) {
     await initTrainingTable();
     await initUserSubtopicProgressTable();
     console.log('All tables ensured/created.');
-    await seedDatabase([topicsPath, subtopicsPath, docsPath, questionsPath, usersPath]);
+    await seedDatabase([topicsPath, subtopicsPath]); // , docsPath, questionsPath, usersPath
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

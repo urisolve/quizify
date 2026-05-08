@@ -9,6 +9,7 @@ const fsp = fs.promises;
  
 const db = require('../../config/db');
 const { createQuestion } = require('../../models/Questions');
+const { addRagDocument } = require('../../models/Documents');
  
 dotenv.config();
  
@@ -353,6 +354,25 @@ async function extractZipSubfolder(zipBuffer, targetDir, subfolder) {
   );
 }
 
+async function extractZipBuffer(zipBuffer, targetDir) {
+  const zip = await JSZip.loadAsync(zipBuffer);
+  await Promise.all(
+    Object.values(zip.files).map(async (entry) => {
+      const safeRel = entry.name.replace(/\\/g, '/');
+      if (safeRel.includes('..')) {
+        throw new Error(`Refusing to extract suspicious path: ${entry.name}`);
+      }
+      const destPath = path.join(targetDir, safeRel);
+      if (entry.dir) {
+        await fsp.mkdir(destPath, { recursive: true });
+        return;
+      }
+      await fsp.mkdir(path.dirname(destPath), { recursive: true });
+      await fsp.writeFile(destPath, await entry.async('nodebuffer'));
+    })
+  );
+}
+
 // PK = 0x50 0x4B → real ZIP. Anything else means the API returned a JSON error.
 function assertZipBuffer(buffer, stage, status) {
   const isZip = buffer.length >= 2 && buffer[0] === 0x50 && buffer[1] === 0x4b;
@@ -368,6 +388,240 @@ async function readZipFile(zipBuffer, name, mode = 'string') {
   const file = zip.file(name);
   if (!file) throw new Error(`Missing "${name}" in ZIP.`);
   return file.async(mode);
+}
+
+async function buildOutputOnlyZip(pedZipBuffer, netlistText) {
+  const inZip = await JSZip.loadAsync(pedZipBuffer);
+  const outZip = new JSZip();
+  const prefix = 'output/';
+
+  const tasks = [];
+  inZip.forEach((relPath, entry) => {
+    if (!relPath.startsWith(prefix) || entry.dir) return;
+    const stripped = relPath.slice(prefix.length);
+
+    tasks.push(
+      (async () => {
+        if (stripped === 'lcm_pedagogical_solution_pt.md') {
+          const original = await entry.async('string');
+          const rebuilt  = restructurePedagogicalMarkdown(original, netlistText);
+          outZip.file(stripped, rebuilt);
+        } else {
+          outZip.file(stripped, await entry.async('nodebuffer'));
+        }
+      })()
+    );
+  });
+
+  await Promise.all(tasks);
+  return outZip.generateAsync({ type: 'nodebuffer' });
+}
+
+// Edit the markdown.
+function restructurePedagogicalMarkdown(md, netlistText) {
+  // ---------- helpers ----------
+  // Grab everything between a heading and the next heading at the same level
+  // (or shallower).
+  function sliceSection(text, headingRegex, sameOrShallowerLevel) {
+    const start = text.match(headingRegex);
+    if (!start) return '';
+    const after = text.slice(start.index + start[0].length);
+    const stop = after.match(
+      new RegExp(`^#{1,${sameOrShallowerLevel}} `, 'm')
+    );
+    return (stop ? after.slice(0, stop.index) : after).trim();
+  }
+
+  // First markdown table found in a chunk of text.
+  function firstTable(text) {
+    const m = text.match(/\|[^\n]*\|\n\|[^\n]*\|\n(?:\|[^\n]*\|\n?)+/);
+    return m ? m[0].trim() : '';
+  }
+  // Number of data rows in a table (header + separator excluded).
+  function rowCount(table) {
+    const lines = table.split('\n').filter((l) => l.startsWith('|'));
+    return Math.max(0, lines.length - 2);
+  }
+
+  // ---------- extract pieces ----------
+  const esquematicoImg =
+    (md.match(/!\[Esquemático do Circuito\][^\n]+/) || [''])[0];
+
+  const tabelaCompSection = sliceSection(md, /^### Tabela de Componentes\s*$/m, 3);
+  const componentsTable = firstTable(tabelaCompSection);
+
+  const simType =
+    (md.match(/\*\*Tipo de Simulação:\*\*\s+([^\n]+)/) || ['', 'DC'])[1].trim();
+
+  const nosSection = sliceSection(md, /^## Nós\s*$/m, 2);
+  const nosTable = firstTable(nosSection);
+  const nosCount = rowCount(nosTable);
+
+  const ramosSection = sliceSection(md, /^## Ramos\s*$/m, 2);
+  const ramosTable = firstTable(ramosSection);
+  const ramosCount = rowCount(ramosTable);
+
+  const bnc = md.match(
+    /B\s*&=\s*(\d+)\s*\\\\\s*N\s*&=\s*(\d+)\s*\\\\\s*C\s*&=\s*(\d+)/
+  );
+  const [B, N, C] = bnc ? [bnc[1], bnc[2], bnc[3]] : ['?', '?', '?'];
+
+  const mpExpr =
+    (md.match(/Mp\s*&=\s*B\s*-\s*\(N\s*-\s*1\)\s*-\s*C\s*=\s*([^\\\n]+)/) || [
+      '',
+      `${B} - (${N} - 1) - ${C}`,
+    ])[1].trim();
+
+  const Ma = (md.match(/Ma\s*&=\s*C\s*=\s*(\d+)/) || ['', '0'])[1];
+
+  // Mesh catalog: each "### Malha M<n>" + its table.
+  const catalogSection = sliceSection(
+    md,
+    /^## Catálogo de malhas[^\n]*$/m,
+    1
+  );
+  const meshBlocks = [];
+  const meshRe = /### Malha (M\d+)\s*\n([\s\S]*?)(?=\n### Malha M\d+|\n# |\n## |$)/g;
+  let mm;
+  while ((mm = meshRe.exec(catalogSection)) !== null) {
+    meshBlocks.push({ name: mm[1], table: firstTable(mm[2]) });
+  }
+
+  const finalSystem = sliceSection(
+    md,
+    /^### Sistema de Equações Final\s*$/m,
+    3
+  );
+
+  const mpResultsBlock =
+    (sliceSection(md, /^### Correntes de malha \(resultado\)\s*$/m, 3).match(
+      /\$\$[\s\S]*?\$\$/
+    ) || [''])[0];
+
+  const correntesViz = sliceSection(
+    md,
+    /^### Visualização das Correntes\s*$/m,
+    3
+  );
+
+  // The currents-by-branch table is the last table in the document.
+  const allTables =
+    md.match(/\|[^\n]*\|\n\|[^\n]*\|\n(?:\|[^\n]*\|\n?)+/g) || [];
+  const correntesTable = (allTables[allTables.length - 1] || '').trim();
+
+  // ---------- assemble ----------
+  const meshesRendered = meshBlocks
+    .map((b, i) => {
+      const lvl = i === 0 ? '###' : '####';
+      return [
+        `${lvl} Malha ${b.name}`,
+        `![Malha ${b.name}](mesh-exports/01-all-meshes/${b.name}.png)`,
+        '',
+        b.table,
+      ].join('\n');
+    })
+    .join('\n\n');
+
+  return `# Método das Correntes nas Malhas
+
+# Interpretação do Circuito
+
+## Esquemático
+
+${esquematicoImg}
+
+## Netlist
+
+\`\`\`text
+${netlistText.trim()}
+\`\`\`
+
+## Elementos
+
+### Tabela de Componentes
+
+${componentsTable}
+
+---
+
+## Informações do circuito
+
+**Tipo de Simulação:** ${simType}
+
+### Nós
+
+Neste circuito existem ${nosCount} nós e são os seguintes:
+
+${nosTable}
+
+### Ramos
+
+Neste circuito existem ${ramosCount} ramos e são os seguintes:
+
+${ramosTable}
+
+### Número de equações
+
+#### Contagem de ramos, nós e fontes de corrente ideais
+
+$$
+\\begin{aligned}
+B &= ${B} \\\\
+N &= ${N} \\\\
+C &= ${C}
+\\end{aligned}
+$$
+
+#### Número de equações (malhas principais)
+
+$$
+\\begin{aligned}
+Mp &= B - (N - 1) - C = ${mpExpr} \\\\
+\\end{aligned}
+$$
+
+#### Número de malhas auxiliares (fontes de corrente)
+
+$$
+\\begin{aligned}
+Ma &= C = ${Ma}
+\\end{aligned}
+$$
+
+# Escolha das Malhas
+
+## Malhas
+
+Neste circuito existem ${meshBlocks.length} malhas e são as seguintes:
+
+Cada malha está apresentada pelo seu esquemático e pelos seus constituintes: ramos e componentes
+
+${meshesRendered}
+
+# Escrita das equações
+
+## Malhas escolhidas
+
+![Sobreposição das Malhas](mesh-exports/04-selected-combined/selected-meshes.png)
+
+## Sistema de Equações Final
+
+${finalSystem}
+
+## Correntes de malha (resultado)
+
+${mpResultsBlock}
+
+# Cálculo das correntes
+
+## Visualização das Correntes
+
+${correntesViz}
+
+## Valores das correntes
+
+${correntesTable}
+`;
 }
 
 async function stageGenerate() {
@@ -514,15 +768,25 @@ async function createPmb(req, res) {
 
     const genZip    = await stageGenerate();        console.log('[playground] generate ✓');
     const fixedZip  = await stageFixNetlist(genZip); console.log('[playground] fix-netlist ✓');
+    const netlistText = await readZipFile(fixedZip, 'netlist.txt');
     const simZip    = await stageSimulate(fixedZip); console.log('[playground] simulate ✓');
     const renderZip = await stageRender(genZip, simZip); console.log('[playground] render ✓');
     const pedZip    = await stagePedagogical(genZip, simZip, renderZip); console.log('[playground] pedagogical ✓');
 
+    // Edit the markdown and rebuild a ZIP containing only output/ contents.
+    const outputZip = await buildOutputOnlyZip(pedZip, netlistText);
+
     const { number, dirPath } = await allocateNextPmbDir();
-    await extractZipSubfolder(pedZip, dirPath, 'output');
+    await extractZipBuffer(outputZip, dirPath);
+
+    const ragDocumentId = await addRagDocument({
+      type_document: 'pmb',
+      filename: `pmb_${number}.zip`,
+      content: outputZip,
+    });
 
     console.log(
-      `[playground] createPmb — extracted ${pedZip.length} bytes to ${dirPath}`
+      `[playground] createPmb — saved row #${ragDocumentId}, ${outputZip.length} bytes`
     );
 
     req.session.flash = {
@@ -530,7 +794,7 @@ async function createPmb(req, res) {
       messageKey: 'flashes.pmb_created',
       messageVars: {
         pmbNumber: number,
-        sizeKb: Math.round(pedZip.length / 1024),
+        sizeKb: Math.round(outputZip.length / 1024),
       },
     };
   } catch (err) {
