@@ -11,7 +11,7 @@ Requirements:
 - Ask about topology (counting or identifying), not about numeric KVL/KCL solving.
 - The correct answer must be directly supported by the grounding document.
 - Provide at least 3 plausible but incorrect distractors in Portuguese.
-- Feedback must briefly explain why the correct answer is correct and cite the relevant subsection name (Nós, Ramos, or Número de Equações).
+- Feedback must be a short pedagogical hint that helps the student think about the problem WITHOUT revealing the correct answer or showing the calculation.
 - Return the image path of the schematic.
 - Difficulty: introductory.', NULL, NULL, NULL),
 (2, 1, 'Escolha das Malhas', 'Selecionar e marcar Ma Malhas Auxiliares e Mp malhas principais', NULL, TRUE, 0, 3, 0, 0, 0,'
@@ -20,7 +20,7 @@ The question must focus on selecting and marking Ma Malhas Auxiliares (auxiliary
 Requirements:
 - The correct answer must be directly supported by the grounding document.
 - Provide at least 3 plausible but incorrect distractors in Portuguese.
-- Feedback must briefly explain why the correct mesh choice is valid (or why the others are not), and cite the relevant document section.
+- Feedback must be a short pedagogical hint that helps the student think about the problem WITHOUT revealing the correct answer or showing the calculation.
 - Return an image path of the selected meshes diagram (e.g., "mesh-exports/04-selected-combined/selected-meshes.png").
 - Difficulty: introductory.', NULL, NULL, NULL),
 (3, 1, 'Escrita de Equações', 'Construir as Mp equações de malha, com base na Lei das Malhas e considerando as correntes de malha que influenciam cada carga', NULL, TRUE, 0, 3, 0, 0, 0,'
@@ -29,7 +29,7 @@ The question must focus on building the M mesh equations using Kirchhoff\'s Volt
 Requirements:
 - The correct answer must be directly supported by the grounding document.
 - Provide at least 3 plausible but incorrect distractors in Portuguese (commonly: wrong sign, missing current, wrong load).
-- Feedback must briefly explain why the correct equation/term is right and cite the relevant document section.
+- Feedback must be a short pedagogical hint that helps the student think about the problem WITHOUT revealing the correct answer or showing the calculation.
 - Return an image path of the selected resolution meshes under discussion (e.g., a specific mesh image or the combined meshes image).
 - Difficulty: introductory to intermediate.', NULL, NULL, NULL),
 (4, 1, 'Cálculo das Correntes', 'Calcular as correntes nos ramos', NULL, TRUE, 0, 3, 0, 0, 0,'
@@ -38,7 +38,7 @@ The question must focus on calculating the currents in the branches once the mes
 Requirements:
 - The correct answer must be directly supported by the grounding document.
 - Provide at least 3 plausible but incorrect distractors in Portuguese (e.g. wrong sign, swapped currents, omitted term).
-- Feedback must briefly explain the calculation step by step and cite the relevant document section.
+- Feedback must be a short pedagogical hint that helps the student think about the problem WITHOUT revealing the correct answer or showing the calculation.
 - Return an image path of the branch currents figure (e.g., something under "current-exports/" or "branch-exports/").
 - Difficulty: intermediate.', NULL, NULL, NULL)
 ON DUPLICATE KEY UPDATE

@@ -171,7 +171,8 @@
         "review_all": "Revisão Geral",
         "review_critical": "Questões Críticas",
         "review_unrated": "Sem Classificação",
-        "pmbloading": "A criar..."
+        "loading": "A criar...",
+        "edit_question": "Editar pergunta"
     },
     "playgroundreview": {
         "type": "tipo: ",
@@ -203,7 +204,16 @@
         "review_done_unrated": "Já reviste todas as questões sem classificação. Lista reiniciada.",
         "pmb_placeholder": "PMB a ser criado",
         "pmb_created": "PMB criado em pmb_{{pmbNumber}}/ped.zip ({{sizeKb}} KB).",
-        "pmb_failed": "Falha ao criar PMB: {{error}}"
+        "pmb_failed": "Falha ao criar PMB: {{error}}",
+        "question_updated": "Questão atualizada"
+    },
+    "questionedit":{
+        "fields_title": "Editar Pergunta",
+        "question": "Pergunta",
+        "correct": "Resposta correta",
+        "distractors": "Distratores",
+        "feedback": "Feedback",
+        "save": "Guardar"
     },
     "auth": {
         "user_created": "Utilizador criado com sucesso",

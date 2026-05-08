@@ -35,6 +35,8 @@ router.post('/playground/create-questions', requireAuthentication, playgroundCon
 router.get ('/playground/review', requireAuthentication, playgroundController.showReviewQuestion);
 router.post('/playground/review/rate', requireAuthentication, playgroundController.submitReviewRating);
 router.get('/pmb-asset/:id/*', requireAuthentication, playgroundController.servePmbAsset);
+router.get('/playground/questions/:id/edit', requireAuthentication, playgroundController.showQuestionEdit);
+router.post('/playground/questions/:id', requireAuthentication, playgroundController.updateQuestionFields);
 
 const leaderboardPageController = require('../controllers/pages/leaderboardController');
 router.get('/leaderboard', requireAuthentication, leaderboardPageController);

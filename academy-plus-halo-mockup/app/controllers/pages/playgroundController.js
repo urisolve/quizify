@@ -79,6 +79,7 @@ Constraints:
 - "incorrect_answer" should be a flat array of at least 3 plain-text distractors in Portuguese.
 - All strings must be plain text, no JSON, no HTML.
 - All the answers should contain only portuguese content based on the document.
+- "feedback" must be a SHORT pedagogical HINT that nudges the student toward the right reasoning. It MUST NOT contain the correct answer, the numerical result, or a step-by-step solution.
 - "circuit_image" MUST be one of these path patterns (and only one):
   • "circuit-png/00-combined.png"  (overall schematic)
   • "node-exports/nodes-combined.png"  (all nodes)
@@ -910,6 +911,7 @@ async function createPmb(req, res) {
  
 async function createQuestions(req, res) {
   let rawText = '';
+  let newQuestionId = null;
 
   try {
     // Read and validate the chosen subtopic.
@@ -982,7 +984,7 @@ async function createQuestions(req, res) {
     validateQuestionShape(question, pmb.ragDocumentId);
  
     console.log('[playground] createQuestions — inserting row');
-    await createQuestion({
+    newQuestionId = await createQuestion({
       subtopic_id: subtopicId,
       rag_document_id: pmb.ragDocumentId,
       question_type: 'EM',
@@ -998,6 +1000,7 @@ async function createQuestions(req, res) {
       type: 'success',
       messageKey: 'flashes.question_created',
       generatedQuestion: {
+        id: newQuestionId,
         ...question,
         image: question.circuit_image,
         subtopicId,
@@ -1017,6 +1020,7 @@ async function createQuestions(req, res) {
       messageVars: { error: err.message }
     };
   }
+
   return res.redirect('/playground');
 }
 
@@ -1166,6 +1170,11 @@ async function submitReviewRating(req, res) {
       ? req.query.mode
       : 'all';
 
+  // If the rating came from the edit page, the form sends a return_to hint.
+  const returnTo = req.body?.return_to;
+
+  let questionId;
+
   try {
     const questionId = parseInt(req.body.questionId, 10);
     const rating = parseInt(req.body.rating, 10);
@@ -1202,7 +1211,143 @@ async function submitReviewRating(req, res) {
     };
   }
 
+  if (returnTo === 'edit' && questionId) {
+    return res.redirect(`/playground/questions/${questionId}/edit`);
+  }
+  if (returnTo === 'playground') {
+    return res.redirect('/playground');
+  }
   return res.redirect(`/playground/review?mode=${encodeURIComponent(mode)}`);
+}
+
+async function showQuestionEdit(req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) return res.status(400).send('Bad request');
+
+    const lang = req.language;
+
+    const [rows] = await db.query(
+      `SELECT id, subtopic_id, rag_document_id, question_type,
+              question_text, image, correct_answer, incorrect_answer,
+              feedback, difficulty,
+              rating_count_teacher, rating_sum_teacher,
+              rating_count_student, rating_sum_student
+         FROM questions
+        WHERE id = ?
+        LIMIT 1`,
+      [id]
+    );
+    if (!rows.length) {
+      req.session.flash = { type: 'danger', messageKey: 'flashes.question_not_found' };
+      return res.redirect('/playground');
+    }
+
+    const q = rows[0];
+
+    // Editable PT slots for the form.
+    const parseJson = (v) => (v == null ? null : (typeof v === 'string' ? JSON.parse(v) : v));
+    const questionPt   = parseJson(q.question_text)?.[0]    || '';
+    const correctPt    = parseJson(q.correct_answer)?.[0]   || '';
+    const incorrectsPt = parseJson(q.incorrect_answer)?.[0] || ['', '', ''];
+    const feedbackPt   = parseJson(q.feedback)?.[0]         || '';
+
+    // Localized values + shuffled answers, matching playground_review.
+    const incorrects = pickLocaleArray(q.incorrect_answer, lang)
+      .filter((a) => a && String(a).trim())
+      .map((text) => ({ text, correct: false }));
+    shuffle(incorrects);
+    const answers = shuffle([
+      { text: pickLocale(q.correct_answer, lang), correct: true },
+      ...incorrects.slice(0, 3),
+    ]);
+
+    const teacherAvg = q.rating_count_teacher
+      ? (Number(q.rating_sum_teacher) / Number(q.rating_count_teacher)).toFixed(2)
+      : '–';
+    const studentAvg = q.rating_count_student
+      ? (Number(q.rating_sum_student) / Number(q.rating_count_student)).toFixed(2)
+      : '–';
+
+    const imagePath = q.image
+      ? (String(q.image).startsWith('/') ? q.image : `/${q.image}`)
+      : null;
+
+    const flash = req.session.flash || null;
+    delete req.session.flash;
+
+    res.renderPage('playground_question_edit', {
+      layout: 'main',
+      headerTitle: 'Edit question',
+      user: req.session.user,
+      flash,
+      subtopicId: q.subtopic_id,
+      mode: 'all',
+      question: {
+        id: q.id,
+        question_type: q.question_type,
+        difficulty: q.difficulty,
+        image: imagePath,
+        rating_count_teacher: q.rating_count_teacher,
+        rating_avg_teacher: teacherAvg,
+        rating_count_student: q.rating_count_student,
+        rating_avg_student: studentAvg,
+        // Editable PT fields
+        question_text: questionPt,
+        correct_answer: correctPt,
+        incorrect_answers: incorrectsPt,
+        feedback: feedbackPt,
+      },
+      answers,
+    });
+  } catch (err) {
+    console.error('[playground] showQuestionEdit failed:', err);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+async function updateQuestionFields(req, res) {
+  const id = parseInt(req.params.id, 10);
+  try {
+    if (!Number.isInteger(id)) throw new Error('Bad request');
+
+    const questionPt   = String(req.body.question_text || '').trim();
+    const correctPt    = String(req.body.correct_answer || '').trim();
+    const feedbackPt   = String(req.body.feedback || '').trim();
+    const incorrectsPt = (req.body.incorrect_answer || [])
+      .map((s) => String(s || '').trim())
+      .filter(Boolean);
+
+    if (!questionPt || !correctPt || incorrectsPt.length < 3) {
+      throw new Error('Question, correct answer, and at least 3 distractors are required.');
+    }
+
+    await db.query(
+      `UPDATE questions
+          SET question_text    = ?,
+              correct_answer   = ?,
+              incorrect_answer = ?,
+              feedback         = ?
+        WHERE id = ?`,
+      [
+        JSON.stringify([questionPt, questionPt]),
+        JSON.stringify([correctPt, correctPt]),
+        JSON.stringify([incorrectsPt, incorrectsPt]),
+        JSON.stringify([feedbackPt, feedbackPt]),
+        id,
+      ]
+    );
+
+    req.session.flash = { type: 'success', messageKey: 'flashes.question_updated' };
+  } catch (err) {
+    console.error('[playground] updateQuestionFields failed:', err);
+    req.session.flash = {
+      type: 'danger',
+      messageKey: 'flashes.question_update_failed',
+      messageVars: { error: err.message },
+    };
+  }
+  return res.redirect(`/playground/questions/${id}/edit`);
 }
 
  
@@ -1212,5 +1357,7 @@ module.exports = {
   createQuestions,
   showReviewQuestion,
   submitReviewRating,
-  servePmbAsset
+  servePmbAsset,
+  showQuestionEdit,        
+  updateQuestionFields
 };

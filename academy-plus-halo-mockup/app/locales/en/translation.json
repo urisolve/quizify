@@ -162,7 +162,8 @@
         "review_all": "General Review",
         "review_critical": "Critical Questions",
         "review_unrated": "Unrated Questions",
-        "pmbloading": "Creating..."
+        "loading": "Creating...",
+        "edit_question": "Edit question"
     },
     "playgroundreview": {
         "type": "type: ",
@@ -194,7 +195,16 @@
         "review_done_unrated": "You've reviewed every unrated question. The queue has been reset.",
         "pmb_placeholder": "PMB being created",
         "pmb_created": "PMB saved to pmb_{{pmbNumber}}/ped.zip ({{sizeKb}} KB).",
-        "pmb_failed": "Failed to create PMB: {{error}}"
+        "pmb_failed": "Failed to create PMB: {{error}}",
+        "question_updated": "Question updated"
+    },
+        "questionedit":{
+        "fields_title": "Edit question",
+        "question": "Question",
+        "correct": "Correct answer",
+        "distractors": "Distractors",
+        "feedback": "Feedback",
+        "save": "Save"
     },
     "auth": {
         "user_created": "User created successfully",
