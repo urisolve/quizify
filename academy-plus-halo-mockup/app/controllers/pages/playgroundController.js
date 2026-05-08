@@ -26,6 +26,19 @@ const JSZip = require('jszip');
 const DATASET_BUILDER_URL = process.env.DATASET_BUILDER_URL || 'http://cloud.microlumin.com:5005';
 const PMB_BASE_DIR = path.join(__dirname, '../../public/assets/files/docs');
 
+const MIME_BY_EXT = {
+  png: 'image/png',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  gif: 'image/gif',
+  webp: 'image/webp',
+  svg: 'image/svg+xml',
+  pdf: 'application/pdf',
+  md:  'text/markdown; charset=utf-8',
+  json: 'application/json; charset=utf-8',
+  txt: 'text/plain; charset=utf-8',
+};
+
 // Default generation payload — sensible defaults for a random DC circuit.
 const DEFAULT_GENERATION_PAYLOAD = {
   generation: {
@@ -49,12 +62,6 @@ const DEFAULT_GENERATION_PAYLOAD = {
   slowmo_s: 0,
 };
  
-// Grounding document used for Create Questions
-const GROUNDING_DOC_PATH = path.join(
-  __dirname,
-  '../../public/assets/files/docs/pmb_2/lcm_pedagogical_solution_pt.md'
-);
- 
 // Keep the output easy to parse, but do not over-constrain the model on formatting.
 const JSON_SCHEMA_INSTRUCTIONS = `
 Return ONLY a JSON object. Use Portuguese-only content and keep the structure simple.
@@ -70,16 +77,24 @@ Return ONLY a JSON object. Use Portuguese-only content and keep the structure si
 Constraints:
 - "question_text", "correct_answer", and "feedback" should be plain strings in Portuguese.
 - "incorrect_answer" should be a flat array of at least 3 plain-text distractors in Portuguese.
-- "circuit_image" must be a relative image path from the pedagogical document (for example: "circuit-png/00-combined.png", "node-exports/nodes-combined.png").
 - All strings must be plain text, no JSON, no HTML.
 - All the answers should contain only portuguese content based on the document.
+- "circuit_image" MUST be one of these path patterns (and only one):
+  • "circuit-png/00-combined.png"  (overall schematic)
+  • "node-exports/nodes-combined.png"  (all nodes)
+  • "node-exports/03-with-circuit-combined/<NodeName>.png"  (single node)
+  • "branch-exports/branches-combined.png"  (all branches)
+  • "branch-exports/03-with-circuit-combined/B<n>.png"  (single branch)
+  • "mesh-exports/04-selected-combined/selected-meshes.png"  (chosen meshes)
+  • "mesh-exports/01-all-meshes/M<n>.png"  (single mesh from catalog)
+  • "mesh-exports/03-principal/Mp<n>.png"  (single principal mesh)
+  • "current-exports/03-with-circuit-combined/I<n>.png"  (single current)
+  • "current-exports/currents-combined.png"  (all currents)
+- Choose the path that best matches the question. Do NOT mix prefixes.
 - Respond with ONLY the JSON object. No prefix, no suffix, no commentary.
 `.trim();
  
-async function buildRagPayload() {
-  const content = await fsp.readFile(GROUNDING_DOC_PATH, 'utf8');
-  const name = path.basename(GROUNDING_DOC_PATH);
- 
+async function buildRagPayload(markdownContent, name) {
   return {
     enabled: true,
     top_k: 5,
@@ -94,60 +109,144 @@ async function buildRagPayload() {
       name,
       title: name,
       source_type: 'sample',
-      content,
+      content: markdownContent,
       mime_type: 'text/markdown',
-      size_bytes: Buffer.byteLength(content, 'utf8'),
-      line_count: content.split(/\r?\n/).length,
-      url: null
-    }
+      size_bytes: Buffer.byteLength(markdownContent, 'utf8'),
+      line_count: markdownContent.split(/\r?\n/).length,
+      url: null,
+    },
   };
 }
 
-function normalizeDocImageRelativePath(value) {
+function mimeFromName(name) {
+  const ext = (name.split('.').pop() || '').toLowerCase();
+  return MIME_BY_EXT[ext] || 'application/octet-stream';
+}
+
+async function servePmbAsset(req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id) || id <= 0) {
+      return res.status(400).send('Bad request');
+    }
+
+    // Express captures the wildcard portion as req.params[0]
+    const relPath = (req.params[0] || '').replace(/^\/+/, '');
+    if (!relPath || relPath.includes('..')) {
+      return res.status(400).send('Bad path');
+    }
+
+    const [rows] = await db.query(
+      `SELECT content FROM rag_documents
+        WHERE id = ? AND type_document = 'pmb'
+        LIMIT 1`,
+      [id]
+    );
+    if (!rows.length || !rows[0].content) {
+      return res.status(404).send('Not found');
+    }
+
+    const zip = await JSZip.loadAsync(rows[0].content);
+    const entry = zip.file(relPath);
+    if (!entry) {
+      return res.status(404).send('File not found in archive');
+    }
+
+    const buf = await entry.async('nodebuffer');
+    res.setHeader('Content-Type', mimeFromName(relPath));
+    res.setHeader('Cache-Control', 'public, max-age=86400');
+    return res.send(buf);
+  } catch (err) {
+    console.error('[pmb-asset] error:', err);
+    return res.status(500).send('Internal Server Error');
+  }
+}
+
+// Pick a random PMB from rag_documents, then read its on-disk markdown.
+// Returns { ragDocumentId, pmbNumber, markdownContent } or null if no PMBs exist.
+async function pickRandomPmbGrounding() {
+  const [rows] = await db.query(
+    `SELECT id, filename
+       FROM rag_documents
+      WHERE type_document = 'pmb'
+      ORDER BY RAND()
+      LIMIT 1`
+  );
+  if (!rows.length) return null;
+
+  const row = rows[0];
+  const m = (row.filename || '').match(/pmb_(\d+)\.zip$/);
+  if (!m) {
+    throw new Error(`Cannot derive folder from filename "${row.filename}".`);
+  }
+  const pmbNumber = parseInt(m[1], 10);
+
+  const mdPath = path.join(
+    PMB_BASE_DIR,
+    `pmb_${pmbNumber}`,
+    'lcm_pedagogical_solution_pt.md'
+  );
+
+  const [blobRows] = await db.query(
+    `SELECT content FROM rag_documents WHERE id = ?`,
+    [row.id]
+  );
+  const zip = await JSZip.loadAsync(blobRows[0].content);
+  const markdownContent = await zip.file('lcm_pedagogical_solution_pt.md').async('string');
+
+  return {
+    ragDocumentId: row.id,
+    pmbNumber,
+    markdownContent,
+  };
+}
+
+function buildPmbAssetUrl(ragDocumentId, relPath) {
+  return `/pmb-asset/${ragDocumentId}/${relPath.replace(/^\/+/, '')}`;
+}
+
+function fallbackImageBySubtopic(subtopicId, ragDocumentId) {
+  const url = (rel) => buildPmbAssetUrl(ragDocumentId, rel);
+  switch (subtopicId) {
+    case 1: return url('circuit-png/00-combined.png');
+    case 2: return url('mesh-exports/04-selected-combined/selected-meshes.png');
+    case 3: return url('mesh-exports/04-selected-combined/selected-meshes.png');
+    case 4: return url('branch-exports/branches-combined.png');
+    default: return url('circuit-png/00-combined.png');
+  }
+}
+
+function normalizeDocImageRelativePath(value, ragDocumentId) {
   const raw = typeof value === 'string' ? value.trim() : '';
   if (!raw) return null;
 
   const noQuotes = raw.replace(/^['"]|['"]$/g, '');
-  const cleaned = noQuotes.replace(/\\/g, '/').replace(/^\/+/, '');
+  let cleaned = noQuotes.replace(/\\/g, '/').replace(/^\/+/, '');
 
   if (cleaned.includes('..')) return null;
+  if (!/\.(png|jpg|jpeg|webp|gif|svg)$/i.test(cleaned)) return null;
 
-  const lowered = cleaned.toLowerCase();
-  if (!(/\.(png|jpg|jpeg|webp|gif|svg)$/i.test(cleaned))) {
-    return null;
-  }
+  // Strip any leading folder prefix HALO might have included.
+  cleaned = cleaned.replace(/^assets\/files\/docs\/pmb_\d+\//i, '');
+  cleaned = cleaned.replace(/^pmb_\d+\//i, '');
+  cleaned = cleaned.replace(/^pmb-asset\/\d+\//i, '');
+  cleaned = cleaned.replace(/^output\//, '');
 
-  if (
-    lowered.startsWith('circuit-png/') ||
-    lowered.startsWith('node-exports/') ||
-    lowered.startsWith('branch-exports/') ||
-    lowered.startsWith('mesh-exports/') ||
-    lowered.startsWith('current-exports/')
-  ) {
-    return `${DOC_IMAGES_BASE_RELATIVE}/${cleaned}`;
-  }
-
-  if (lowered.startsWith('assets/files/docs/pmb_2/')) {
-    return cleaned;
-  }
-
-  if (cleaned.startsWith('/assets/files/docs/pmb_2/')) {
-    return cleaned.slice(1);
-  }
-
-  return null;
+  return buildPmbAssetUrl(ragDocumentId, cleaned);
 }
 
-function fallbackImageBySubtopic(subtopicId) {
-  switch (subtopicId) {
-    case 1: return `${DOC_IMAGES_BASE_RELATIVE}/circuit-png/00-combined.png`;
-    case 2: return `${DOC_IMAGES_BASE_RELATIVE}/mesh-exports/04-selected-combined/selected-meshes.png`;
-    case 3: return `${DOC_IMAGES_BASE_RELATIVE}/mesh-exports/04-selected-combined/selected-meshes.png`;
-    case 4: return `${DOC_IMAGES_BASE_RELATIVE}/branch-exports/branches-combined.png`;
-    default:
-      return `${DOC_IMAGES_BASE_RELATIVE}/circuit-png/00-combined.png`;
-  }
+async function pmbAssetExists(ragDocumentId, relPath) {
+  const [rows] = await db.query(
+    `SELECT content FROM rag_documents
+      WHERE id = ? AND type_document = 'pmb' LIMIT 1`,
+    [ragDocumentId]
+  );
+  if (!rows.length || !rows[0].content) return false;
+
+  const zip = await JSZip.loadAsync(rows[0].content);
+  return zip.file(relPath) !== null;
 }
+
  
 // Talk to HALO directly and accumulate the streamed content into one string.
 async function collectHaloRagResponse(payload) {
@@ -260,7 +359,7 @@ function normalizeDistractors(value) {
   throw new Error('incorrect_answer must contain at least 3 distractors.');
 }
 
-function normalizeQuestionShape(q) {
+function normalizeQuestionShape(q, ragDocumentId) {
   if (!q || typeof q !== 'object' || Array.isArray(q)) {
     throw new Error('Response is not a JSON object.');
   }
@@ -270,7 +369,7 @@ function normalizeQuestionShape(q) {
     correct_answer: normalizeTextValue(q.correct_answer, 'correct_answer'),
     incorrect_answer: normalizeDistractors(q.incorrect_answer),
     feedback: normalizeTextValue(q.feedback, 'feedback'),
-    circuit_image: normalizeDocImageRelativePath(q.circuit_image)
+    circuit_image: normalizeDocImageRelativePath(q.circuit_image, ragDocumentId)
   };
 }
 
@@ -832,8 +931,20 @@ async function createQuestions(req, res) {
       throw new Error(`Subtopic ${subtopicId} has no rag_prompt configured.`);
     }
 
+    // Pick a random PMB to ground against.
+    const pmb = await pickRandomPmbGrounding();
+    if (!pmb) {
+      throw new Error('No PMB documents available — create one in the Playground first.');
+    }
+    console.log(
+      `[playground] createQuestions — grounding on pmb_${pmb.pmbNumber} (rag_document_id=${pmb.ragDocumentId})`
+    );
+
     console.log('[playground] createQuestions — building RAG payload');
-    const rag = await buildRagPayload();
+    const rag = await buildRagPayload(
+      pmb.markdownContent,
+      `pmb_${pmb.pmbNumber}.md`
+    );
  
     const haloPayload = {
       prompt: `${userPrompt}\n\n${JSON_SCHEMA_INSTRUCTIONS}`,
@@ -849,18 +960,31 @@ async function createQuestions(req, res) {
     console.log(`[playground] createQuestions — raw response length: ${rawText.length}`);
     console.log('[playground] createQuestions — raw response:\n' + rawText); 
  
-    const question = normalizeQuestionShape(extractJsonObject(rawText));
+    const question = normalizeQuestionShape(extractJsonObject(rawText), pmb.ragDocumentId);
+
+    // Validate that the image HALO chose actually exists in the PMB.
+    if (question.circuit_image) {
+      const relPath = question.circuit_image.replace(/^\/pmb-asset\/\d+\//, '');
+      const exists = await pmbAssetExists(pmb.ragDocumentId, relPath);
+      if (!exists) {
+        console.warn(
+          `[playground] HALO returned non-existent image "${question.circuit_image}" — using fallback`
+        );
+        question.circuit_image = fallbackImageBySubtopic(subtopicId, pmb.ragDocumentId);
+      }
+    }
+
     if (!question.circuit_image) {
-      question.circuit_image = fallbackImageBySubtopic(subtopicId);
+      question.circuit_image = fallbackImageBySubtopic(subtopicId, pmb.ragDocumentId);
     }
 
     console.log('[playground] createQuestions — parsed question:', JSON.stringify(question, null, 2));
-    validateQuestionShape(question);
+    validateQuestionShape(question, pmb.ragDocumentId);
  
     console.log('[playground] createQuestions — inserting row');
     await createQuestion({
       subtopic_id: subtopicId,
-      rag_document_id: 1,
+      rag_document_id: pmb.ragDocumentId,
       question_type: 'EM',
       question_text:    dupBilingual(question.question_text),
       image:            question.circuit_image,
@@ -875,9 +999,11 @@ async function createQuestions(req, res) {
       messageKey: 'flashes.question_created',
       generatedQuestion: {
         ...question,
-        image: `/${question.circuit_image}`,
-        subtopicId
-      }
+        image: question.circuit_image,
+        subtopicId,
+        pmbNumber: pmb.pmbNumber,
+        ragDocumentId: pmb.ragDocumentId,
+      },
     };
   } catch (err) {
     console.error('[playground] createQuestions failed:', err);
@@ -1085,5 +1211,6 @@ module.exports = {
   createPmb,
   createQuestions,
   showReviewQuestion,
-  submitReviewRating
+  submitReviewRating,
+  servePmbAsset
 };

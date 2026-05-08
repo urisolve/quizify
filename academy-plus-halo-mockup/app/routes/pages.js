@@ -34,6 +34,7 @@ router.post('/playground/create-pmb', requireAuthentication, playgroundControlle
 router.post('/playground/create-questions', requireAuthentication, playgroundController.createQuestions);
 router.get ('/playground/review', requireAuthentication, playgroundController.showReviewQuestion);
 router.post('/playground/review/rate', requireAuthentication, playgroundController.submitReviewRating);
+router.get('/pmb-asset/:id/*', requireAuthentication, playgroundController.servePmbAsset);
 
 const leaderboardPageController = require('../controllers/pages/leaderboardController');
 router.get('/leaderboard', requireAuthentication, leaderboardPageController);
