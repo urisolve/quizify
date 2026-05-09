@@ -84,6 +84,8 @@ async function initQuestionsTable() {
         incorrect_answer JSON NOT NULL,
         feedback JSON DEFAULT NULL,
         difficulty TINYINT DEFAULT 1,
+        model VARCHAR(50) NOT NULL,
+        type ENUM('AI Generated','Edited by Human','Created by Human') NOT NULL,
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
         rating_sum_teacher INT DEFAULT 0,
@@ -136,13 +138,15 @@ function getQuestionById(questionId) {
 async function createQuestion({
   subtopic_id,
   rag_document_id = null,
-  question_type = 'EM',
-  question_text = [],
+  question_type,
+  question_text,
   image = null,
-  correct_answer = [],
-  incorrect_answer = [],
+  correct_answer,
+  incorrect_answer,
   feedback = null,
-  difficulty = 1
+  difficulty = 1,
+  model,
+  type
 }) {
   // validation
   if (!subtopic_id || !question_type) {
@@ -164,13 +168,22 @@ async function createQuestion({
   if (feedback !== null && (!Array.isArray(feedback) || feedback.length !== 2)) {
     throw new Error('createQuestion: feedback must be [PT, EN] or null.');
   }
+  if (!model || typeof model !== 'string') {
+    throw new Error('createQuestion: model is required.');
+  }
+  const allowedTypes = ['AI Generated', 'Edited by Human', 'Created by Human'];
+  if (!allowedTypes.includes(type)) {
+    throw new Error(
+      `createQuestion: type must be one of ${allowedTypes.join(', ')}.`
+    );
+  }
 
   const sql = `
     INSERT INTO questions
       (subtopic_id, rag_document_id, question_type, question_text, image,
        correct_answer, incorrect_answer, feedback, difficulty,
-       number_tries, number_corrects)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
+       model, type, number_tries, number_corrects)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
   `;
 
   const params = [
@@ -183,6 +196,8 @@ async function createQuestion({
     JSON.stringify(incorrect_answer),
     feedback === null ? null : JSON.stringify(feedback),
     difficulty,
+    model,
+    type,
   ];
 
   const [result] = await db.query(sql, params);
@@ -202,7 +217,18 @@ function updateQuestion(questionId, updates) {
     'number_tries', 'number_corrects',
     'rating_sum_teacher', 'rating_count_teacher',
     'rating_sum_student', 'rating_count_student',
+    'model', 'type',
   ];
+
+  // Validate type if it's being updated.
+  if (updates.type !== undefined) {
+    const allowedTypes = ['AI Generated', 'Edited by Human', 'Created by Human'];
+    if (!allowedTypes.includes(updates.type)) {
+      throw new Error(
+        `Update failed: type must be one of ${allowedTypes.join(', ')}.`
+      );
+    }
+  }
 
   // Validation for incorrect answers length
   if (updates.incorrect_answer !== undefined) {

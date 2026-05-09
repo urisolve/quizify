@@ -71,6 +71,15 @@
               <input type="hidden" name="questionFocus" value="topology" />
 
               <div>
+                <label class="form-label fw-semibold mb-1" for="model">
+                  {{ t 'playground.model_label' }}
+                </label>
+                <select class="form-select" id="model" name="model" required>
+                  <option value="">Loading models...</option>
+                </select>
+              </div>
+
+              <div>
                 <label class="form-label fw-semibold mb-1" for="subtopicId"> {{t 'playground.subtopic_label'}}</label>
                 <select class="form-select" id="subtopicId" name="subtopicId" required>
                   {{#each subtopics}}

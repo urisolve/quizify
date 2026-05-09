@@ -17,6 +17,9 @@ const HALO_URL = process.env.HALO_URL || 'http://cloud.microlumin.com';
 const HALO_PORT = process.env.HALO_PORT || 2020;
 const HALO_RAG_STREAM_URL = `${HALO_URL}:${HALO_PORT}/rag/stream`;
 
+const APP_BASE_URL = process.env.APP_BASE_URL || 'http://localhost:3000';
+const RAG_STREAM_URL = `${APP_BASE_URL}/api/chat/rag/stream`;
+
 const DOC_IMAGES_BASE_RELATIVE = 'assets/files/docs/pmb_2';
 const DOC_IMAGES_BASE_PUBLIC = `/${DOC_IMAGES_BASE_RELATIVE}`;
 
@@ -25,6 +28,12 @@ const dupBilingual = (v) => [v, v];
 const JSZip = require('jszip');
 const DATASET_BUILDER_URL = process.env.DATASET_BUILDER_URL || 'http://cloud.microlumin.com:5005';
 const PMB_BASE_DIR = path.join(__dirname, '../../public/assets/files/docs');
+
+const QUESTION_TYPE = {
+  AI_GENERATED:     'AI Generated',
+  EDITED_BY_HUMAN:  'Edited by Human',
+  CREATED_BY_HUMAN: 'Created by Human',
+};
 
 const MIME_BY_EXT = {
   png: 'image/png',
@@ -250,16 +259,26 @@ async function pmbAssetExists(ragDocumentId, relPath) {
 
  
 // Talk to HALO directly and accumulate the streamed content into one string.
-async function collectHaloRagResponse(payload) {
-  const response = await fetch(HALO_RAG_STREAM_URL, {
+async function collectHaloRagResponse(payload, cookie = '') {
+  const response = await fetch(RAG_STREAM_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload)
+    headers: {
+      'Content-Type': 'application/json',
+      Cookie: cookie,
+    },
+    body: JSON.stringify(payload),
   });
  
   if (!response.ok || !response.body) {
     const text = await response.text().catch(() => '');
     throw new Error(`HALO returned ${response.status}: ${text || 'unknown error'}`);
+  }
+
+  const ct = response.headers.get('content-type') || '';
+  if (!response.ok || !response.body || !ct.includes('text/event-stream')) {
+    const body = await response.text().catch(() => '');
+    const stripped = body.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
+    throw new Error(`HALO returned ${response.status} (${ct || 'no content-type'}): ${stripped}`);
   }
  
   const reader = response.body.getReader();
@@ -914,6 +933,12 @@ async function createQuestions(req, res) {
   let newQuestionId = null;
 
   try {
+    // Read and validate the model.
+    const model = String(req.body?.model || '').trim();
+    if (!model) {
+      throw new Error('No model selected.');
+    }
+
     // Read and validate the chosen subtopic.
     const subtopicId = parseInt(req.body?.subtopicId, 10);
     if (!Number.isInteger(subtopicId) || subtopicId <= 0) {
@@ -952,13 +977,19 @@ async function createQuestions(req, res) {
       prompt: `${userPrompt}\n\n${JSON_SCHEMA_INSTRUCTIONS}`,
       system: 'You are a question-generation assistant. Return only valid JSON matching the schema, no prose.',
       messages: [],
-      model: null,
+      model,
       requestId: null,
       rag
     };
  
     console.log('[playground] createQuestions — calling HALO RAG stream');
-    rawText = await collectHaloRagResponse(haloPayload);
+    console.log(
+      '[playground] payload size:',
+      rawText?.length ?? 'n/a',
+      'model:', model,
+      'doc bytes:', rag.document.size_bytes
+    );
+    rawText = await collectHaloRagResponse(haloPayload, req.headers.cookie || '');
     console.log(`[playground] createQuestions — raw response length: ${rawText.length}`);
     console.log('[playground] createQuestions — raw response:\n' + rawText); 
  
@@ -994,6 +1025,8 @@ async function createQuestions(req, res) {
       incorrect_answer: dupBilingual(question.incorrect_answer),
       feedback:         dupBilingual(question.feedback),
       difficulty:       1,
+      model,
+      type: QUESTION_TYPE.AI_GENERATED
     });
  
     req.session.flash = {
@@ -1327,7 +1360,8 @@ async function updateQuestionFields(req, res) {
           SET question_text    = ?,
               correct_answer   = ?,
               incorrect_answer = ?,
-              feedback         = ?
+              feedback         = ?,
+              type             = 'Edited by Human'
         WHERE id = ?`,
       [
         JSON.stringify([questionPt, questionPt]),

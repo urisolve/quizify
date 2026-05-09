@@ -163,7 +163,8 @@
         "review_critical": "Critical Questions",
         "review_unrated": "Unrated Questions",
         "loading": "Creating...",
-        "edit_question": "Edit question"
+        "edit_question": "Edit question",
+        "model_label": "Model"
     },
     "playgroundreview": {
         "type": "type: ",

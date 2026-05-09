@@ -172,7 +172,8 @@
         "review_critical": "Questões Críticas",
         "review_unrated": "Sem Classificação",
         "loading": "A criar...",
-        "edit_question": "Editar pergunta"
+        "edit_question": "Editar pergunta",
+        "model_label": "Modelo"
     },
     "playgroundreview": {
         "type": "tipo: ",

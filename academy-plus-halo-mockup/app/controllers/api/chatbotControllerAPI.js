@@ -365,6 +365,7 @@ exports.handleRagStream = async (req, res) => {
   console.log('[chatbotControllerAPI] Incoming RAG stream request');
   console.log('[chatbotControllerAPI] HALO RAG stream URL:', HALO_RAG_STREAM_URL);
   console.log('[chatbotControllerAPI] requestId:', requestId);
+  console.log('[chatbotControllerAPI] model:', model);
   console.log('[chatbotControllerAPI] rag.traceId:', rag?.traceId || rag?.trace_id || null);
 
   return proxySseStream(
