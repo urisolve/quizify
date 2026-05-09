@@ -184,7 +184,7 @@
         "otherquestion": "Another question"        
     },
     "flashes": {
-        "question_created": "Question created successfully and includes circuit image.",
+        "question_created": "Question created successfully in {{elapsedSec}} s.",
         "question_failed": "Failed to create question: {{error}}",
         "no_questions": "No questions to review.",
         "rating_saved": "Rating {{rating}} saved for question #{{questionId}}.",
@@ -195,11 +195,11 @@
         "review_done_critical": "You've reviewed every critical question. The queue has been reset.",
         "review_done_unrated": "You've reviewed every unrated question. The queue has been reset.",
         "pmb_placeholder": "PMB being created",
-        "pmb_created": "PMB saved to pmb_{{pmbNumber}}/ped.zip ({{sizeKb}} KB).",
+        "pmb_created": "PMB #{{pmbId}} created ({{sizeKb}} KB, {{elapsedSec}} s).",
         "pmb_failed": "Failed to create PMB: {{error}}",
         "question_updated": "Question updated"
     },
-        "questionedit":{
+    "questionedit":{
         "fields_title": "Edit question",
         "question": "Question",
         "correct": "Correct answer",

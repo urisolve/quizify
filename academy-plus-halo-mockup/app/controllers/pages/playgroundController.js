@@ -20,14 +20,10 @@ const HALO_RAG_STREAM_URL = `${HALO_URL}:${HALO_PORT}/rag/stream`;
 const APP_BASE_URL = process.env.APP_BASE_URL || 'http://localhost:3000';
 const RAG_STREAM_URL = `${APP_BASE_URL}/api/chat/rag/stream`;
 
-const DOC_IMAGES_BASE_RELATIVE = 'assets/files/docs/pmb_2';
-const DOC_IMAGES_BASE_PUBLIC = `/${DOC_IMAGES_BASE_RELATIVE}`;
-
 const dupBilingual = (v) => [v, v];
 
 const JSZip = require('jszip');
 const DATASET_BUILDER_URL = process.env.DATASET_BUILDER_URL || 'http://cloud.microlumin.com:5005';
-const PMB_BASE_DIR = path.join(__dirname, '../../public/assets/files/docs');
 
 const QUESTION_TYPE = {
   AI_GENERATED:     'AI Generated',
@@ -176,7 +172,7 @@ async function servePmbAsset(req, res) {
 // Returns { ragDocumentId, pmbNumber, markdownContent } or null if no PMBs exist.
 async function pickRandomPmbGrounding() {
   const [rows] = await db.query(
-    `SELECT id, filename
+    `SELECT id, content
        FROM rag_documents
       WHERE type_document = 'pmb'
       ORDER BY RAND()
@@ -185,28 +181,19 @@ async function pickRandomPmbGrounding() {
   if (!rows.length) return null;
 
   const row = rows[0];
-  const m = (row.filename || '').match(/pmb_(\d+)\.zip$/);
-  if (!m) {
-    throw new Error(`Cannot derive folder from filename "${row.filename}".`);
+  if (!row.content) {
+    throw new Error(`PMB row ${row.id} has no content stored.`);
   }
-  const pmbNumber = parseInt(m[1], 10);
 
-  const mdPath = path.join(
-    PMB_BASE_DIR,
-    `pmb_${pmbNumber}`,
-    'lcm_pedagogical_solution_pt.md'
-  );
-
-  const [blobRows] = await db.query(
-    `SELECT content FROM rag_documents WHERE id = ?`,
-    [row.id]
-  );
-  const zip = await JSZip.loadAsync(blobRows[0].content);
-  const markdownContent = await zip.file('lcm_pedagogical_solution_pt.md').async('string');
+  const zip = await JSZip.loadAsync(row.content);
+  const mdEntry = zip.file('lcm_pedagogical_solution_pt.md');
+  if (!mdEntry) {
+    throw new Error(`PMB ${row.id} is missing lcm_pedagogical_solution_pt.md`);
+  }
+  const markdownContent = await mdEntry.async('string');
 
   return {
     ragDocumentId: row.id,
-    pmbNumber,
     markdownContent,
   };
 }
@@ -421,75 +408,6 @@ async function showPlayground(req, res) {
     console.error('Playground error:', err);
     res.status(500).send('Internal Server Error');
   }
-}
-
-// Find the next free pmb_N directory under PMB_BASE_DIR and create it.
-async function allocateNextPmbDir() {
-  const entries = await fsp.readdir(PMB_BASE_DIR, { withFileTypes: true });
-  let maxN = 0;
-  for (const entry of entries) {
-    if (!entry.isDirectory()) continue;
-    const m = entry.name.match(/^pmb_(\d+)$/);
-    if (m) {
-      const n = parseInt(m[1], 10);
-      if (n > maxN) maxN = n;
-    }
-  }
-  const number = maxN + 1;
-  const dirPath = path.join(PMB_BASE_DIR, `pmb_${number}`);
-  await fsp.mkdir(dirPath, { recursive: true });
-  return { number, dirPath };
-}
-
-// Extract every file in `zipBuffer` into `targetDir`, preserving subfolders.
-async function extractZipSubfolder(zipBuffer, targetDir, subfolder) {
-  const prefix = subfolder.endsWith('/') ? subfolder : `${subfolder}/`;
-  const zip = await JSZip.loadAsync(zipBuffer);
-  const entries = Object.values(zip.files);
-
-  await Promise.all(
-    entries.map(async (entry) => {
-      const normalised = entry.name.replace(/\\/g, '/');
-      if (!normalised.startsWith(prefix)) return;
-
-      const relPath = normalised.slice(prefix.length);
-      if (!relPath) return; // the directory entry itself
-
-      if (relPath.includes('..')) {
-        throw new Error(`Refusing to extract suspicious path: ${entry.name}`);
-      }
-
-      const destPath = path.join(targetDir, relPath);
-
-      if (entry.dir) {
-        await fsp.mkdir(destPath, { recursive: true });
-        return;
-      }
-
-      await fsp.mkdir(path.dirname(destPath), { recursive: true });
-      const buf = await entry.async('nodebuffer');
-      await fsp.writeFile(destPath, buf);
-    })
-  );
-}
-
-async function extractZipBuffer(zipBuffer, targetDir) {
-  const zip = await JSZip.loadAsync(zipBuffer);
-  await Promise.all(
-    Object.values(zip.files).map(async (entry) => {
-      const safeRel = entry.name.replace(/\\/g, '/');
-      if (safeRel.includes('..')) {
-        throw new Error(`Refusing to extract suspicious path: ${entry.name}`);
-      }
-      const destPath = path.join(targetDir, safeRel);
-      if (entry.dir) {
-        await fsp.mkdir(destPath, { recursive: true });
-        return;
-      }
-      await fsp.mkdir(path.dirname(destPath), { recursive: true });
-      await fsp.writeFile(destPath, await entry.async('nodebuffer'));
-    })
-  );
 }
 
 // PK = 0x50 0x4B → real ZIP. Anything else means the API returned a JSON error.
@@ -882,6 +800,8 @@ async function stagePedagogical(genZipBuffer, simZipBuffer, renderZipBuffer) {
 }
 
 async function createPmb(req, res) {
+  const t0 = Date.now();
+
   try {
     console.log('[playground] createPmb — pipeline starting');
 
@@ -895,25 +815,32 @@ async function createPmb(req, res) {
     // Edit the markdown and rebuild a ZIP containing only output/ contents.
     const outputZip = await buildOutputOnlyZip(pedZip, netlistText);
 
-    const { number, dirPath } = await allocateNextPmbDir();
-    await extractZipBuffer(outputZip, dirPath);
+    const elapsedMs = Date.now() - t0;
+
+    // const { number, dirPath } = await allocateNextPmbDir();
+    // await extractZipBuffer(outputZip, dirPath);
 
     const ragDocumentId = await addRagDocument({
       type_document: 'pmb',
-      filename: `pmb_${number}.zip`,
+      filename: `pmb.zip`,
       content: outputZip,
+      creation_time_ms: elapsedMs,
     });
 
-    console.log(
-      `[playground] createPmb — saved row #${ragDocumentId}, ${outputZip.length} bytes`
+    await db.query(
+      `UPDATE rag_documents SET filename = ? WHERE id = ?`,
+      [`pmb_${ragDocumentId}.zip`, ragDocumentId]
     );
+
+    console.log(`[playground] createPmb — saved row #${ragDocumentId}, ${outputZip.length} bytes`);
 
     req.session.flash = {
       type: 'success',
       messageKey: 'flashes.pmb_created',
       messageVars: {
-        pmbNumber: number,
+        pmbId: ragDocumentId,
         sizeKb: Math.round(outputZip.length / 1024),
+        elapsedSec: (elapsedMs / 1000).toFixed(1),
       },
     };
   } catch (err) {
@@ -931,6 +858,7 @@ async function createPmb(req, res) {
 async function createQuestions(req, res) {
   let rawText = '';
   let newQuestionId = null;
+  const t0 = Date.now();
 
   try {
     // Read and validate the model.
@@ -963,14 +891,13 @@ async function createQuestions(req, res) {
     if (!pmb) {
       throw new Error('No PMB documents available — create one in the Playground first.');
     }
-    console.log(
-      `[playground] createQuestions — grounding on pmb_${pmb.pmbNumber} (rag_document_id=${pmb.ragDocumentId})`
-    );
+
+    console.log(`[playground] createQuestions — grounding on rag_document_id=${pmb.ragDocumentId}`);
 
     console.log('[playground] createQuestions — building RAG payload');
     const rag = await buildRagPayload(
       pmb.markdownContent,
-      `pmb_${pmb.pmbNumber}.md`
+      `pmb_${pmb.ragDocumentId}.md`
     );
  
     const haloPayload = {
@@ -989,6 +916,7 @@ async function createQuestions(req, res) {
       'model:', model,
       'doc bytes:', rag.document.size_bytes
     );
+
     rawText = await collectHaloRagResponse(haloPayload, req.headers.cookie || '');
     console.log(`[playground] createQuestions — raw response length: ${rawText.length}`);
     console.log('[playground] createQuestions — raw response:\n' + rawText); 
@@ -1014,6 +942,7 @@ async function createQuestions(req, res) {
     console.log('[playground] createQuestions — parsed question:', JSON.stringify(question, null, 2));
     validateQuestionShape(question, pmb.ragDocumentId);
  
+    const elapsedMs = Date.now() - t0;
     console.log('[playground] createQuestions — inserting row');
     newQuestionId = await createQuestion({
       subtopic_id: subtopicId,
@@ -1026,19 +955,25 @@ async function createQuestions(req, res) {
       feedback:         dupBilingual(question.feedback),
       difficulty:       1,
       model,
-      type: QUESTION_TYPE.AI_GENERATED
+      type: QUESTION_TYPE.AI_GENERATED,
+      creation_time_ms: elapsedMs,
     });
+
+    console.log(`[playground] createQuestions — saved id ${newQuestionId} in ${elapsedMs} ms`);
  
     req.session.flash = {
       type: 'success',
       messageKey: 'flashes.question_created',
+      messageVars: {
+        elapsedSec: (elapsedMs / 1000).toFixed(1),
+      },
       generatedQuestion: {
         id: newQuestionId,
         ...question,
         image: question.circuit_image,
         subtopicId,
-        pmbNumber: pmb.pmbNumber,
         ragDocumentId: pmb.ragDocumentId,
+        elapsedSec: (elapsedMs / 1000).toFixed(1),
       },
     };
   } catch (err) {

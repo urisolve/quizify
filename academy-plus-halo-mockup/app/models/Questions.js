@@ -85,6 +85,7 @@ async function initQuestionsTable() {
         feedback JSON DEFAULT NULL,
         difficulty TINYINT DEFAULT 1,
         model VARCHAR(50) NOT NULL,
+        creation_time_ms INT DEFAULT NULL,
         type ENUM('AI Generated','Edited by Human','Created by Human') NOT NULL,
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
@@ -146,7 +147,8 @@ async function createQuestion({
   feedback = null,
   difficulty = 1,
   model,
-  type
+  type,
+  creation_time_ms = null
 }) {
   // validation
   if (!subtopic_id || !question_type) {
@@ -182,8 +184,8 @@ async function createQuestion({
     INSERT INTO questions
       (subtopic_id, rag_document_id, question_type, question_text, image,
        correct_answer, incorrect_answer, feedback, difficulty,
-       model, type, number_tries, number_corrects)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
+       model, type, number_tries, number_corrects, creation_time_ms)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
   `;
 
   const params = [
@@ -198,6 +200,7 @@ async function createQuestion({
     difficulty,
     model,
     type,
+    creation_time_ms
   ];
 
   const [result] = await db.query(sql, params);
@@ -217,7 +220,7 @@ function updateQuestion(questionId, updates) {
     'number_tries', 'number_corrects',
     'rating_sum_teacher', 'rating_count_teacher',
     'rating_sum_student', 'rating_count_student',
-    'model', 'type',
+    'model', 'type', 'creation_time_ms'
   ];
 
   // Validate type if it's being updated.

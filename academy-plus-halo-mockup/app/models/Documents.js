@@ -10,6 +10,7 @@ async function initRagTable() {
         filename      VARCHAR(255) DEFAULT NULL,
         size_bytes    INT          DEFAULT NULL,
         content       LONGBLOB     DEFAULT NULL,
+        creation_time_ms INT       DEFAULT NULL,
         created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
       )
     `);
@@ -20,11 +21,11 @@ async function initRagTable() {
 }
 
 // Add a new RAG document
-async function addRagDocument({ type_document, filename, content }) {
+async function addRagDocument({ type_document, filename, content, creation_time_ms = null }) {
   const [result] = await db.query(
-    `INSERT INTO rag_documents (type_document, filename, size_bytes, content)
-       VALUES (?, ?, ?, ?)`,
-    [type_document, filename, content?.length ?? null, content ?? null]
+    `INSERT INTO rag_documents (type_document, filename, size_bytes, content, creation_time_ms)
+       VALUES (?, ?, ?, ?, ?)`,
+    [type_document, filename, content?.length ?? null, content ?? null, creation_time_ms]
   );
   return result.insertId;
 }
