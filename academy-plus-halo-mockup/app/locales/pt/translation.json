@@ -173,7 +173,12 @@
         "review_unrated": "Sem Classificação",
         "loading": "A criar...",
         "edit_question": "Editar pergunta",
-        "model_label": "Modelo"
+        "model_label": "Modelo",
+        "pmb_review_title": "Rever PMB",
+        "pmb_review_subtitle": "Vê o conteúdo de uma PMB existente e, se necessário, elimina-a.",
+        "pmb_id_label": "PMB",
+        "pmb_id_placeholder": "Escolhe uma PMB...",
+        "pmb_review_button": "Rever PMB"
     },
     "playgroundreview": {
         "type": "tipo: ",
@@ -192,6 +197,13 @@
         "back": "Voltar ao Playground",
         "otherquestion": "Outra questão"
     },
+    "pmbreview": {
+        "title": "PMB",
+        "linked_questions": "perguntas associadas",
+        "back": "Voltar ao Playground",
+        "delete_button": "Eliminar PMB",
+        "delete_confirm": "Tens a certeza? Vão ser eliminadas {{count}} perguntas associadas. Esta ação é irreversível."
+    },
     "flashes": {
         "question_created": "Pergunta criada com sucesso em {{elapsedSec}} s.",
         "question_failed": "Falha ao criar pergunta: {{error}}",
@@ -206,7 +218,11 @@
         "pmb_placeholder": "PMB a ser criado",
         "pmb_created": "PMB #{{pmbId}} criado ({{sizeKb}} KB, {{elapsedSec}} s).",
         "pmb_failed": "Falha ao criar PMB: {{error}}",
-        "question_updated": "Questão atualizada"
+        "question_updated": "Questão atualizada",
+        "invalid_pmb": "PMB inválida.",
+        "pmb_not_found": "PMB não encontrada.",
+        "pmb_deleted": "PMB #{{pmbId}} eliminada (e {{deletedQuestions}} perguntas associadas).",
+        "pmb_delete_failed": "Falha ao eliminar PMB: {{error}}"
     },
     "questionedit":{
         "fields_title": "Editar Pergunta",

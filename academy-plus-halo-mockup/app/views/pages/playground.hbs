@@ -20,9 +20,10 @@
  
     <!-- Action cards -->
 
-    <!-- Create PMB -->
-    <div class="col">
-      <section class="card h-100">
+    <!-- PMB -->
+    <div class="col d-flex flex-column gap-4">
+      <!-- Create PMB -->
+      <section class="card flex-grow-1 mb-0">
         <div class="card-body p-4 d-flex flex-column gap-3">
           <div class="d-flex align-items-start gap-3">
             <span class="halo-section-icon bg-light-success text-success">
@@ -33,7 +34,7 @@
               <p class="mb-0 text-muted small" style="text-align: justify;">{{ t 'playground.pmbsubtitle' }}</p>
             </div>
           </div>
- 
+
           <div class="mt-auto">
             <form method="POST" action="/playground/create-pmb" data-disable-on-submit>
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
@@ -45,6 +46,47 @@
                         role="status" aria-hidden="true"></span>
                   {{ t 'playground.loading' }}
                 </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Review PMB -->
+      <section class="card flex-grow-1 mb-0">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-info text-info">
+              <i class="ti ti-file-search"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.pmb_review_title' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                {{ t 'playground.pmb_review_subtitle' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-auto">
+            <form method="GET" action="/playground/pmb/review" class="d-flex flex-column gap-3">
+              <div>
+                <label class="form-label fw-semibold mb-1" for="pmbId">
+                  {{ t 'playground.pmb_id_label' }}
+                </label>
+                <select class="form-select" id="pmbId" name="pmbId" required>
+                  <option value="" disabled selected>
+                    {{ t 'playground.pmb_id_placeholder' }}
+                  </option>
+                  {{#each pmbs}}
+                    <option value="{{this.id}}">
+                      #{{this.id}} — {{this.filename}}{{#if this.sizeKb}} ({{this.sizeKb}} KB){{/if}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <button class="btn btn-info text-white w-100 py-2 fw-semibold" type="submit">
+                <i class="ti ti-eye me-2"></i>{{ t 'playground.pmb_review_button' }}
               </button>
             </form>
           </div>

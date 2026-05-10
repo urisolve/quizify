@@ -168,6 +168,114 @@ async function servePmbAsset(req, res) {
   }
 }
 
+async function showPmbReview(req, res) {
+  try {
+    const id = parseInt(req.query.pmbId, 10);
+    if (!Number.isInteger(id) || id <= 0) {
+      req.session.flash = { type: 'danger', messageKey: 'flashes.invalid_pmb' };
+      return res.redirect('/playground');
+    }
+
+    const [rows] = await db.query(
+      `SELECT id, filename, size_bytes, creation_time_ms, created_at, content
+         FROM rag_documents
+        WHERE id = ? AND type_document = 'pmb'
+        LIMIT 1`,
+      [id]
+    );
+    if (!rows.length) {
+      req.session.flash = { type: 'danger', messageKey: 'flashes.pmb_not_found' };
+      return res.redirect('/playground');
+    }
+
+    const row = rows[0];
+    const zip = await JSZip.loadAsync(row.content);
+    const mdEntry = zip.file('lcm_pedagogical_solution_pt.md');
+    if (!mdEntry) {
+      throw new Error(`PMB ${id} is missing lcm_pedagogical_solution_pt.md`);
+    }
+    let markdown = await mdEntry.async('string');
+
+    // Rewrite relative image paths to /pmb-asset/<id>/... so they render.
+    markdown = markdown.replace(
+      /(!\[[^\]]*\]\()([^)]+)(\))/g,
+      (full, open, src, close) => {
+        if (/^[a-z]+:\/\//i.test(src) || src.startsWith('/')) return full;
+        return `${open}/pmb-asset/${id}/${src}${close}`;
+      }
+    );
+
+    // Count linked questions for the confirm dialog and badge.
+    const [qRows] = await db.query(
+      `SELECT COUNT(*) AS n FROM questions WHERE rag_document_id = ?`,
+      [id]
+    );
+    const linkedQuestionCount = Number(qRows[0]?.n || 0);
+
+    const flash = req.session.flash || null;
+    delete req.session.flash;
+
+    res.renderPage('playground_pmb_review', {
+      layout: 'main',
+      headerTitle: 'Review PMB',
+      user: req.session.user,
+      flash,
+      pmb: {
+        id: row.id,
+        filename: row.filename,
+        sizeKb: row.size_bytes ? Math.round(row.size_bytes / 1024) : null,
+        elapsedSec: row.creation_time_ms ? (row.creation_time_ms / 1000).toFixed(1) : null,
+        createdAt: row.created_at,
+        markdown,
+      },
+      linkedQuestionCount,
+    });
+  } catch (err) {
+    console.error('[playground] showPmbReview failed:', err);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+async function deletePmb(req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error('Invalid PMB id.');
+    }
+
+    // Count first so we can mention it in the success flash.
+    const [qRows] = await db.query(
+      `SELECT COUNT(*) AS n FROM questions WHERE rag_document_id = ?`,
+      [id]
+    );
+    const deletedQuestions = Number(qRows[0]?.n || 0);
+
+    // FK questions.rag_document_id is ON DELETE CASCADE — questions go with it.
+    const [del] = await db.query(
+      `DELETE FROM rag_documents WHERE id = ? AND type_document = 'pmb'`,
+      [id]
+    );
+    if (!del.affectedRows) {
+      throw new Error(`PMB ${id} not found.`);
+    }
+
+    req.session.flash = {
+      type: 'success',
+      messageKey: 'flashes.pmb_deleted',
+      messageVars: { pmbId: id, deletedQuestions },
+    };
+  } catch (err) {
+    console.error('[playground] deletePmb failed:', err);
+    req.session.flash = {
+      type: 'danger',
+      messageKey: 'flashes.pmb_delete_failed',
+      messageVars: { error: err.message },
+    };
+  }
+
+  return res.redirect('/playground');
+}
+
 // Pick a random PMB from rag_documents, then read its on-disk markdown.
 // Returns { ragDocumentId, pmbNumber, markdownContent } or null if no PMBs exist.
 async function pickRandomPmbGrounding() {
@@ -395,14 +503,27 @@ async function showPlayground(req, res) {
       `SELECT id FROM subtopics ORDER BY id`
     );
     const subtopics = subtopicRows.map((s) => ({ id: s.id }));
+
+    const [pmbRows] = await db.query(
+      `SELECT id, filename, size_bytes
+         FROM rag_documents
+        WHERE type_document = 'pmb'
+        ORDER BY id DESC`
+    );
+    const pmbs = pmbRows.map((r) => ({
+      id: r.id,
+      filename: r.filename,
+      sizeKb: r.size_bytes ? Math.round(r.size_bytes / 1024) : null,
+    }));
  
     res.renderPage('playground', {
       layout: 'main',
       headerTitle: 'Playground',
       user: req.session.user,
       flash,
-      reviewBatch,
-      subtopics
+      reviewBatch: req.session.reviewBatch || null,
+      subtopics,
+      pmbs,
     });
   } catch (err) {
     console.error('Playground error:', err);
@@ -530,10 +651,11 @@ function restructurePedagogicalMarkdown(md, netlistText) {
     3
   );
 
-  const mpResultsBlock =
-    (sliceSection(md, /^### Correntes de malha \(resultado\)\s*$/m, 3).match(
+  const mpResultsBlock = (
+    sliceSection(md, /^### Correntes de malha \(resultado\)\s*$/m, 3).match(
       /\$\$[\s\S]*?\$\$/
-    ) || [''])[0];
+    ) || ['']
+  )[0].replace(/\\\\/g, '\\\\\\\\'); 
 
   const correntesViz = sliceSection(
     md,
@@ -603,8 +725,8 @@ ${ramosTable}
 
 $$
 \\begin{aligned}
-B &= ${B} \\\\
-N &= ${N} \\\\
+B &= ${B} \\\\\\\\
+N &= ${N} \\\\\\\\
 C &= ${C}
 \\end{aligned}
 $$
@@ -1328,5 +1450,7 @@ module.exports = {
   submitReviewRating,
   servePmbAsset,
   showQuestionEdit,        
-  updateQuestionFields
+  updateQuestionFields,
+  showPmbReview,
+  deletePmb,
 };

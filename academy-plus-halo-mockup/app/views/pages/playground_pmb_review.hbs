@@ -1,0 +1,85 @@
+<div class="container-fluid">
+  <div class="row g-4">
+
+    <!-- Header -->
+    <div class="col-12">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-3">
+          <div class="d-flex align-items-center gap-3 flex-wrap">
+            <span class="halo-section-icon bg-light-info text-info">
+              <i class="ti ti-file-search"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h2 class="fw-semibold mb-0 fs-4">
+                {{ t 'pmbreview.title' }} #{{pmb.id}}
+              </h2>
+              <p class="mb-0 text-muted small">
+                {{pmb.filename}}
+                {{#if pmb.sizeKb}} · {{pmb.sizeKb}} KB{{/if}}
+                {{#if pmb.elapsedSec}} · {{pmb.elapsedSec}} s{{/if}}
+                {{#if linkedQuestionCount}} · {{linkedQuestionCount}} {{ t 'pmbreview.linked_questions' }}{{/if}}
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    {{#if flash}}
+      <div class="col-12">
+        <div class="alert alert-{{flash.type}} mb-0">
+          {{#if flash.messageKey}}{{t flash.messageKey flash.messageVars}}{{else}}{{flash.message}}{{/if}}
+        </div>
+      </div>
+    {{/if}}
+
+    <!-- Markdown -->
+    <div class="col-12">
+      <section class="card">
+        <div class="card-body p-4">
+          <textarea id="pmb-markdown-source" hidden>{{pmb.markdown}}</textarea>
+          <div id="pmb-markdown-rendered" class="halo-chat-response"></div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Actions -->
+    <div class="col-12">
+      <section class="card">
+        <div class="card-body p-4 d-flex justify-content-between gap-2 flex-wrap">
+          <a href="/playground" class="btn btn-outline-secondary">
+            <i class="ti ti-arrow-left me-1"></i>{{ t 'pmbreview.back' }}
+          </a>
+
+          <form method="POST"
+                action="/playground/pmb/{{pmb.id}}/delete"
+                data-confirm="{{t 'pmbreview.delete_confirm' count=linkedQuestionCount}}">
+            <button type="submit" class="btn btn-danger">
+              <i class="ti ti-trash me-2"></i>{{ t 'pmbreview.delete_button' }}
+              {{#if linkedQuestionCount}}({{linkedQuestionCount}}){{/if}}
+            </button>
+          </form>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      displayMath: [['$$', '$$'], ['\\[', '\\]']],
+    },
+    options: {
+      // Don't typeset code blocks — keep their raw LaTeX visible.
+      ignoreHtmlClass: 'no-mathjax',
+      processHtmlClass: 'mathjax',
+    },
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<script src="/js/pages/playground_pmb_review.js"></script>

@@ -37,6 +37,8 @@ router.post('/playground/review/rate', requireAuthentication, playgroundControll
 router.get('/pmb-asset/:id/*', requireAuthentication, playgroundController.servePmbAsset);
 router.get('/playground/questions/:id/edit', requireAuthentication, playgroundController.showQuestionEdit);
 router.post('/playground/questions/:id', requireAuthentication, playgroundController.updateQuestionFields);
+router.get('/playground/pmb/review', requireAuthentication, playgroundController.showPmbReview);
+router.post('/playground/pmb/:id/delete', requireAuthentication, playgroundController.deletePmb);
 
 const leaderboardPageController = require('../controllers/pages/leaderboardController');
 router.get('/leaderboard', requireAuthentication, leaderboardPageController);

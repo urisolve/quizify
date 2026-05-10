@@ -164,7 +164,12 @@
         "review_unrated": "Unrated Questions",
         "loading": "Creating...",
         "edit_question": "Edit question",
-        "model_label": "Model"
+        "model_label": "Model",
+        "pmb_review_title": "Review PMB",
+        "pmb_review_subtitle": "View the contents of an existing PMB and optionally delete it.",
+        "pmb_id_label": "PMB",
+        "pmb_id_placeholder": "Choose a PMB...",
+        "pmb_review_button": "Review PMB"
     },
     "playgroundreview": {
         "type": "type: ",
@@ -183,6 +188,13 @@
         "back": "Back to the Playground",
         "otherquestion": "Another question"        
     },
+    "pmbreview": {
+        "title": "PMB",
+        "linked_questions": "linked questions",
+        "back": "Back to Playground",
+        "delete_button": "Delete PMB",
+        "delete_confirm": "Are you sure? {{count}} linked questions will also be deleted. This cannot be undone."
+    },
     "flashes": {
         "question_created": "Question created successfully in {{elapsedSec}} s.",
         "question_failed": "Failed to create question: {{error}}",
@@ -197,7 +209,11 @@
         "pmb_placeholder": "PMB being created",
         "pmb_created": "PMB #{{pmbId}} created ({{sizeKb}} KB, {{elapsedSec}} s).",
         "pmb_failed": "Failed to create PMB: {{error}}",
-        "question_updated": "Question updated"
+        "question_updated": "Question updated",
+        "invalid_pmb": "Invalid PMB.",
+        "pmb_not_found": "PMB not found.",
+        "pmb_deleted": "PMB #{{pmbId}} deleted (along with {{deletedQuestions}} linked questions).",
+        "pmb_delete_failed": "Failed to delete PMB: {{error}}"
     },
     "questionedit":{
         "fields_title": "Edit question",
