@@ -43,6 +43,7 @@
             <span class="hide-menu">{{ t 'sidebar.ailearningarea' }}</span>
           </a>
         </li>
+        {{#hasAnyRole 'teacher' 'admin'}}
         <li class="sidebar-item">
           <a class="sidebar-link" href="/playground" aria-expanded="false">
             <span>
@@ -51,6 +52,7 @@
             <span class="hide-menu">{{ t 'sidebar.playground' }}</span>
           </a>
         </li>
+        {{/hasAnyRole}}
 
         <li class="sidebar-item">
           <a class="sidebar-link" href="/chatbot" aria-expanded="false">

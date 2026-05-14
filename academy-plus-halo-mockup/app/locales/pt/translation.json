@@ -175,7 +175,7 @@
         "edit_question": "Editar pergunta",
         "model_label": "Modelo",
         "pmb_review_title": "Rever PMB",
-        "pmb_review_subtitle": "Vê o conteúdo de uma PMB existente e, se necessário, elimina-a.",
+        "pmb_review_subtitle": "Vê o conteúdo de uma PMB existente",
         "pmb_id_label": "PMB",
         "pmb_id_placeholder": "Escolhe uma PMB...",
         "pmb_review_button": "Rever PMB"
@@ -275,5 +275,10 @@
         "restricted_access_sub":"Esta área é reservada a utilizadores registados. Faz login ou cria uma conta para aceder a todos os recursos do HALO.",
         "access_denied":"Acesso Negado",
         "access_denied_sub":"Para aceder a esta página, entra na tua conta."
+    },
+    "errors": {
+        "forbidden_title": "Acesso negado",
+        "forbidden_body": "Não tens permissão para aceder a esta página.",
+        "back_home": "Voltar ao início"
     }
 }

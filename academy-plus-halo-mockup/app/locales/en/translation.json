@@ -166,7 +166,7 @@
         "edit_question": "Edit question",
         "model_label": "Model",
         "pmb_review_title": "Review PMB",
-        "pmb_review_subtitle": "View the contents of an existing PMB and optionally delete it.",
+        "pmb_review_subtitle": "View the contents of an existing PMB",
         "pmb_id_label": "PMB",
         "pmb_id_placeholder": "Choose a PMB...",
         "pmb_review_button": "Review PMB"
@@ -266,5 +266,10 @@
         "restricted_access_sub":"This area is reserved for registered users. Login or create an account to access all HALO features.",
         "access_denied":"Access Denied",
         "access_denied_sub":"To access this page, you need to be logged in."
+    },
+    "errors": {
+        "forbidden_title": "Access denied",
+        "forbidden_body": "You don't have permission to access this page.",
+        "back_home": "Back to home"
     }
 }

@@ -75,6 +75,7 @@ const loginUser = async (req, res) => {
             id: user.id,
             username: user.username,
             email: user.email,
+            role: user.role,
             level: getLevelFromScore(user.exp || 0),
             levelProgress: getLevelProgressPercent(user.exp || 0),
             avatar: user.avatar_url,

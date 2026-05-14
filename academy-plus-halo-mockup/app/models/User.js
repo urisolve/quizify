@@ -13,7 +13,7 @@ const initUsersTable = async () => {
                         password_hash VARCHAR(255) NOT NULL,
                         name VARCHAR(50) DEFAULT NULL,
                         date_of_birth DATE DEFAULT NULL,
-                        role INT NOT NULL DEFAULT 0,
+                        role ENUM('student', 'teacher', 'admin') NOT NULL DEFAULT 'student',
                         exp INT NOT NULL DEFAULT 0,
                         hide_name BOOLEAN NOT NULL DEFAULT FALSE,
                         private_account BOOLEAN NOT NULL DEFAULT FALSE,

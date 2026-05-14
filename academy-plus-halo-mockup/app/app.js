@@ -27,7 +27,7 @@ const seedDatabase = require('../db/seed');
 const topicsPath = path.join(__dirname, '../db/insert_topics.sql');
 const subtopicsPath = path.join(__dirname, '../db/insert_subtopics.sql');
 //const questionsPath = path.join(__dirname, '../db/insert_questions.sql');
-//const usersPath = path.join(__dirname, '../db/insert_users.sql');
+const usersPath = path.join(__dirname, '../db/insert_users.sql');
 //const docsPath = path.join(__dirname, '../db/insert_docs.sql');
 
 //* i18next configuration
@@ -84,6 +84,18 @@ app.use(express.static(publicPath));
 
 // * Handlebars helpers
 const hbsHelpers = {
+    
+  hasRole: function (role, options) {
+    const userRole = options.data.root.user?.role;
+    return userRole === role ? options.fn(this) : options.inverse(this);
+  },
+
+  hasAnyRole: function (...args) {
+    const options = args.pop();
+    const userRole = options.data.root.user?.role;
+    return args.includes(userRole) ? options.fn(this) : options.inverse(this);
+  },
+
   t: function (key, varsOrOptions, maybeOptions) { // 't' means translate and is used to translate a key.
     //console.log(options.data.root.i18n.t(key)); 
     // Access the i18n instance
@@ -223,7 +235,7 @@ async function waitForDB(retries = 10, delay = 3000) {
     await initTrainingTable();
     await initUserSubtopicProgressTable();
     console.log('All tables ensured/created.');
-    await seedDatabase([topicsPath, subtopicsPath]); // , docsPath, questionsPath, usersPath
+    await seedDatabase([topicsPath, subtopicsPath, usersPath]); // , docsPath, questionsPath
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
