@@ -54,6 +54,17 @@
         </li>
         {{/hasAnyRole}}
 
+        {{#hasRole 'admin'}}
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="/admin" aria-expanded="false">
+            <span>
+              <i class="ti ti-shield"></i>
+            </span>
+            <span class="hide-menu">{{ t 'sidebar.admin' }}</span>
+          </a>
+        </li>
+        {{/hasRole}}
+
         <li class="sidebar-item">
           <a class="sidebar-link" href="/chatbot" aria-expanded="false">
             <span>

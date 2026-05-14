@@ -74,13 +74,14 @@
         "home": "Home",
         "learningarea": "Área de aprendizagem",
         "ailearningarea": "Aprendizagem com IA",
-        "playground": "Treino",
+        "playground": "Área Docente",
         "chatbot": "Chatbot",
         "aboutus": "Sobre nós",
         "abouthalo": "Sobre o HALO",
         "contributors": "Contribuições",
         "publications": "Publicações",
-        "contactus": "Contacto"
+        "contactus": "Contacto",
+        "admin": "Área Administrador"
     },
     "statistics": {
         "statistics": "Estatísticas",
@@ -148,7 +149,7 @@
         "4": { "name": "Cálculo das Correntes", "description": "Calcular as correntes nos ramos"}      
     },
     "playground": {
-        "title": "Treino",
+        "title": "Área Docente",
         "subtitle": "Gerar novo conteúdo para a plataforma.",
         "pmbtitle": "Criar PMB",
         "pmbsubtitle": "Gerar uma nova entrada PMB e armazená-la na base de dados.",
@@ -222,7 +223,11 @@
         "invalid_pmb": "PMB inválida.",
         "pmb_not_found": "PMB não encontrada.",
         "pmb_deleted": "PMB #{{pmbId}} eliminada (e {{deletedQuestions}} perguntas associadas).",
-        "pmb_delete_failed": "Falha ao eliminar PMB: {{error}}"
+        "pmb_delete_failed": "Falha ao eliminar PMB: {{error}}",
+        "user_created": "Utilizador {{username}} criado com o papel {{role}}.",
+        "user_create_failed": "Falha ao criar utilizador: {{error}}",
+        "role_changed": "{{username}} agora tem o papel {{role}}.",
+        "role_change_failed": "Falha ao alterar papel: {{error}}"
     },
     "questionedit":{
         "fields_title": "Editar Pergunta",
@@ -280,5 +285,25 @@
         "forbidden_title": "Acesso negado",
         "forbidden_body": "Não tens permissão para aceder a esta página.",
         "back_home": "Voltar ao início"
+    },
+    "admin": {
+        "title": "Área de Administrador",
+        "subtitle": "Gerir utilizadores e permissões.",
+        "create_user_title": "Criar Utilizador",
+        "create_user_subtitle": "Adicionar um novo utilizador e atribuir-lhe um papel.",
+        "create_user_button": "Criar utilizador",
+        "change_role_title": "Alterar Papel",
+        "change_role_subtitle": "Mudar o papel de um utilizador existente.",
+        "change_role_button": "Alterar papel",
+        "field_username": "Nome de utilizador",
+        "field_email": "Email",
+        "field_password": "Palavra-passe",
+        "field_role": "Papel",
+        "field_user": "Utilizador",
+        "user_placeholder": "Escolhe um utilizador...",
+        "password_hint": "Mínimo 8 caracteres, com maiúscula, número e símbolo.",
+        "role_student": "Estudante",
+        "role_teacher": "Docente",
+        "role_admin": "Administrador"
     }
 }

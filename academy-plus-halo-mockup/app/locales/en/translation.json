@@ -73,13 +73,14 @@
         "home": "Home",
         "learningarea": "Learning Area",
         "ailearningarea": "AI Learning Path",
-        "playground": "Playground",
+        "playground": "Teacher Area",
         "chatbot": "Chatbot",
         "aboutus": "About Us",
         "abouthalo": "About HALO",
         "contributors": "Contributors",
         "publications": "Publications",
-        "contactus": "Contact Us"
+        "contactus": "Contact Us",
+        "admin": "Admin Area"
     },
     "statistics": {
         "statistics": "Statistics",
@@ -139,7 +140,7 @@
         "4": { "name": "Current Calculation", "description": "Calculating the currents in the branches"}      
     },
     "playground": {
-        "title": "Playground",
+        "title": "Teacher Area",
         "subtitle": "Generate new content for the platform.",
         "pmbtitle": "Create PMB",
         "pmbsubtitle": "Generate a new PMB entry and store it in the database.",
@@ -213,7 +214,11 @@
         "invalid_pmb": "Invalid PMB.",
         "pmb_not_found": "PMB not found.",
         "pmb_deleted": "PMB #{{pmbId}} deleted (along with {{deletedQuestions}} linked questions).",
-        "pmb_delete_failed": "Failed to delete PMB: {{error}}"
+        "pmb_delete_failed": "Failed to delete PMB: {{error}}",
+        "user_created": "User {{username}} created with role {{role}}.",
+        "user_create_failed": "Failed to create user: {{error}}",
+        "role_changed": "{{username}} now has role {{role}}.",
+        "role_change_failed": "Failed to change role: {{error}}"
     },
     "questionedit":{
         "fields_title": "Edit question",
@@ -271,5 +276,25 @@
         "forbidden_title": "Access denied",
         "forbidden_body": "You don't have permission to access this page.",
         "back_home": "Back to home"
+    },
+    "admin": {
+        "title": "Administrator Area",
+        "subtitle": "Managing users and permissions.",
+        "create_user_title": "Create User",
+        "create_user_subtitle": "Add a new user and assign a role to them.",
+        "create_user_button": "Create user",
+        "change_role_title": "Change Role",
+        "change_role_subtitle": "Change the role of an existing user.",
+        "change_role_button": "Change role",
+        "field_username": "Username",
+        "field_email": "Email",
+        "field_password": "Password",
+        "field_role": "Role",
+        "field_user": "User",
+        "user_placeholder": "Choose a user...",
+        "password_hint": "Minimum 8 characters, including uppercase, numbers, and symbols.",
+        "role_student": "Student",
+        "role_teacher": "Teacher",
+        "role_admin": "Administrator"
     }
 }

@@ -41,6 +41,11 @@ router.post('/playground/questions/:id', requireAuthentication, requireRole('tea
 router.get('/playground/pmb/review', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.showPmbReview);
 router.post('/playground/pmb/:id/delete', requireAuthentication, requireRole('admin'), playgroundController.deletePmb);
 
+const adminController = require('../controllers/pages/adminController');
+router.get('/admin',             requireAuthentication, requireRole('admin'), adminController.showAdmin);
+router.post('/admin/create-user', requireAuthentication, requireRole('admin'), adminController.createUser);
+router.post('/admin/change-role', requireAuthentication, requireRole('admin'), adminController.changeRole);
+
 const leaderboardPageController = require('../controllers/pages/leaderboardController');
 router.get('/leaderboard', requireAuthentication, leaderboardPageController);
 

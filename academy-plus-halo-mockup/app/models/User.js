@@ -30,10 +30,13 @@ const initUsersTable = async () => {
 };
 
 // Create User
-const createUser = async ({ username, email, passwordHash }) => {
+const createUser = async ({ username, email, passwordHash, role = 'student' }) => {
+    const allowedRoles = ['student', 'teacher', 'admin'];
+    const safeRole = allowedRoles.includes(role) ? role : 'student';
+
     const [result] = await db.query(
-        'INSERT INTO users (username, email, password_hash, badges) VALUES (?, ?, ?, JSON_ARRAY())',
-        [username, email, passwordHash] // Initialize badges as empty array
+        'INSERT INTO users (username, email, password_hash, role, badges) VALUES (?, ?, ?, ?, JSON_ARRAY())',
+        [username, email, passwordHash, safeRole] // Initialize badges as empty array
     );
     return result.insertId;
 };
@@ -48,6 +51,14 @@ const findUserByEmail = async (email) => {
 const findUserById = async (id) => {
     const [rows] = await db.query('SELECT * FROM users WHERE id = ?', [id]);
     return rows[0];
+};
+
+// All users, for the change-role dropdown.
+const getAllUsers = async () => {
+    const [rows] = await db.query(
+        'SELECT id, username, email, role FROM users ORDER BY username'
+    );
+    return rows;
 };
 
 // Update User
@@ -82,6 +93,15 @@ const updateUser = async (userId, updates) => {
 // Update User Password
 const updateUserPassword = async (id, hashedPassword) => {
     await db.query('UPDATE users SET password_hash = ? WHERE id = ?', [hashedPassword, id]);
+};
+
+// Update User Role
+const updateUserRole = async (userId, role) => {
+    const allowedRoles = ['student', 'teacher', 'admin'];
+    if (!allowedRoles.includes(role)) {
+        throw new Error(`Invalid role: ${role}`);
+    }
+    await db.query('UPDATE users SET role = ? WHERE id = ?', [role, userId]);
 };
 
 // Increment user's exp by a given amount
@@ -203,5 +223,7 @@ module.exports = {
     awardBadge,
     checkAndAwardTopicBadge,
     getUserBadges,
-    deleteUserBadge
+    deleteUserBadge,
+    updateUserRole,
+    getAllUsers
 };
