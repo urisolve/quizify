@@ -53,6 +53,12 @@ const findUserById = async (id) => {
     return rows[0];
 };
 
+// Get User by username
+const findUserByUsername = async (username) => {
+    const [rows] = await db.query('SELECT * FROM users WHERE username = ?', [username]);
+    return rows[0];
+};
+
 // All users, for the change-role dropdown.
 const getAllUsers = async () => {
     const [rows] = await db.query(
@@ -225,5 +231,6 @@ module.exports = {
     getUserBadges,
     deleteUserBadge,
     updateUserRole,
-    getAllUsers
+    getAllUsers,
+    findUserByUsername
 };

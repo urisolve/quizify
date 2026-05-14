@@ -56,10 +56,10 @@ const registerUser = async (req, res) => {
 };
 
 const loginUser = async (req, res) => {
-    const { email, password } = req.body;
+    const { username, password } = req.body;
 
     try {
-        const user = await User.findUserByEmail(email);
+        const user = await User.findUserByUsername(username);
         if (!user) {
             return res.status(401).json({ message: req.t('auth.invalid_credentials') });
         }
@@ -68,7 +68,6 @@ const loginUser = async (req, res) => {
         if (!passwordMatch) {
             return res.status(401).json({ message: req.t('auth.invalid_credentials') });
         }
-
 
         // Compute level from score (default 0 if missing)
         req.session.user = {
@@ -86,10 +85,7 @@ const loginUser = async (req, res) => {
             date_of_birth: user.date_of_birth
         };
 
-
-        const redirectTo = '/';
-
-        res.status(200).json({ message: req.t('auth.login_successful'), redirectTo });
+        res.status(200).json({ message: req.t('auth.login_successful'), redirectTo: '/' });
     } catch (err) {
         console.error('Login error:', err);
         res.status(500).json({ message: req.t('auth.internal_server_error') });
