@@ -84,8 +84,12 @@ async function initQuestionsTable() {
         incorrect_answer JSON NOT NULL,
         feedback JSON DEFAULT NULL,
         difficulty TINYINT DEFAULT 1,
+        model VARCHAR(50) NOT NULL,
+        creation_time_ms INT DEFAULT NULL,
+        type ENUM('AI Generated','Edited by Human','Created by Human') NOT NULL,
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
+        time_spent INT DEFAULT 0,
         rating_sum_teacher INT DEFAULT 0,
         rating_count_teacher INT DEFAULT 0,
         rating_sum_student INT DEFAULT 0,
@@ -107,10 +111,33 @@ function getQuestionsBySubtopic(subtopicId) {
 }
 
 // Get a random question for a subtopic (without duplicates)
-async function getRandomQuestionBySubtopic(subtopicId, limit) {
+async function getRandomQuestionBySubtopic(subtopicId, limit, userId = null) {
+  const params = [subtopicId];
+
+  // Exclude questions this user has already answered correctly.
+  let passedFilter = '';
+  if (userId) {
+    passedFilter = `
+      AND q.id NOT IN (
+        SELECT question_id FROM training
+        WHERE user_id = ? AND success = 1
+      )`;
+    params.push(userId);
+  }
+  params.push(limit);
+
   const [rows] = await db.query(
-    'SELECT id FROM questions WHERE subtopic_id = ? ORDER BY RAND() LIMIT ?',
-    [subtopicId, limit]
+    `SELECT q.id
+      FROM questions q
+      WHERE q.subtopic_id = ?
+        -- teacher side: unrated, or average above 2.5
+      AND (q.rating_count_teacher = 0 OR q.rating_sum_teacher / q.rating_count_teacher > 2.5)
+      -- student side: unrated, or average above 2.5
+      AND (q.rating_count_student = 0 OR q.rating_sum_student / q.rating_count_student > 2.5)
+        ${passedFilter}
+      ORDER BY RAND()
+      LIMIT ?`,
+    params
   );
   
   // Remove duplicates and limit
@@ -136,13 +163,16 @@ function getQuestionById(questionId) {
 async function createQuestion({
   subtopic_id,
   rag_document_id = null,
-  question_type = 'EM',
-  question_text = [],
+  question_type,
+  question_text,
   image = null,
-  correct_answer = [],
-  incorrect_answer = [],
+  correct_answer,
+  incorrect_answer,
   feedback = null,
-  difficulty = 1
+  difficulty = 1,
+  model,
+  type,
+  creation_time_ms = null
 }) {
   // validation
   if (!subtopic_id || !question_type) {
@@ -164,13 +194,22 @@ async function createQuestion({
   if (feedback !== null && (!Array.isArray(feedback) || feedback.length !== 2)) {
     throw new Error('createQuestion: feedback must be [PT, EN] or null.');
   }
+  if (!model || typeof model !== 'string') {
+    throw new Error('createQuestion: model is required.');
+  }
+  const allowedTypes = ['AI Generated', 'Edited by Human', 'Created by Human'];
+  if (!allowedTypes.includes(type)) {
+    throw new Error(
+      `createQuestion: type must be one of ${allowedTypes.join(', ')}.`
+    );
+  }
 
   const sql = `
     INSERT INTO questions
       (subtopic_id, rag_document_id, question_type, question_text, image,
        correct_answer, incorrect_answer, feedback, difficulty,
-       number_tries, number_corrects)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0)
+       model, type, number_tries, number_corrects, creation_time_ms)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
   `;
 
   const params = [
@@ -183,6 +222,9 @@ async function createQuestion({
     JSON.stringify(incorrect_answer),
     feedback === null ? null : JSON.stringify(feedback),
     difficulty,
+    model,
+    type,
+    creation_time_ms
   ];
 
   const [result] = await db.query(sql, params);
@@ -202,7 +244,18 @@ function updateQuestion(questionId, updates) {
     'number_tries', 'number_corrects',
     'rating_sum_teacher', 'rating_count_teacher',
     'rating_sum_student', 'rating_count_student',
+    'model', 'type', 'creation_time_ms'
   ];
+
+  // Validate type if it's being updated.
+  if (updates.type !== undefined) {
+    const allowedTypes = ['AI Generated', 'Edited by Human', 'Created by Human'];
+    if (!allowedTypes.includes(updates.type)) {
+      throw new Error(
+        `Update failed: type must be one of ${allowedTypes.join(', ')}.`
+      );
+    }
+  }
 
   // Validation for incorrect answers length
   if (updates.incorrect_answer !== undefined) {

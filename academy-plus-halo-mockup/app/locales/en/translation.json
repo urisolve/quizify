@@ -73,13 +73,14 @@
         "home": "Home",
         "learningarea": "Learning Area",
         "ailearningarea": "AI Learning Path",
-        "playground": "Playground",
+        "playground": "Teacher Area",
         "chatbot": "Chatbot",
         "aboutus": "About Us",
         "abouthalo": "About HALO",
         "contributors": "Contributors",
         "publications": "Publications",
-        "contactus": "Contact Us"
+        "contactus": "Contact Us",
+        "admin": "Admin Area"
     },
     "statistics": {
         "statistics": "Statistics",
@@ -139,7 +140,7 @@
         "4": { "name": "Current Calculation", "description": "Calculating the currents in the branches"}      
     },
     "playground": {
-        "title": "Playground",
+        "title": "Teacher Area",
         "subtitle": "Generate new content for the platform.",
         "pmbtitle": "Create PMB",
         "pmbsubtitle": "Generate a new PMB entry and store it in the database.",
@@ -161,7 +162,17 @@
         "labelImage": "Circuit image selected by the model",
         "review_all": "General Review",
         "review_critical": "Critical Questions",
-        "review_unrated": "Unrated Questions"
+        "review_unrated": "Unrated Questions",
+        "loading": "Creating...",
+        "edit_question": "Edit question",
+        "model_label": "Model",
+        "pmb_review_title": "Review PMB",
+        "pmb_review_subtitle": "View the contents of an existing PMB",
+        "pmb_id_label": "PMB",
+        "pmb_id_placeholder": "Choose a PMB...",
+        "pmb_review_button": "Review PMB",
+        "pmb_source_label": "PMB",
+        "pmb_random": "Random"
     },
     "playgroundreview": {
         "type": "type: ",
@@ -180,10 +191,15 @@
         "back": "Back to the Playground",
         "otherquestion": "Another question"        
     },
+    "pmbreview": {
+        "title": "PMB",
+        "linked_questions": "linked questions",
+        "back": "Back to Playground",
+        "delete_button": "Delete PMB",
+        "delete_confirm": "Are you sure? {{count}} linked questions will also be deleted. This cannot be undone."
+    },
     "flashes": {
-        "pmb_placeholder": "PMB being created",
-        "pmb_failed": "Failed to create PMB",
-        "question_created": "Question created successfully and includes circuit image.",
+        "question_created": "Question created successfully in {{elapsedSec}} s.",
         "question_failed": "Failed to create question: {{error}}",
         "no_questions": "No questions to review.",
         "rating_saved": "Rating {{rating}} saved for question #{{questionId}}.",
@@ -192,7 +208,28 @@
         "no_unrated_questions": "No unrated questions to review.",
         "review_done_all": "You've reviewed every available question. The queue has been reset.",
         "review_done_critical": "You've reviewed every critical question. The queue has been reset.",
-        "review_done_unrated": "You've reviewed every unrated question. The queue has been reset."
+        "review_done_unrated": "You've reviewed every unrated question. The queue has been reset.",
+        "pmb_placeholder": "PMB being created",
+        "pmb_created": "PMB #{{pmbId}} created ({{sizeKb}} KB, {{elapsedSec}} s).",
+        "pmb_failed": "Failed to create PMB: {{error}}",
+        "question_updated": "Question updated",
+        "invalid_pmb": "Invalid PMB.",
+        "pmb_not_found": "PMB not found.",
+        "pmb_deleted": "PMB #{{pmbId}} deleted (along with {{deletedQuestions}} linked questions).",
+        "pmb_delete_failed": "Failed to delete PMB: {{error}}",
+        "user_created": "User {{username}} created with role {{role}}.",
+        "user_create_failed": "Failed to create user: {{error}}",
+        "role_changed": "{{username}} now has role {{role}}.",
+        "role_change_failed": "Failed to change role: {{error}}",
+        "all_questions_answered": "You've already correctly answered every available question for this topic."
+    },
+    "questionedit":{
+        "fields_title": "Edit question",
+        "question": "Question",
+        "correct": "Correct answer",
+        "distractors": "Distractors",
+        "feedback": "Feedback",
+        "save": "Save"
     },
     "auth": {
         "user_created": "User created successfully",
@@ -237,5 +274,30 @@
         "restricted_access_sub":"This area is reserved for registered users. Login or create an account to access all HALO features.",
         "access_denied":"Access Denied",
         "access_denied_sub":"To access this page, you need to be logged in."
+    },
+    "errors": {
+        "forbidden_title": "Access denied",
+        "forbidden_body": "You don't have permission to access this page.",
+        "back_home": "Back to home"
+    },
+    "admin": {
+        "title": "Administrator Area",
+        "subtitle": "Managing users and permissions.",
+        "create_user_title": "Create User",
+        "create_user_subtitle": "Add a new user and assign a role to them.",
+        "create_user_button": "Create user",
+        "change_role_title": "Change Role",
+        "change_role_subtitle": "Change the role of an existing user.",
+        "change_role_button": "Change role",
+        "field_username": "Username",
+        "field_email": "Email",
+        "field_password": "Password",
+        "field_role": "Role",
+        "field_user": "User",
+        "user_placeholder": "Choose a user...",
+        "password_hint": "Minimum 8 characters, including uppercase, numbers, and symbols.",
+        "role_student": "Student",
+        "role_teacher": "Teacher",
+        "role_admin": "Administrator"
     }
 }

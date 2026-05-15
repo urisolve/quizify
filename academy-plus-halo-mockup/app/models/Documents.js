@@ -7,8 +7,11 @@ async function initRagTable() {
       CREATE TABLE IF NOT EXISTS rag_documents (
         id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
         type_document VARCHAR(10) NOT NULL,
-        input_details JSON NOT NULL,
-        invalidations INT DEFAULT 0
+        filename      VARCHAR(255) DEFAULT NULL,
+        size_bytes    INT          DEFAULT NULL,
+        content       LONGBLOB     DEFAULT NULL,
+        creation_time_ms INT       DEFAULT NULL,
+        created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
       )
     `);
     console.log('RAG documents table ensured/created.');
@@ -18,60 +21,65 @@ async function initRagTable() {
 }
 
 // Add a new RAG document
-async function addRagDocument(type_document, input_details) {
+async function addRagDocument({ type_document, filename, content, creation_time_ms = null }) {
   const [result] = await db.query(
-    'INSERT INTO rag_documents (type_document, input_details) VALUES (?, ?)',
-    [type_document, JSON.stringify(input_details)]
+    `INSERT INTO rag_documents (type_document, filename, size_bytes, content, creation_time_ms)
+       VALUES (?, ?, ?, ?, ?)`,
+    [type_document, filename, content?.length ?? null, content ?? null, creation_time_ms]
   );
   return result.insertId;
 }
 
 //Get a document by ID
 async function getRagDocumentById(id) {
-  const [rows] = await db.query('SELECT * FROM rag_documents WHERE id = ?', [id]);
-  return rows[0] || null;
-}
-
-//Increment invalidations 
-async function incrementInvalidation(id) {
-  return db.query(
-    'UPDATE rag_documents SET invalidations = invalidations + 1 WHERE id = ?',
+  const [rows] = await db.query(
+    `SELECT id, type_document, filename, size_bytes, content, created_at
+       FROM rag_documents WHERE id = ?`,
     [id]
   );
+  return rows[0] || null;
 }
 
 //Update document details
 async function updateRagDocument(id, updates) {
-  const allowedFields = ['type_document', 'input_details', 'invalidations'];
-  const fields = Object.keys(updates).filter(f => allowedFields.includes(f));
+  const allowed = ['type_document', 'filename', 'content'];
+  const fields = Object.keys(updates).filter((f) => allowed.includes(f));
+  if (!fields.length) return;
   
-  if (fields.length === 0) return;
-
-  const setClause = fields.map(f => `${f} = ?`).join(', ');
-  const values = fields.map(f => {
-    return (f === 'input_details') ? JSON.stringify(updates[f]) : updates[f];
-  });
+  const setParts = [];
+  const values = [];
+  for (const f of fields) {
+    setParts.push(`${f} = ?`);
+    values.push(updates[f]);
+  }
+  if (fields.includes('content')) {
+    setParts.push('size_bytes = ?');
+    values.push(updates.content?.length ?? null);
+  }
 
   values.push(id);
-  return db.query(`UPDATE rag_documents SET ${setClause} WHERE id = ?`, values);
+  return db.query(
+    `UPDATE rag_documents SET ${setParts.join(', ')} WHERE id = ?`,
+    values
+  );
 }
 
 // Get questions associated with same document
-const getQuestionsFromSource = async (ragId) => {
+async function getQuestionsFromSource(ragId) {
   const [rows] = await db.query(
-    `SELECT q.*, r.type_document 
-     FROM questions q
-     JOIN rag_documents r ON q.rag_document_id = r.id
-     WHERE r.id = ?`,
+    `SELECT q.*, r.type_document
+       FROM questions q
+       JOIN rag_documents r ON q.rag_document_id = r.id
+      WHERE r.id = ?`,
     [ragId]
   );
   return rows;
-};
+}
 
 module.exports = {
   initRagTable,
   addRagDocument,
   getRagDocumentById,
-  incrementInvalidation,
-  updateRagDocument
+  updateRagDocument,
+  getQuestionsFromSource
 };

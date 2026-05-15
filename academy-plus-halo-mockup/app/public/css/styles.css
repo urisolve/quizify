@@ -3768,4 +3768,33 @@ body {
   width: 30%;
 }
 
+.halo-collapsible-heading .halo-chevron {
+  transition: transform .2s ease;
+}
+.halo-collapsible-heading[aria-expanded="false"] .halo-chevron {
+  transform: rotate(-90deg);
+}
+
+#pmb-markdown-rendered .table th,
+#pmb-markdown-rendered .table td {
+  padding: 0.85rem 1.25rem;     /* default Bootstrap is 0.5rem 0.5rem */
+  vertical-align: middle;
+  white-space: nowrap;          /* keep cell content on one line */
+}
+
+#pmb-markdown-rendered .table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  letter-spacing: .02em;
+}
+
+#pmb-markdown-rendered .table {
+  margin: 1rem 0;
+  font-size: 0.95rem;
+}
+
+.halo-collapsible-heading[aria-expanded="false"] .halo-chevron {
+  transform: rotate(-90deg);
+}
+
 /*# sourceMappingURL=styles.css.map */

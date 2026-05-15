@@ -6,6 +6,9 @@ async function practicePlusPage(req, res) {
     delete req.session.queryComplete;
     const userId = req.session.user?.id;
 
+    const flash = req.session.flash;
+    delete req.session.flash;
+
     // Fetch user info (adjust fields as needed)
  /*    const [[user]] = await db.query('SELECT avatar_url, conquest FROM users WHERE id = ?', [userId]);
     let badges = [];
@@ -55,6 +58,7 @@ async function practicePlusPage(req, res) {
       layout: 'main',
       headerTitle: 'Practice Plus',
       topics: topicsWithSubs,
+      flash,
       topicsJson: JSON.stringify(topicsWithSubs),
       generalProgress: totalProgress,
       userAvatar: req.session.user?.avatar_url || null,

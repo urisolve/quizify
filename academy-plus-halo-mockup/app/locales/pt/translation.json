@@ -74,13 +74,14 @@
         "home": "Home",
         "learningarea": "Área de aprendizagem",
         "ailearningarea": "Aprendizagem com IA",
-        "playground": "Treino",
+        "playground": "Área Docente",
         "chatbot": "Chatbot",
         "aboutus": "Sobre nós",
         "abouthalo": "Sobre o HALO",
         "contributors": "Contribuições",
         "publications": "Publicações",
-        "contactus": "Contacto"
+        "contactus": "Contacto",
+        "admin": "Área Administrador"
     },
     "statistics": {
         "statistics": "Estatísticas",
@@ -148,7 +149,7 @@
         "4": { "name": "Cálculo das Correntes", "description": "Calcular as correntes nos ramos"}      
     },
     "playground": {
-        "title": "Treino",
+        "title": "Área Docente",
         "subtitle": "Gerar novo conteúdo para a plataforma.",
         "pmbtitle": "Criar PMB",
         "pmbsubtitle": "Gerar uma nova entrada PMB e armazená-la na base de dados.",
@@ -170,7 +171,17 @@
         "labelImage": "Imagem do circuito selecionada pelo modelo",
         "review_all": "Revisão Geral",
         "review_critical": "Questões Críticas",
-        "review_unrated": "Sem Classificação"
+        "review_unrated": "Sem Classificação",
+        "loading": "A criar...",
+        "edit_question": "Editar pergunta",
+        "model_label": "Modelo",
+        "pmb_review_title": "Rever PMB",
+        "pmb_review_subtitle": "Vê o conteúdo de uma PMB existente",
+        "pmb_id_label": "PMB",
+        "pmb_id_placeholder": "Escolhe uma PMB...",
+        "pmb_review_button": "Rever PMB",
+        "pmb_source_label": "PMB",
+        "pmb_random": "Aleatória"
     },
     "playgroundreview": {
         "type": "tipo: ",
@@ -189,10 +200,15 @@
         "back": "Voltar ao Playground",
         "otherquestion": "Outra questão"
     },
+    "pmbreview": {
+        "title": "PMB",
+        "linked_questions": "perguntas associadas",
+        "back": "Voltar ao Playground",
+        "delete_button": "Eliminar PMB",
+        "delete_confirm": "Tens a certeza? Vão ser eliminadas {{count}} perguntas associadas. Esta ação é irreversível."
+    },
     "flashes": {
-        "pmb_placeholder": "PMB a ser criado",
-        "pmb_failed": "Falha ao criar PMB.",
-        "question_created": "Pergunta criada com sucesso e inclui imagem do circuito.",
+        "question_created": "Pergunta criada com sucesso em {{elapsedSec}} s.",
         "question_failed": "Falha ao criar pergunta: {{error}}",
         "no_questions": "Sem perguntas para rever.",
         "rating_saved": "Avaliação {{rating}} guardada para a questão #{{questionId}}.",
@@ -201,7 +217,28 @@
         "no_unrated_questions": "Sem questões por classificar.",
         "review_done_all": "Já reviste todas as questões disponíveis. Lista reiniciada.",
         "review_done_critical": "Já reviste todas as questões críticas. Lista reiniciada.",
-        "review_done_unrated": "Já reviste todas as questões sem classificação. Lista reiniciada."
+        "review_done_unrated": "Já reviste todas as questões sem classificação. Lista reiniciada.",
+        "pmb_placeholder": "PMB a ser criado",
+        "pmb_created": "PMB #{{pmbId}} criado ({{sizeKb}} KB, {{elapsedSec}} s).",
+        "pmb_failed": "Falha ao criar PMB: {{error}}",
+        "question_updated": "Questão atualizada",
+        "invalid_pmb": "PMB inválida.",
+        "pmb_not_found": "PMB não encontrada.",
+        "pmb_deleted": "PMB #{{pmbId}} eliminada (e {{deletedQuestions}} perguntas associadas).",
+        "pmb_delete_failed": "Falha ao eliminar PMB: {{error}}",
+        "user_created": "Utilizador {{username}} criado com o papel {{role}}.",
+        "user_create_failed": "Falha ao criar utilizador: {{error}}",
+        "role_changed": "{{username}} agora tem o papel {{role}}.",
+        "role_change_failed": "Falha ao alterar papel: {{error}}",
+        "all_questions_answered": "Já respondeste corretamente a todas as questões disponíveis para este tópico."
+    },
+    "questionedit":{
+        "fields_title": "Editar Pergunta",
+        "question": "Pergunta",
+        "correct": "Resposta correta",
+        "distractors": "Distratores",
+        "feedback": "Feedback",
+        "save": "Guardar"
     },
     "auth": {
         "user_created": "Utilizador criado com sucesso",
@@ -246,5 +283,30 @@
         "restricted_access_sub":"Esta área é reservada a utilizadores registados. Faz login ou cria uma conta para aceder a todos os recursos do HALO.",
         "access_denied":"Acesso Negado",
         "access_denied_sub":"Para aceder a esta página, entra na tua conta."
+    },
+    "errors": {
+        "forbidden_title": "Acesso negado",
+        "forbidden_body": "Não tens permissão para aceder a esta página.",
+        "back_home": "Voltar ao início"
+    },
+    "admin": {
+        "title": "Área de Administrador",
+        "subtitle": "Gerir utilizadores e permissões.",
+        "create_user_title": "Criar Utilizador",
+        "create_user_subtitle": "Adicionar um novo utilizador e atribuir-lhe um papel.",
+        "create_user_button": "Criar utilizador",
+        "change_role_title": "Alterar Papel",
+        "change_role_subtitle": "Mudar o papel de um utilizador existente.",
+        "change_role_button": "Alterar papel",
+        "field_username": "Nome de utilizador",
+        "field_email": "Email",
+        "field_password": "Palavra-passe",
+        "field_role": "Papel",
+        "field_user": "Utilizador",
+        "user_placeholder": "Escolhe um utilizador...",
+        "password_hint": "Mínimo 8 caracteres, com maiúscula, número e símbolo.",
+        "role_student": "Estudante",
+        "role_teacher": "Docente",
+        "role_admin": "Administrador"
     }
 }

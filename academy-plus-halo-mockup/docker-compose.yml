@@ -31,7 +31,8 @@ services:
       - app-network
 
   mysql:
-    image: mariadb:10.5
+    image: mariadb:10.11
+    command: --max_allowed_packet=256M
     container_name: halo_mysql_db
     restart: unless-stopped
     environment:

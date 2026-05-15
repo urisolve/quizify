@@ -52,12 +52,6 @@ const queryPlusController = async (req, res) => {
     });
   }
 
-  // --- Always ensure a weekly_training entry exists for this user/question/week ---
-  //if (req.session.user && req.session.user.id && currentQuestionId) {
-  //  const userId = req.session.user.id;
-    //await initWeeklyTrainingEntry(userId, currentQuestionId);
-  //}
-
   // Prepare answers (shuffle correct + 3 random incorrect)
   const incorrects = pickLocaleArray(questionData.incorrect_answer, lang)
     .filter(ans => ans && String(ans).trim() !== '');

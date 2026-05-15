@@ -13,10 +13,18 @@ const topicQueryController = async (req, res) => {
   // For each subtopic, get a random question id
   const questionIds = (await Promise.all(
     subtopics.map(async (sub) => {
-      const ids = await getRandomQuestionBySubtopic(sub.id, 1);
+      const ids = await getRandomQuestionBySubtopic(sub.id, 1, req.session.user?.id);
       return ids[0]?.id; // Get the first (and only) id
     })
   )).filter(id => id);
+
+  if (!questionIds.length) {
+    req.session.flash = {
+      type: 'info',
+      messageKey: 'flashes.all_questions_answered',
+    };
+    return res.redirect('/practice-plus');
+  }
 
   // Store query session
   req.session.query = initializeQuerySession('topic', {

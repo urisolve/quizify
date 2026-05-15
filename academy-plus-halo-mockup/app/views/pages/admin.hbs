@@ -1,0 +1,159 @@
+<div class="container-fluid">
+  <div class="row g-4">
+
+    <!-- Hero -->
+    <div class="col-12">
+      <section class="card border-0 halo-hero-card overflow-hidden">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center gap-3">
+            <span class="halo-section-icon bg-light-primary text-primary">
+              <i class="ti ti-shield"></i>
+            </span>
+            <div>
+              <h2 class="card-title fw-semibold mb-0">{{ t 'admin.title' }}</h2>
+              <p class="mb-0 text-muted small">{{ t 'admin.subtitle' }}</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Flash -->
+    {{#if flash}}
+      <div class="col-12">
+        <div class="alert alert-{{flash.type}} d-flex align-items-center gap-2 mb-0" role="alert">
+          <i class="ti {{#if (eq flash.type 'success')}}ti-circle-check{{else}}ti-alert-circle{{/if}} fs-5"></i>
+          <div>
+            {{#if flash.messageKey}}{{t flash.messageKey flash.messageVars}}
+            {{else}}{{flash.message}}{{/if}}
+          </div>
+        </div>
+      </div>
+    {{/if}}
+
+    <!-- Create User -->
+    <div class="col">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-success text-success">
+              <i class="ti ti-user-plus"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'admin.create_user_title' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                {{ t 'admin.create_user_subtitle' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-auto">
+            <form method="POST" action="/admin/create-user"
+                  class="d-flex flex-column gap-3" data-disable-on-submit>
+              <div>
+                <label class="form-label fw-semibold mb-1" for="username">
+                  {{ t 'admin.field_username' }}
+                </label>
+                <input type="text" class="form-control" id="username" name="username" required>
+              </div>
+              <div>
+                <label class="form-label fw-semibold mb-1" for="email">
+                  {{ t 'admin.field_email' }}
+                </label>
+                <input type="email" class="form-control" id="email" name="email" required>
+              </div>
+              <div>
+                <label class="form-label fw-semibold mb-1" for="password">
+                  {{ t 'admin.field_password' }}
+                </label>
+                <input type="password" class="form-control" id="password" name="password" required>
+                <div class="form-text">{{ t 'admin.password_hint' }}</div>
+              </div>
+              <div>
+                <label class="form-label fw-semibold mb-1" for="role">
+                  {{ t 'admin.field_role' }}
+                </label>
+                <select class="form-select" id="role" name="role" required>
+                  <option value="student" selected>{{ t 'admin.role_student' }}</option>
+                  <option value="teacher">{{ t 'admin.role_teacher' }}</option>
+                  <option value="admin">{{ t 'admin.role_admin' }}</option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
+                <span class="btn-label">
+                  <i class="ti ti-user-plus me-2"></i>{{ t 'admin.create_user_button' }}
+                </span>
+                <span class="btn-loading d-none">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  {{ t 'playground.loading' }}
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Change Role -->
+    <div class="col">
+      <section class="card h-100">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-warning text-warning">
+              <i class="ti ti-user-cog"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'admin.change_role_title' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                {{ t 'admin.change_role_subtitle' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-auto">
+            <form method="POST" action="/admin/change-role"
+                  class="d-flex flex-column gap-3" data-disable-on-submit>
+              <div>
+                <label class="form-label fw-semibold mb-1" for="userId">
+                  {{ t 'admin.field_user' }}
+                </label>
+                <select class="form-select" id="userId" name="userId" required>
+                  <option value="" disabled selected>{{ t 'admin.user_placeholder' }}</option>
+                  {{#each users}}
+                    <option value="{{this.id}}">
+                      {{this.username}} ({{this.email}}) — {{this.role}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+              <div>
+                <label class="form-label fw-semibold mb-1" for="newRole">
+                  {{ t 'admin.field_role' }}
+                </label>
+                <select class="form-select" id="newRole" name="role" required>
+                  <option value="student">{{ t 'admin.role_student' }}</option>
+                  <option value="teacher">{{ t 'admin.role_teacher' }}</option>
+                  <option value="admin">{{ t 'admin.role_admin' }}</option>
+                </select>
+              </div>
+
+              <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
+                <span class="btn-label">
+                  <i class="ti ti-refresh me-2"></i>{{ t 'admin.change_role_button' }}
+                </span>
+                <span class="btn-loading d-none">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  {{ t 'playground.loading' }}
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </div>
+
+  </div>
+</div>
+
+<script src="/js/pages/playground.js"></script>

@@ -20,9 +20,10 @@
  
     <!-- Action cards -->
 
-    <!-- Create PMB -->
-    <div class="col">
-      <section class="card h-100">
+    <!-- PMB -->
+    <div class="col d-flex flex-column gap-4">
+      <!-- Create PMB -->
+      <section class="card flex-grow-1 mb-0">
         <div class="card-body p-4 d-flex flex-column gap-3">
           <div class="d-flex align-items-start gap-3">
             <span class="halo-section-icon bg-light-success text-success">
@@ -33,11 +34,59 @@
               <p class="mb-0 text-muted small" style="text-align: justify;">{{ t 'playground.pmbsubtitle' }}</p>
             </div>
           </div>
- 
+
           <div class="mt-auto">
-            <form method="POST" action="/playground/create-pmb">
+            <form method="POST" action="/playground/create-pmb" data-disable-on-submit>
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
-                <i class="ti ti-plus me-2"></i>{{ t 'playground.pmbbutton' }}
+                <span class="btn-label">
+                  <i class="ti ti-plus me-2"></i>{{ t 'playground.pmbbutton' }}
+                </span>
+                <span class="btn-loading d-none">
+                  <span class="spinner-border spinner-border-sm me-2"
+                        role="status" aria-hidden="true"></span>
+                  {{ t 'playground.loading' }}
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </section>
+      
+      <!-- Review PMB -->
+      <section class="card flex-grow-1 mb-0">
+        <div class="card-body p-4 d-flex flex-column gap-3">
+          <div class="d-flex align-items-start gap-3">
+            <span class="halo-section-icon bg-light-info text-info">
+              <i class="ti ti-file-search"></i>
+            </span>
+            <div class="flex-grow-1">
+              <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.pmb_review_title' }}</h3>
+              <p class="mb-0 text-muted small" style="text-align: justify;">
+                {{ t 'playground.pmb_review_subtitle' }}
+              </p>
+            </div>
+          </div>
+
+          <div class="mt-auto">
+            <form method="GET" action="/playground/pmb/review" class="d-flex flex-column gap-3">
+              <div>
+                <label class="form-label fw-semibold mb-1" for="pmbId">
+                  {{ t 'playground.pmb_id_label' }}
+                </label>
+                <select class="form-select" id="pmbId" name="pmbId" required>
+                  <option value="" disabled selected>
+                    {{ t 'playground.pmb_id_placeholder' }}
+                  </option>
+                  {{#each pmbs}}
+                    <option value="{{this.id}}">
+                      #{{this.id}} — {{this.filename}}{{#if this.sizeKb}} ({{this.sizeKb}} KB){{/if}}
+                    </option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <button class="btn btn-info text-white w-100 py-2 fw-semibold" type="submit">
+                <i class="ti ti-eye me-2"></i>{{ t 'playground.pmb_review_button' }}
               </button>
             </form>
           </div>
@@ -60,8 +109,31 @@
           </div>
  
           <div class="mt-auto">
-            <form method="POST" action="/playground/create-questions" class="d-flex flex-column gap-3">
+            <form method="POST" action="/playground/create-questions" class="d-flex flex-column gap-3" data-disable-on-submit>
               <input type="hidden" name="questionFocus" value="topology" />
+
+              <div>
+                <label class="form-label fw-semibold mb-1" for="pmbId">
+                  {{ t 'playground.pmb_source_label' }}
+                </label>
+                <select class="form-select" id="pmbId" name="pmbId">
+                  <option value="" selected>{{ t 'playground.pmb_random' }}</option>
+                  {{#each pmbs}}
+                    <option value="{{this.id}}">#{{this.id}} — {{this.filename}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div>
+                <label class="form-label fw-semibold mb-1" for="model">
+                  {{ t 'playground.model_label' }}
+                </label>
+                <select class="form-select" id="model" name="model" required>
+                  <option value="gpt-oss:20b" selected>gpt-oss:20b</option>
+                  <option value="llama3.3:70b">llama3.3:70b</option>
+                  <option value="lcm-full:latest">lcm-full:latest</option>
+                </select>
+              </div>
 
               <div>
                 <label class="form-label fw-semibold mb-1" for="subtopicId"> {{t 'playground.subtopic_label'}}</label>
@@ -73,7 +145,14 @@
               </div>
 
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
-                <i class="ti ti-plus me-2"></i>{{ t 'playground.questionbutton' }}
+                <span class="btn-label">
+                  <i class="ti ti-plus me-2"></i>{{ t 'playground.questionbutton' }}
+                </span>
+                <span class="btn-loading d-none">
+                  <span class="spinner-border spinner-border-sm me-2"
+                        role="status" aria-hidden="true"></span>
+                  {{ t 'playground.loading' }}
+                </span>
               </button>
             </form>
           </div>
@@ -119,11 +198,8 @@
         <div class="alert alert-{{flash.type}} d-flex align-items-center gap-2 mb-0" role="alert">
           <i class="ti {{#if (eq flash.type 'success')}}ti-circle-check{{else}}ti-alert-circle{{/if}} fs-5"></i>
           <div>
-            {{#if flash.messageKey}}
-              {{t flash.messageKey flash.messageVars}}
-            {{else}}
-              {{flash.message}}
-            {{/if}}
+            {{#if flash.messageKey}}{{t flash.messageKey flash.messageVars}}
+            {{else}}{{flash.message}}{{/if}}
           </div>
         </div>
       </div>
@@ -140,6 +216,10 @@
                 <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.creationTitle' }}</h3>
                 <p class="mb-0 text-muted small">{{ t 'playground.creationsubTitle' }}</p>
               </div>
+              <a href="/playground/questions/{{flash.generatedQuestion.id}}/edit"
+                class="btn btn-outline-primary py-2 fw-semibold">
+                <i class="ti ti-pencil me-2"></i>{{ t 'playground.edit_question' }}
+              </a>
               <span class="badge bg-light-success text-success">{{ t 'playground.labelStatus' }}</span>
             </div>
 
@@ -189,6 +269,57 @@
                 </div>
               </div>
             {{/if}}
+
+            {{#if flash.generatedQuestion.id}}
+              <!-- Likert rating, identical to playground_review -->
+              <div class="mt-4">
+                <div class="d-flex align-items-center gap-3 mb-3">
+                  <span class="halo-section-icon bg-light-warning text-warning">
+                    <i class="ti ti-star"></i>
+                  </span>
+                  <h2 class="card-title fw-semibold mb-0 fs-5">{{ t 'playgroundreview.evaluation' }}</h2>
+                </div>
+
+                <form method="POST" action="/playground/review/rate"
+                      class="d-grid gap-2" data-disable-on-submit>
+                  <input type="hidden" name="questionId" value="{{flash.generatedQuestion.id}}">
+                  <input type="hidden" name="return_to" value="playground">
+
+                  <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                    <input type="radio" name="rating" value="1" required class="mt-1">
+                    <div><span class="badge bg-danger me-2">1</span>
+                    <span class="fw-semibold">{{ t 'playgroundreview.scaleone' }}</span></div>
+                  </label>
+                  <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                    <input type="radio" name="rating" value="2" required class="mt-1">
+                    <div><span class="badge bg-warning text-dark me-2">2</span>
+                    <span class="fw-semibold">{{ t 'playgroundreview.scaletwo' }}</span></div>
+                  </label>
+                  <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                    <input type="radio" name="rating" value="3" required class="mt-1">
+                    <div><span class="badge bg-secondary me-2">3</span>
+                    <span class="fw-semibold">{{ t 'playgroundreview.scalethree' }}</span></div>
+                  </label>
+                  <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                    <input type="radio" name="rating" value="4" required class="mt-1">
+                    <div><span class="badge bg-info me-2">4</span>
+                    <span class="fw-semibold">{{ t 'playgroundreview.scalefour' }}</span></div>
+                  </label>
+                  <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
+                    <input type="radio" name="rating" value="5" required class="mt-1">
+                    <div><span class="badge bg-success me-2">5</span>
+                    <span class="fw-semibold">{{ t 'playgroundreview.scalefive' }}</span></div>
+                  </label>
+
+                  <div class="d-flex gap-2 mt-3">
+                    <button type="submit" class="btn btn-primary py-2 fw-semibold flex-grow-1">
+                      <i class="ti ti-send me-2"></i>{{ t 'playgroundreview.submiteval' }}
+                    </button>
+                    
+                  </div>
+                </form>
+              </div>
+            {{/if}}
           </div>
         </section>
       </div>
@@ -198,3 +329,6 @@
   
   </div>
 </div>
+
+<script src="/js/pages/playground.js"></script>
+<script src="/js/pages/playground_review.js"></script>

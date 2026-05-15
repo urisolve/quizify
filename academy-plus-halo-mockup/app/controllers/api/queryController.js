@@ -1,12 +1,13 @@
 const User = require('../../models/User');
 const Questions = require('../../models/Questions');
-const { getSubtopicById, setUserSubtopicProgress, getTopicBadge } = require('../../models/practicePlusModel');
+const { getSubtopicById, setUserSubtopicProgress, getTopicBadge, getUserSubtopicProgressById, getTopicProgress } = require('../../models/practicePlusModel');
 const { logTrainingAttempt, getUserWeeklyStats} = require('../../models/Training');
 const { checkAndAwardTopicBadge } = require('../../models/User');
 const { calculateQuestionScore } = require('../../utils/scoreCalculator');
 const { incrementQuestionTries } = require('../../utils/querySession');
 const getWeekStart = require('../../utils/getWeekStart');
 const { pickLocale } = require('../../utils/localize');
+const finalizeQuizStats = require('../../utils/finalizeQuizStats');
 
 exports.submitAnswer = async (req, res) => {
   const { answer } = req.body;
@@ -103,6 +104,7 @@ exports.submitAnswer = async (req, res) => {
         req.session.query = query;
         return res.json({ correct: false, complete: false, roundUp: true, progress: 100, feedback: question.feedback || null, round: query.round });
       }
+      await finalizeQuizStats(query); 
       return res.json({ correct: false, complete: true, progress: 100, feedback: question.feedback || null, round: query.round });
     }
 
@@ -128,12 +130,6 @@ exports.submitAnswer = async (req, res) => {
       score,
       time: questionTime
     });
-
-  // On correct answer: increment tries and completed, update score
-  // const newTries = (currentDone?.tries ?? 0) + 1;
-  // const newCompleted = (currentDone?.completed ?? 0) + 1;
-  // const newScore = (currentDone?.score ?? 0) + score;
-  // await updateWeeklyTraining(userId, questionId, weekStart, { tries: newTries, score: newScore, completed: newCompleted });
 
   // Also add the score earned for this question to the user's total score
   await User.incrementUserExp(userId, score);
@@ -198,26 +194,34 @@ exports.submitAnswer = async (req, res) => {
 
     // Completed Quiz
     if (query.type === 'subtopic' && query.subtopicId) {
-      await setUserSubtopicProgress(userId, query.subtopicId, 100);
+
+      // --- Score-based partial progress ---
+      // Read current progress, add this quiz's score, cap at 100.
+      const [[progressRow]] = await getUserSubtopicProgressById(userId, query.subtopicId);
+      const currentProgress = progressRow?.progress || 0;
+      const newProgress = Math.min(currentProgress + query.score, 100);
+      await setUserSubtopicProgress(userId, query.subtopicId, newProgress);
 
       // --- BADGE LOGIC ---
+      // Award the topic badge only when the whole topic reaches 100%.
       // Get topic_id for this subtopic
       const [[subtopic]] = await getSubtopicById(query.subtopicId);
       if (subtopic && subtopic.topic_id) {
-        // Use completionBefore saved in session
-        const completionBefore = query.completionBefore || 0;
+        const [[topicProgress]] = await getTopicProgress(userId, subtopic.topic_id);
+        const topicCompletionAfter = topicProgress ? Number(topicProgress.completion) : 0;
 
         // Get badge info for this topic
         const [[topicBadge]] = await getTopicBadge(subtopic.topic_id);
         const topicHasBadge = topicBadge && topicBadge.badge != null;
 
-        if (completionBefore < 100 && topicHasBadge) {
+        if (topicCompletionAfter >= 100 && topicHasBadge) {
           await checkAndAwardTopicBadge(userId, subtopic.topic_id);
         }
       }
     }
     // For topic queryzes, we don't mark anything as complete since it's just a test
 
+    await finalizeQuizStats(query); 
     return res.json({ correct: true, complete: true, progress: progressPercent });
   } else {
     return res.json({ correct: true, complete: false, progress: progressPercent });

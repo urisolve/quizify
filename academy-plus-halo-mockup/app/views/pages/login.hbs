@@ -34,16 +34,16 @@
             <form id="login-form">
 
               <div class="mb-3">
-                <label class="form-label fw-medium">{{ t 'auth.email' }}</label>
+                <label class="form-label fw-medium">{{ t 'auth.user_name' }}</label>
                 <div class="input-group">
                   <span class="input-group-text bg-light border-end-0">
-                    <i class="ti ti-mail text-muted"></i>
+                    <i class="ti ti-user text-muted"></i>
                   </span>
                   <input
                     class="form-control border-start-0 ps-0"
-                    type="email"
-                    name="email"
-                    placeholder="{{ t 'auth.email_ex' }}"
+                    type="text"
+                    name="username"
+                    placeholder="{{ t 'auth.user_name' }}"
                     required
                   />
                 </div>
