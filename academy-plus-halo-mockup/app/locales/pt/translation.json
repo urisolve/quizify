@@ -179,7 +179,9 @@
         "pmb_review_subtitle": "Vê o conteúdo de uma PMB existente",
         "pmb_id_label": "PMB",
         "pmb_id_placeholder": "Escolhe uma PMB...",
-        "pmb_review_button": "Rever PMB"
+        "pmb_review_button": "Rever PMB",
+        "pmb_source_label": "PMB",
+        "pmb_random": "Aleatória"
     },
     "playgroundreview": {
         "type": "tipo: ",

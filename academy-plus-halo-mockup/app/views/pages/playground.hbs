@@ -113,11 +113,25 @@
               <input type="hidden" name="questionFocus" value="topology" />
 
               <div>
+                <label class="form-label fw-semibold mb-1" for="pmbId">
+                  {{ t 'playground.pmb_source_label' }}
+                </label>
+                <select class="form-select" id="pmbId" name="pmbId">
+                  <option value="" selected>{{ t 'playground.pmb_random' }}</option>
+                  {{#each pmbs}}
+                    <option value="{{this.id}}">#{{this.id}} — {{this.filename}}</option>
+                  {{/each}}
+                </select>
+              </div>
+
+              <div>
                 <label class="form-label fw-semibold mb-1" for="model">
                   {{ t 'playground.model_label' }}
                 </label>
                 <select class="form-select" id="model" name="model" required>
-                  <option value="">Loading models...</option>
+                  <option value="gpt-oss:20b" selected>gpt-oss:20b</option>
+                  <option value="llama3.3:70b">llama3.3:70b</option>
+                  <option value="lcm-full:latest">lcm-full:latest</option>
                 </select>
               </div>
 

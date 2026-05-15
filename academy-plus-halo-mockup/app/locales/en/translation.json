@@ -170,7 +170,9 @@
         "pmb_review_subtitle": "View the contents of an existing PMB",
         "pmb_id_label": "PMB",
         "pmb_id_placeholder": "Choose a PMB...",
-        "pmb_review_button": "Review PMB"
+        "pmb_review_button": "Review PMB",
+        "pmb_source_label": "PMB",
+        "pmb_random": "Random"
     },
     "playgroundreview": {
         "type": "type: ",

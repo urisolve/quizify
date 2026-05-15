@@ -278,32 +278,34 @@ async function deletePmb(req, res) {
 
 // Pick a random PMB from rag_documents, then read its on-disk markdown.
 // Returns { ragDocumentId, pmbNumber, markdownContent } or null if no PMBs exist.
-async function pickRandomPmbGrounding() {
+async function loadPmbGrounding(ragDocumentId) {
   const [rows] = await db.query(
-    `SELECT id, content
-       FROM rag_documents
-      WHERE type_document = 'pmb'
-      ORDER BY RAND()
-      LIMIT 1`
+    `SELECT id, content FROM rag_documents
+      WHERE id = ? AND type_document = 'pmb' LIMIT 1`,
+    [ragDocumentId]
   );
-  if (!rows.length) return null;
+  if (!rows.length || !rows[0].content) return null;
 
-  const row = rows[0];
-  if (!row.content) {
-    throw new Error(`PMB row ${row.id} has no content stored.`);
-  }
-
-  const zip = await JSZip.loadAsync(row.content);
+  const zip = await JSZip.loadAsync(rows[0].content);
   const mdEntry = zip.file('lcm_pedagogical_solution_pt.md');
   if (!mdEntry) {
-    throw new Error(`PMB ${row.id} is missing lcm_pedagogical_solution_pt.md`);
+    throw new Error(`PMB ${ragDocumentId} is missing lcm_pedagogical_solution_pt.md`);
   }
-  const markdownContent = await mdEntry.async('string');
-
   return {
-    ragDocumentId: row.id,
-    markdownContent,
+    ragDocumentId: rows[0].id,
+    markdownContent: await mdEntry.async('string'),
   };
+}
+
+// Pick a random PMB, then load it.
+async function pickRandomPmbGrounding() {
+  const [rows] = await db.query(
+    `SELECT id FROM rag_documents
+      WHERE type_document = 'pmb'
+      ORDER BY RAND() LIMIT 1`
+  );
+  if (!rows.length) return null;
+  return loadPmbGrounding(rows[0].id);
 }
 
 function buildPmbAssetUrl(ragDocumentId, relPath) {
@@ -981,12 +983,13 @@ async function createQuestions(req, res) {
   let rawText = '';
   let newQuestionId = null;
   const t0 = Date.now();
+  const ALLOWED_MODELS = ['gpt-oss:20b', 'llama3.3:70b', 'lcm-full:latest'];
 
   try {
     // Read and validate the model.
-    const model = String(req.body?.model || '').trim();
+    const model = ALLOWED_MODELS.includes(req.body?.model) ? req.body.model : null;
     if (!model) {
-      throw new Error('No model selected.');
+      throw new Error('Invalid model selected.');
     }
 
     // Read and validate the chosen subtopic.
@@ -1009,9 +1012,20 @@ async function createQuestions(req, res) {
     }
 
     // Pick a random PMB to ground against.
-    const pmb = await pickRandomPmbGrounding();
-    if (!pmb) {
-      throw new Error('No PMB documents available — create one in the Playground first.');
+    // Pick the PMB to ground against — specific if chosen, otherwise random.
+    const requestedPmbId = parseInt(req.body?.pmbId, 10);
+    let pmb;
+
+    if (Number.isInteger(requestedPmbId) && requestedPmbId > 0) {
+      pmb = await loadPmbGrounding(requestedPmbId);
+      if (!pmb) {
+        throw new Error(`PMB ${requestedPmbId} not found or has no content.`);
+      }
+    } else {
+      pmb = await pickRandomPmbGrounding();
+      if (!pmb) {
+        throw new Error('No PMB documents available — create one in the Playground first.');
+      }
     }
 
     console.log(`[playground] createQuestions — grounding on rag_document_id=${pmb.ragDocumentId}`);
@@ -1441,6 +1455,8 @@ async function updateQuestionFields(req, res) {
   return res.redirect(`/playground/questions/${id}/edit`);
 }
 
+
+
  
 module.exports = {
   showPlayground,
@@ -1452,5 +1468,5 @@ module.exports = {
   showQuestionEdit,        
   updateQuestionFields,
   showPmbReview,
-  deletePmb,
+  deletePmb
 };
