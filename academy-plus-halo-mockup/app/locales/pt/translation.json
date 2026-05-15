@@ -227,7 +227,8 @@
         "user_created": "Utilizador {{username}} criado com o papel {{role}}.",
         "user_create_failed": "Falha ao criar utilizador: {{error}}",
         "role_changed": "{{username}} agora tem o papel {{role}}.",
-        "role_change_failed": "Falha ao alterar papel: {{error}}"
+        "role_change_failed": "Falha ao alterar papel: {{error}}",
+        "all_questions_answered": "Já respondeste corretamente a todas as questões disponíveis para este tópico."
     },
     "questionedit":{
         "fields_title": "Editar Pergunta",

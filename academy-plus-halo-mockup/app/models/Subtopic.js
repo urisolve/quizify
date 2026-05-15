@@ -14,7 +14,7 @@ async function initSubtopicsTable() {
         unlock_progress INT DEFAULT 0,
         number_questions INT DEFAULT 0,
         number_tries INT DEFAULT 0,
-        number_correct INT DEFAULT 0,
+        number_corrects INT DEFAULT 0,
         time_spent INT DEFAULT 0,
         rag_prompt TEXT DEFAULT NULL,
         rag_system TEXT DEFAULT NULL,
@@ -69,7 +69,7 @@ async function createSubtopic({
 async function updateSubtopic(id, updates) {
   const allowedFields = [
     'title', 'description', 'image', 'locked', 'unlock_progress',
-    'number_questions', 'number_tries', 'number_correct', 'time_spent'
+    'number_questions', 'number_tries', 'number_corrects', 'time_spent'
   ];
 
   // Filter fields and handle JSON conversion
@@ -93,7 +93,7 @@ async function incrementTopicStats(id, { tries = 0, correct = 0, time = 0 }) {
   await db.query(
     `UPDATE subtopics SET 
      number_tries = number_tries + ?, 
-     number_correct = number_correct + ?, 
+     number_corrects = number_corrects + ?, 
      time_spent = time_spent + ? 
      WHERE id = ?`,
     [tries, correct, time, id]

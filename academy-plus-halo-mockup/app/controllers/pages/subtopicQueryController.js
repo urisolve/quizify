@@ -11,10 +11,18 @@ const subtopicQueryController = async (req, res) => {
   if (!subtopic) return res.redirect('/practice-plus');
 
   const numQuestions = subtopic?.number_questions || 1;
-console.log(`Subtópico ${subtopicId}: configurado para ${numQuestions} questões`);
+  console.log(`Subtópico ${subtopicId}: configurado para ${numQuestions} questões`);
   
-// Get questions for this subtopic
-  const questionIds = (await getRandomQuestionBySubtopic(subtopicId, numQuestions)).map(q => q.id);
+  // Get questions for this subtopic
+  const questionIds = (await getRandomQuestionBySubtopic(subtopicId, numQuestions, req.session.user?.id)).map(q => q.id);
+
+  if (!questionIds.length) {
+    req.session.flash = {
+      type: 'info',
+      messageKey: 'flashes.all_questions_answered',
+    };
+    return res.redirect('/practice-plus');
+  }
 
   // Get topic_id for this subtopic
   const topicId = subtopic.topic_id;
@@ -23,7 +31,7 @@ console.log(`Subtópico ${subtopicId}: configurado para ${numQuestions} questõe
     const [[topicProgress]] = await getTopicProgress(req.session.user.id, topicId);
     completionBefore = topicProgress ? topicProgress.completion : 0;
   }
-console.log(`User exp antes: ${req.session.user?.exp}`);
+  console.log(`User exp antes: ${req.session.user?.exp}`);
   // Store query session
   req.session.query = initializeQuerySession('subtopic', {
     subtopicId,

@@ -14,7 +14,7 @@ async function initTopicsTable() {
         number_subtopics INT NOT NULL DEFAULT 0,
         number_questions INT DEFAULT 0,
         number_tries INT DEFAULT 0,
-        number_correct INT DEFAULT 0,
+        number_corrects INT DEFAULT 0,
         time_spent INT DEFAULT 0
       )
     `);
@@ -64,7 +64,7 @@ async function updateTopic(id, updates) {
   const allowedFields = [
     'title', 'description', 'badge', 'locked', 'date_unlock',
     'number_subtopics', 'number_questions', 'number_tries', 
-    'number_correct', 'time_spent'
+    'number_corrects', 'time_spent'
   ];
 
   // Filter fields and handle JSON conversion
@@ -88,7 +88,7 @@ async function incrementTopicStats(id, { tries = 0, correct = 0, time = 0 }) {
   await db.query(
     `UPDATE topics SET 
      number_tries = number_tries + ?, 
-     number_correct = number_correct + ?, 
+     number_corrects = number_corrects + ?, 
      time_spent = time_spent + ? 
      WHERE id = ?`,
     [tries, correct, time, id]

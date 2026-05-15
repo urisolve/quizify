@@ -218,7 +218,8 @@
         "user_created": "User {{username}} created with role {{role}}.",
         "user_create_failed": "Failed to create user: {{error}}",
         "role_changed": "{{username}} now has role {{role}}.",
-        "role_change_failed": "Failed to change role: {{error}}"
+        "role_change_failed": "Failed to change role: {{error}}",
+        "all_questions_answered": "You've already correctly answered every available question for this topic."
     },
     "questionedit":{
         "fields_title": "Edit question",

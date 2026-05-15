@@ -25,6 +25,13 @@ function getUserSubtopicProgress(userId) {
   return db.query('SELECT subtopic_id, progress FROM user_subtopic_progress WHERE user_id = ?', [userId]); 
 }
 
+function getUserSubtopicProgressById(userId, subtopicId) {
+  return db.query(
+    'SELECT progress FROM user_subtopic_progress WHERE user_id = ? AND subtopic_id = ?',
+    [userId, subtopicId]
+  );
+}
+
 function setUserSubtopicProgress(userId, subtopicId, progress) {
   return db.query(
     'INSERT INTO user_subtopic_progress (user_id, subtopic_id, progress) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE progress = ?',
@@ -33,7 +40,8 @@ function setUserSubtopicProgress(userId, subtopicId, progress) {
 }
 
 function getSubtopicsByTopic(topicId) { 
-  return db.query('SELECT id, title, content, num_questions, weight, image FROM subtopics WHERE topic_id = ?', [topicId]); 
+  return db.query(
+    `SELECT id, title, description, number_questions, image FROM subtopics WHERE topic_id = ?`, [topicId]); 
 }
 
 function getUserSubtopicProgressForTopic(userId, topicId) {
@@ -72,5 +80,6 @@ module.exports = {
   getTopicBadge,
   getUserConquests,
   setUserConquests,
-  getSubtopicById
+  getSubtopicById,
+  getUserSubtopicProgressById
 };

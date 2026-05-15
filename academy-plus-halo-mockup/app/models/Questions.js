@@ -89,6 +89,7 @@ async function initQuestionsTable() {
         type ENUM('AI Generated','Edited by Human','Created by Human') NOT NULL,
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
+        time_spent INT DEFAULT 0,
         rating_sum_teacher INT DEFAULT 0,
         rating_count_teacher INT DEFAULT 0,
         rating_sum_student INT DEFAULT 0,
@@ -110,10 +111,33 @@ function getQuestionsBySubtopic(subtopicId) {
 }
 
 // Get a random question for a subtopic (without duplicates)
-async function getRandomQuestionBySubtopic(subtopicId, limit) {
+async function getRandomQuestionBySubtopic(subtopicId, limit, userId = null) {
+  const params = [subtopicId];
+
+  // Exclude questions this user has already answered correctly.
+  let passedFilter = '';
+  if (userId) {
+    passedFilter = `
+      AND q.id NOT IN (
+        SELECT question_id FROM training
+        WHERE user_id = ? AND success = 1
+      )`;
+    params.push(userId);
+  }
+  params.push(limit);
+
   const [rows] = await db.query(
-    'SELECT id FROM questions WHERE subtopic_id = ? ORDER BY RAND() LIMIT ?',
-    [subtopicId, limit]
+    `SELECT q.id
+      FROM questions q
+      WHERE q.subtopic_id = ?
+        -- teacher side: unrated, or average above 2.5
+      AND (q.rating_count_teacher = 0 OR q.rating_sum_teacher / q.rating_count_teacher > 2.5)
+      -- student side: unrated, or average above 2.5
+      AND (q.rating_count_student = 0 OR q.rating_sum_student / q.rating_count_student > 2.5)
+        ${passedFilter}
+      ORDER BY RAND()
+      LIMIT ?`,
+    params
   );
   
   // Remove duplicates and limit
