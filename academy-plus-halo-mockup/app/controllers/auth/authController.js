@@ -69,6 +69,8 @@ const loginUser = async (req, res) => {
             return res.status(401).json({ message: req.t('auth.invalid_credentials') });
         }
 
+        const avatarUrl = await User.ensureUserAvatar(user.id, user.username, user.avatar_url);
+
         // Compute level from score (default 0 if missing)
         req.session.user = {
             id: user.id,
@@ -77,7 +79,8 @@ const loginUser = async (req, res) => {
             role: user.role,
             level: getLevelFromScore(user.exp || 0),
             levelProgress: getLevelProgressPercent(user.exp || 0),
-            avatar: user.avatar_url,
+            avatar_url: avatarUrl,
+            avatar: avatarUrl,
             exp: user.exp || 0,
             hide_name: user.hide_name || false,
             private_account: user.private_account || false,

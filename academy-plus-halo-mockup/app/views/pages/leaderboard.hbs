@@ -1,26 +1,119 @@
-<div class="ranking-table-container">
-  <h2>{{t 'leaderboard.leaderboard'}}</h2>
-  <div id="user-position-message" class="user-position-message">
-    {{t 'leaderboard.your_position'}}: <span id="user-position-number"></span>
+<div class="container-fluid">
+  <div class="row g-4">
+    <div class="col-12">
+      <section class="card border-0 shadow-sm overflow-hidden">
+        <div class="card-body p-4 p-lg-5">
+          <div class="d-flex flex-column flex-lg-row align-items-lg-center justify-content-between gap-3 mb-4">
+            <div>
+              <h2 class="fw-semibold mb-1">{{t 'leaderboard.leaderboard'}}</h2>
+              <p class="text-muted mb-0">
+                {{leaderboard.length}} / {{pageSize}} {{t 'leaderboard.players_per_page'}}
+                {{#if totalUsers}} · {{totalUsers}} {{t 'leaderboard.total_students'}}{{/if}}
+              </p>
+            </div>
+            <div class="badge bg-light-primary text-primary px-3 py-2">
+              {{t 'leaderboard.students_only'}}
+            </div>
+          </div>
+
+          {{#if leaderboard.length}}
+            <div class="table-responsive">
+              <table class="table align-middle mb-0">
+                <thead>
+                  <tr>
+                    <th style="width: 90px;">{{t 'leaderboard.rank'}}</th>
+                    <th>{{t 'leaderboard.user'}}</th>
+                    <th class="text-end">{{t 'leaderboard.points'}}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {{#each leaderboard}}
+                    <tr
+                      class="{{#if isCurrentUser}}table-primary{{else if (eq rank 1)}}table-warning{{/if}}"
+                      style="{{#if isCurrentUser}}box-shadow: inset 0 0 0 2px #0d6efd;{{/if}}{{#if (eq rank 2)}}background: linear-gradient(90deg, #FAFAFA 0%, #F1F4F7 100%); border-left: 4px solid #C0C0C0;{{/if}}{{#if (eq rank 3)}}background-color: #f7e2c7;{{/if}}"
+                    >
+                      <td>
+                        <span class="badge px-3 py-2 {{#if (eq rank 1)}}bg-warning text-dark{{else if (eq rank 2)}}text-dark{{else if (eq rank 3)}}text-white{{else}}bg-light-secondary text-secondary{{/if}}" style="{{#if (eq rank 2)}}background: linear-gradient(180deg, #D9DEE5 0%, #C0C0C0 100%);{{else if (eq rank 3)}}background-color: #cd7f32;{{/if}}">#{{rank}}</span>
+                      </td>
+                      <td>
+                        <div class="d-flex align-items-center gap-3">
+                          <img
+                            src="{{avatar}}"
+                            alt="{{username}} avatar"
+                            class="rounded-circle border"
+                            style="width: 42px; height: 42px; object-fit: cover;"
+                          >
+                          <span class="fw-semibold">{{username}}</span>
+                          {{#if (eq rank 1)}}
+                            <span class="badge bg-warning text-dark">Top 1</span>
+                          {{else if (eq rank 2)}}
+                            <span class="badge text-dark" style="background: linear-gradient(180deg, #D9DEE5 0%, #C0C0C0 100%);">Top 2</span>
+                          {{else if (eq rank 3)}}
+                            <span class="badge text-white" style="background-color: #cd7f32;">Top 3</span>
+                          {{/if}}
+                          {{#if isCurrentUser}}
+                            <span class="badge bg-primary">{{t 'leaderboard.your_position'}}</span>
+                          {{/if}}
+                        </div>
+                      </td>
+                      <td class="text-end fw-semibold">{{points}}</td>
+                    </tr>
+                  {{/each}}
+                </tbody>
+              </table>
+            </div>
+          {{else}}
+            <div class="alert alert-info mb-0" role="alert">
+              {{t 'leaderboard.empty_state'}}
+            </div>
+          {{/if}}
+
+          <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mt-4">
+            <div class="text-muted small">
+              {{t 'leaderboard.page_info' currentPage=currentPage totalPages=totalPages}}
+            </div>
+
+            <nav aria-label="Leaderboard pagination">
+              <ul class="pagination mb-0">
+                <li class="page-item {{#unless hasPreviousPage}}disabled{{/unless}}">
+                  <a class="page-link" href="/leaderboard?page={{previousPage}}">{{t 'leaderboard.previous_page'}}</a>
+                </li>
+                {{#each pageNumbers}}
+                  <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}" aria-current="page">
+                    <a class="page-link" href="/leaderboard?page={{this}}">{{this}}</a>
+                  </li>
+                {{/each}}
+                <li class="page-item {{#unless hasNextPage}}disabled{{/unless}}">
+                  <a class="page-link" href="/leaderboard?page={{nextPage}}">{{t 'leaderboard.next_page'}}</a>
+                </li>
+              </ul>
+            </nav>
+          </div>
+
+          {{#if currentUserPosition}}
+            {{#unless currentUserOnPage}}
+              <div class="mt-4 border border-primary rounded-3 p-3 bg-primary bg-opacity-10">
+                <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap">
+                  <div class="d-flex align-items-center gap-3">
+                    <span class="badge bg-primary px-3 py-2">#{{currentUserPosition}}</span>
+                    <img
+                      src="{{currentUser.avatar}}"
+                      alt="{{currentUser.username}} avatar"
+                      class="rounded-circle border border-primary"
+                      style="width: 42px; height: 42px; object-fit: cover;"
+                    >
+                    <div>
+                      <div class="fw-semibold">{{currentUser.username}}</div>
+                      <div class="text-muted small">{{t 'leaderboard.your_position'}}</div>
+                    </div>
+                  </div>
+                  <div class="fw-semibold text-primary">{{currentUser.points}} {{t 'leaderboard.points'}}</div>
+                </div>
+              </div>
+            {{/unless}}
+          {{/if}}
+        </div>
+      </section>
+    </div>
   </div>
-  <table class="ranking-table" id="ranking-table">
-    <thead>
-      <tr>
-        <th>{{t 'leaderboard.rank'}}</th>
-        <th></th>
-        <th class="username-cell">{{t 'leaderboard.user'}}</th>
-        <!-- Sorting columns -->
-        <th class="sortable-col"><span class="th-active-indicator">{{t 'leaderboard.level'}}</span></th>
-        <th class="sortable-col"><span class="th-active-indicator">{{t 'leaderboard.weekly_score'}}</span></th>
-        <!-- Add to any new sortable columns -->
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Rows will be inserted here -->
-    </tbody>
-  </table>
 </div>
-<script>
-  window.currentUsername = "{{user.username}}";
-</script>
-<script src="/js/pages/leaderboard.js"></script>

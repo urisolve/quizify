@@ -36,7 +36,20 @@
           </div>
 
           <div class="mt-auto">
-            <form method="POST" action="/playground/create-pmb" data-disable-on-submit>
+            <form method="POST" action="/playground/create-pmb" class="d-flex flex-column gap-3" data-disable-on-submit>
+              <div>
+                <label class="form-label fw-semibold mb-1" for="pmbDifficulty">
+                  {{ t 'playground.pmb_difficulty_label' }}
+                </label>
+                <select class="form-select" id="pmbDifficulty" name="difficulty" required>
+                  <option value="1">{{ t 'playground.pmb_difficulty_1' }}</option>
+                  <option value="2">{{ t 'playground.pmb_difficulty_2' }}</option>
+                  <option value="3" selected>{{ t 'playground.pmb_difficulty_3' }}</option>
+                  <option value="4">{{ t 'playground.pmb_difficulty_4' }}</option>
+                  <option value="5">{{ t 'playground.pmb_difficulty_5' }}</option>
+                </select>
+              </div>
+
               <button class="btn btn-primary w-100 py-2 fw-semibold" type="submit">
                 <span class="btn-label">
                   <i class="ti ti-plus me-2"></i>{{ t 'playground.pmbbutton' }}
@@ -113,13 +126,42 @@
               <input type="hidden" name="questionFocus" value="topology" />
 
               <div>
+                <label class="form-label fw-semibold mb-1" for="pmbSourceMode">
+                  {{ t 'playground.pmb_source_mode_label' }}
+                </label>
+                <select class="form-select" id="pmbSourceMode" name="pmbSourceMode" required>
+                  <option value="random_any" selected>{{ t 'playground.pmb_source_mode_random_any' }}</option>
+                  <option value="random_by_level">{{ t 'playground.pmb_source_mode_random_level' }}</option>
+                  <option value="specific_pmb">{{ t 'playground.pmb_source_mode_specific' }}</option>
+                </select>
+              </div>
+
+              <div id="question-pmb-difficulty-wrap" class="d-none">
+                <label class="form-label fw-semibold mb-1" for="questionPmbDifficultyLevel">
+                  {{ t 'playground.pmb_filter_difficulty_label' }}
+                </label>
+                <select class="form-select" id="questionPmbDifficultyLevel" name="pmbDifficultyLevel">
+                  <option value="1">{{ t 'playground.pmb_difficulty_1' }}</option>
+                  <option value="2">{{ t 'playground.pmb_difficulty_2' }}</option>
+                  <option value="3" selected>{{ t 'playground.pmb_difficulty_3' }}</option>
+                  <option value="4">{{ t 'playground.pmb_difficulty_4' }}</option>
+                  <option value="5">{{ t 'playground.pmb_difficulty_5' }}</option>
+                </select>
+              </div>
+
+              <div id="question-pmb-select-wrap" class="d-none">
                 <label class="form-label fw-semibold mb-1" for="pmbId">
                   {{ t 'playground.pmb_source_label' }}
                 </label>
                 <select class="form-select" id="pmbId" name="pmbId">
-                  <option value="" selected>{{ t 'playground.pmb_random' }}</option>
+                  <option value="" selected>{{ t 'playground.pmb_id_placeholder' }}</option>
                   {{#each pmbs}}
-                    <option value="{{this.id}}">#{{this.id}} — {{this.filename}}</option>
+                    <option
+                      value="{{this.id}}"
+                      data-difficulty-level="{{this.difficultyLevel}}"
+                    >
+                      #{{this.id}} — {{this.filename}}{{#if this.difficultyLevel}} ({{ t 'playground.pmb_difficulty_short' }} {{this.difficultyLevel}}){{/if}}
+                    </option>
                   {{/each}}
                 </select>
               </div>
@@ -195,9 +237,19 @@
     <!-- Flash banner -->
     {{#if flash}}
       <div class="col-12">
-        <div class="alert alert-{{flash.type}} d-flex align-items-center gap-2 mb-0" role="alert">
+        <div
+          id="playground-flash-banner"
+          class="alert alert-{{flash.type}} d-flex align-items-center gap-2 mb-0"
+          role="alert"
+          data-flash-type="{{flash.type}}"
+        >
           <i class="ti {{#if (eq flash.type 'success')}}ti-circle-check{{else}}ti-alert-circle{{/if}} fs-5"></i>
-          <div>
+          <div id="playground-flash-message" data-generated-question="{{#if flash.generatedQuestion}}1{{else}}0{{/if}}">
+            {{#if flash.generatedQuestion}}
+              <div class="small fw-semibold text-uppercase text-muted mb-1">
+                {{flash.generatedQuestion.promptSubtopic}} · {{flash.generatedQuestion.promptTheme}} · {{flash.generatedQuestion.model}}
+              </div>
+            {{/if}}
             {{#if flash.messageKey}}{{t flash.messageKey flash.messageVars}}
             {{else}}{{flash.message}}{{/if}}
           </div>
@@ -216,11 +268,24 @@
                 <h3 class="fs-5 fw-semibold mb-1">{{ t 'playground.creationTitle' }}</h3>
                 <p class="mb-0 text-muted small">{{ t 'playground.creationsubTitle' }}</p>
               </div>
-              <a href="/playground/questions/{{flash.generatedQuestion.id}}/edit"
-                class="btn btn-outline-primary py-2 fw-semibold">
-                <i class="ti ti-pencil me-2"></i>{{ t 'playground.edit_question' }}
-              </a>
+              <div class="d-flex gap-2">
+                <a href="/playground/questions/{{flash.generatedQuestion.id}}/edit"
+                  class="btn btn-outline-primary py-2 fw-semibold">
+                  <i class="ti ti-pencil me-2"></i>{{ t 'playground.edit_question' }}
+                </a>
+                <a href="/playground/pmb/review?pmbId={{flash.generatedQuestion.ragDocumentId}}"
+                  class="btn btn-outline-info py-2 fw-semibold">
+                  <i class="ti ti-file-search me-2"></i>Rever PMB
+                </a>
+              </div>
               <span class="badge bg-light-success text-success">{{ t 'playground.labelStatus' }}</span>
+            </div>
+            
+            <div class="d-flex gap-2 mb-3 align-items-center">
+              <span class="badge bg-light-info text-info">PMB #{{flash.generatedQuestion.ragDocumentId}}</span>
+              {{#if flash.generatedQuestion.pmbDifficultyLevel}}
+                <span class="badge bg-light-warning text-warning">Nível {{flash.generatedQuestion.pmbDifficultyLevel}}</span>
+              {{/if}}
             </div>
 
             <div class="border rounded-3 p-3 bg-light mb-3">

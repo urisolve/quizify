@@ -1,5 +1,83 @@
+const fs = require('fs');
+const path = require('path');
+
 const db = require('../config/db');
 const {getSubtopicsByTopic, getUserSubtopicProgressForTopic, getTopicBadge} = require('./practicePlusModel');
+
+const fsp = fs.promises;
+const AVATAR_DIR = path.join(__dirname, '../public/img/logos/avatars');
+const AVATAR_WEB_PREFIX = '/img/logos/avatars';
+const DEFAULT_AVATAR_URLS = new Set([
+  '/img/logos/chatbot_icon.png',
+  '/img/logos/default-avatar.png',
+  '/assets/images/profile/avatar.png',
+]);
+
+function hashSeed(value) {
+  const text = String(value ?? '');
+  let hash = 0;
+  for (let i = 0; i < text.length; i++) {
+    hash = ((hash << 5) - hash) + text.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+}
+
+async function getAvatarFileNames() {
+  try {
+    const entries = await fsp.readdir(AVATAR_DIR, { withFileTypes: true });
+    return entries
+      .filter((entry) => entry.isFile() && /\.svg$/i.test(entry.name))
+      .map((entry) => entry.name)
+      .sort((a, b) => {
+        const aNum = Number((a.match(/avatar_(\d+)\.svg$/i) || [])[1] || 0);
+        const bNum = Number((b.match(/avatar_(\d+)\.svg$/i) || [])[1] || 0);
+        return aNum - bNum || a.localeCompare(b);
+      });
+  } catch (err) {
+    console.error('[avatars] Could not read avatar directory:', err);
+    return [];
+  }
+}
+
+async function resolveAvatarUrl(seed) {
+  const avatarFiles = await getAvatarFileNames();
+  if (!avatarFiles.length) {
+    return '/img/logos/chatbot_icon.png';
+  }
+
+  const index = hashSeed(seed) % avatarFiles.length;
+  return `${AVATAR_WEB_PREFIX}/${avatarFiles[index]}`;
+}
+
+async function ensureUserAvatar(userId, seed, currentAvatar = null) {
+  if (currentAvatar && !DEFAULT_AVATAR_URLS.has(currentAvatar)) {
+    return currentAvatar;
+  }
+
+  const avatarUrl = await resolveAvatarUrl(seed ?? userId);
+  await db.query(
+    'UPDATE users SET avatar_url = ? WHERE id = ?',
+    [avatarUrl, userId]
+  );
+  return avatarUrl;
+}
+
+async function syncUserAvatars() {
+  const [rows] = await db.query(
+    `SELECT id, username, avatar_url
+       FROM users
+      WHERE avatar_url IS NULL
+       OR avatar_url = ''
+       OR avatar_url IN ('/img/logos/chatbot_icon.png', '/img/logos/default-avatar.png', '/assets/images/profile/avatar.png')`
+  );
+
+  for (const user of rows) {
+    await ensureUserAvatar(user.id, user.username || user.id, user.avatar_url);
+  }
+
+  return rows.length;
+}
 
 // Initialize the users table if it doesn't exist
 const initUsersTable = async () => {
@@ -38,6 +116,13 @@ const createUser = async ({ username, email, passwordHash, role = 'student' }) =
         'INSERT INTO users (username, email, password_hash, role, badges) VALUES (?, ?, ?, ?, JSON_ARRAY())',
         [username, email, passwordHash, safeRole] // Initialize badges as empty array
     );
+
+  const avatarUrl = await resolveAvatarUrl(result.insertId);
+  await db.query(
+    'UPDATE users SET avatar_url = ? WHERE id = ?',
+    [avatarUrl, result.insertId]
+  );
+
     return result.insertId;
 };
 
@@ -232,5 +317,7 @@ module.exports = {
     deleteUserBadge,
     updateUserRole,
     getAllUsers,
-    findUserByUsername
+    findUserByUsername,
+    ensureUserAvatar,
+    syncUserAvatars,
 };

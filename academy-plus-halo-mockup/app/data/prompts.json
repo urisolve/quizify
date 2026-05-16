@@ -1,0 +1,416 @@
+{
+  "subtopics": [
+    {
+      "id": 1,
+      "key": "interpretacao_circuito",
+      "title": "Interpretação de Circuito",
+      "prompts": [
+        {
+          "tema": "Número de Nós",
+          "prompt": "Mostra o esquemático do circuito e pede ao aluno para identificar o número total de nós elétricos distintos existentes no circuito."
+        },
+        {
+          "tema": "Número de Ramos",
+          "prompt": "Mostra o circuito e pergunta quantos ramos elétricos existem, considerando cada ligação entre dois nós como um ramo."
+        },
+        {
+          "tema": "Identificação de Componentes em Paralelo",
+          "prompt": "Apresenta o circuito e pede ao aluno para identificar quais componentes estão ligados em paralelo, ou seja, entre os mesmos dois nós."
+        },
+        {
+          "tema": "Identificação de Ramos Paralelos",
+          "prompt": "Mostra os ramos do circuito e pede ao aluno para identificar quais ramos estão ligados em paralelo."
+        },
+        {
+          "tema": "Número de Malhas Principais / Número de Equações de Malha",
+          "prompt": "Pede ao aluno para calcular o número de malhas principais do circuito com base na fórmula e no circuito apresentado."
+        },
+        {
+          "tema": "Número de Malhas Auxiliares / Fontes de Corrente Ideais",
+          "prompt": "Mostra o circuito e pede ao aluno para determinar quantas malhas auxiliares existem associadas às fontes de corrente ideais."
+        },
+        {
+          "tema": "Leitura da Estrutura do Circuito",
+          "prompt": "Apresenta o esquemático do circuito e pede ao aluno para identificar se os componentes estão ligados em série, em paralelo ou numa configuração mista."
+        },
+        {
+          "tema": "Identificação de Componentes Ligados ao Mesmo Nó",
+          "prompt": "Mostra um nó do circuito e pede ao aluno para identificar quais componentes partilham esse nó em comum."
+        },
+        {
+          "tema": "Reconhecimento de Ligações Diretas",
+          "prompt": "Apresenta o circuito e pede ao aluno para identificar quais componentes estão diretamente ligados entre si sem elementos intermédios."
+        },
+        {
+          "tema": "Identificação de Componentes Exclusivos de um Ramo",
+          "prompt": "Apresenta a lista de ramos do circuito e pede ao aluno para identificar quais componentes pertencem exclusivamente a um único ramo."
+        },
+        {
+          "tema": "Interpretação da Tabela de Componentes",
+          "prompt": "Mostra a tabela de componentes do circuito e pede ao aluno para interpretar os tipos de componentes presentes e respetivos valores nominais."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "key": "escolha_das_malhas",
+      "title": "Escolha das Malhas",
+      "prompts": [
+        {
+          "tema": "Identificação de Componentes da Malha",
+          "prompt": "Mostra a figura de uma malha específica e pede ao aluno para identificar todos os componentes pertencentes a essa malha."
+        },
+        {
+          "tema": "Identificação de Ramos da Malha",
+          "prompt": "Apresenta o esquemático de uma malha e pede ao aluno para indicar quais os ramos que fazem parte dessa malha."
+        },
+        {
+          "tema": "Número de Componentes da Malha",
+          "prompt": "Mostra uma malha do circuito e pede ao aluno para indicar quantos componentes existem nessa malha."
+        },
+        {
+          "tema": "Número de Ramos da Malha",
+          "prompt": "Apresenta uma malha específica e pergunta quantos ramos pertencem à malha."
+        },
+        {
+          "tema": "Malha Principal",
+          "prompt": "Mostra uma malha específica e pergunta ao aluno se essa malha pode ser considerada uma malha principal no contexto da análise por correntes de malha."
+        },
+        {
+          "tema": "Malha Auxiliar",
+          "prompt": "Apresenta uma malha e pede ao aluno para indicar se essa malha deve ser tratada como uma malha auxiliar."
+        },
+        {
+          "tema": "Validação de Malha",
+          "prompt": "Mostra um conjunto de ramos destacados no circuito e pergunta ao aluno se o percurso apresentado constitui uma malha válida."
+        },
+        {
+          "tema": "Identificação de Malhas Independentes",
+          "prompt": "Apresenta várias malhas possíveis e pede ao aluno para selecionar quais são independentes entre si."
+        },
+        {
+          "tema": "Deteção de Malha Redundante",
+          "prompt": "Mostra um conjunto de malhas do circuito e pede ao aluno para identificar qual delas é redundante relativamente às restantes."
+        },
+        {
+          "tema": "Cobertura do Circuito por Malhas",
+          "prompt": "Apresenta um conjunto de malhas selecionadas e pergunta ao aluno se todas as regiões relevantes do circuito ficam cobertas por esse conjunto."
+        },
+        {
+          "tema": "Identificação de Componentes Partilhados Entre Malhas",
+          "prompt": "Mostra duas malhas do circuito e pede ao aluno para identificar os componentes comuns a ambas."
+        },
+        {
+          "tema": "Identificação de Ramos Partilhados Entre Malhas",
+          "prompt": "Apresenta duas malhas específicas e pede ao aluno para indicar quais os ramos partilhados entre elas."
+        },
+        {
+          "tema": "Identificação de Componentes Exclusivos da Malha",
+          "prompt": "Mostra uma malha e pede ao aluno para identificar quais componentes pertencem exclusivamente a essa malha."
+        },
+        {
+          "tema": "Comparação Entre Malhas",
+          "prompt": "Mostra duas malhas diferentes e pede ao aluno para indicar as principais diferenças entre elas em termos de ramos e componentes."
+        },
+        {
+          "tema": "Seleção de Conjunto Válido de Malhas",
+          "prompt": "Apresenta vários conjuntos possíveis de malhas e pede ao aluno para selecionar o conjunto adequado para realizar a análise por correntes de malha."
+        },
+        {
+          "tema": "Reconhecimento de Supermalha",
+          "prompt": "Mostra o circuito com destaque para duas malhas adjacentes e pergunta ao aluno se elas formam uma supermalha."
+        },
+        {
+          "tema": "Identificação de Fonte de Corrente Entre Malhas",
+          "prompt": "Apresenta duas malhas vizinhas e pede ao aluno para identificar se existe uma fonte de corrente no ramo comum entre elas."
+        },
+        {
+          "tema": "Associação de Componentes à Malha Correta",
+          "prompt": "Mostra um componente destacado no circuito e pede ao aluno para indicar a que malha ou malhas esse componente pertence."
+        },
+        {
+          "tema": "Número Total de Malhas",
+          "prompt": "Mostra o circuito completo e pede ao aluno para identificar o número total de malhas existentes."
+        },
+        {
+          "tema": "Correspondência Entre Malha e Esquemático",
+          "prompt": "Apresenta várias figuras de malhas e pede ao aluno para associar cada figura à identificação correta da malha correspondente."
+        },
+        {
+          "tema": "Identificação de Percurso Fechado",
+          "prompt": "Mostra um percurso destacado no circuito e pede ao aluno para indicar se esse percurso constitui um caminho fechado válido para análise de malha."
+        },
+        {
+          "tema": "Deteção de Percurso Não Válido",
+          "prompt": "Apresenta um conjunto de ramos destacados e pede ao aluno para identificar porque razão o percurso não constitui uma malha válida."
+        },
+        {
+          "tema": "Identificação da Menor Malha Possível",
+          "prompt": "Mostra o circuito e pede ao aluno para identificar a menor malha fechada existente no esquemático."
+        },
+        {
+          "tema": "Análise de Sobreposição Entre Malhas",
+          "prompt": "Apresenta duas ou mais malhas e pede ao aluno para identificar quais os elementos sobrepostos entre elas."
+        },
+        {
+          "tema": "Escolha de Malhas para Simplificação",
+          "prompt": "Mostra várias opções de conjuntos de malhas e pede ao aluno para selecionar o conjunto que simplifica mais a análise do circuito."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "key": "escrita_de_equacoes",
+      "title": "Escrita de Equações",
+      "prompts": [
+        {
+          "tema": "Equação de uma Malha",
+          "prompt": "Mostra a figura de uma malha específica e pede ao aluno para escrever a equação KVL correspondente a essa malha."
+        },
+        {
+          "tema": "Sistema Completo de Equações",
+          "prompt": "Mostra a sobreposição das malhas do circuito e pede ao aluno para escrever o sistema completo de equações de malha."
+        },
+        {
+          "tema": "Completa a Equação de Malha",
+          "prompt": "Mostra a equação de malha com um espaço em branco e pede ao aluno para preencher o termo faltante."
+        },
+        {
+          "tema": "Identificação de Termos da Equação",
+          "prompt": "Mostra uma equação de malha e pede ao aluno para identificar o significado físico de cada termo da equação."
+        },
+        {
+          "tema": "Resistor Partilhado Entre Malhas",
+          "prompt": "Mostra duas malhas com um resistor comum e pede ao aluno para escrever a expressão correta da queda de tensão nesse resistor."
+        },
+        {
+          "tema": "Identificação de Componentes numa Equação",
+          "prompt": "Apresenta uma equação de malha e pede ao aluno para identificar quais componentes do circuito contribuem para essa equação."
+        },
+        {
+          "tema": "Deteção de Erro de Sinal",
+          "prompt": "Mostra uma equação KVL com um erro de sinal e pede ao aluno para identificar o termo incorreto."
+        },
+        {
+          "tema": "Deteção de Componente Omitido",
+          "prompt": "Apresenta uma equação de malha incompleta e pede ao aluno para identificar qual componente foi omitido."
+        },
+        {
+          "tema": "Deteção de Componente Indevido",
+          "prompt": "Mostra uma equação de malha e pede ao aluno para identificar qual componente não deveria aparecer nessa equação."
+        },
+        {
+          "tema": "Completar Equação de Malha",
+          "prompt": "Apresenta uma equação KVL parcialmente preenchida e pede ao aluno para completar os termos em falta."
+        },
+        {
+          "tema": "Associação Entre Equação e Malha",
+          "prompt": "Mostra várias equações e várias malhas e pede ao aluno para associar cada equação à malha correspondente."
+        },
+        {
+          "tema": "Validação de Equação KVL",
+          "prompt": "Mostra uma equação proposta para uma malha e pede ao aluno para indicar se a equação está correta."
+        },
+        {
+          "tema": "Número de Equações Necessárias",
+          "prompt": "Mostra o circuito e pergunta quantas equações independentes são necessárias para resolver o sistema por correntes de malha."
+        },
+        {
+          "tema": "Identificação de Equação Redundante",
+          "prompt": "Apresenta um conjunto de equações de malha e pede ao aluno para identificar se existe alguma equação redundante."
+        },
+        {
+          "tema": "Equação de Restrição de Fonte de Corrente",
+          "prompt": "Mostra um circuito com fonte de corrente entre malhas e pede ao aluno para escrever a equação de restrição associada."
+        },
+        {
+          "tema": "Equação de Supermalha",
+          "prompt": "Mostra uma supermalha no circuito e pede ao aluno para escrever a equação KVL correspondente."
+        },
+        {
+          "tema": "Correspondência Entre Sistema e Circuito",
+          "prompt": "Apresenta um sistema de equações e vários circuitos possíveis e pede ao aluno para identificar qual circuito corresponde ao sistema."
+        },
+        {
+          "tema": "Interpretação Física do Sistema",
+          "prompt": "Mostra o sistema final de equações e pede ao aluno para interpretar o significado físico das correntes de malha presentes."
+        },
+        {
+          "tema": "Identificação de Correntes na Equação",
+          "prompt": "Apresenta uma equação de malha e pede ao aluno para identificar quais correntes de malha aparecem na equação."
+        },
+        {
+          "tema": "Coeficiente de Corrente de Malha",
+          "prompt": "Mostra uma equação KVL e pede ao aluno para identificar o coeficiente associado a uma corrente de malha específica."
+        },
+        {
+          "tema": "Soma de Resistências da Malha",
+          "prompt": "Mostra uma malha do circuito e pede ao aluno para determinar qual deveria ser o coeficiente diagonal da corrente dessa malha."
+        },
+        {
+          "tema": "Termos Fora da Diagonal",
+          "prompt": "Apresenta uma matriz do sistema de malhas e pede ao aluno para interpretar os termos fora da diagonal principal."
+        },
+        {
+          "tema": "Equação Correspondente à Sobreposição de Malhas",
+          "prompt": "Mostra a imagem de sobreposição das malhas e pede ao aluno para identificar qual equação representa corretamente a interação entre malhas."
+        },
+        {
+          "tema": "Identificação de Fonte na Equação",
+          "prompt": "Apresenta uma equação KVL e pede ao aluno para identificar qual termo representa a contribuição de uma fonte independente."
+        },
+        {
+          "tema": "Validação da Forma Matricial",
+          "prompt": "Mostra uma matriz de coeficientes proposta e pede ao aluno para indicar se ela representa corretamente o sistema de malhas do circuito."
+        },
+        {
+          "tema": "Construção Parcial do Sistema",
+          "prompt": "Mostra uma parte do circuito e pede ao aluno para construir apenas a equação correspondente a uma das malhas."
+        },
+        {
+          "tema": "Deteção de Equação Impossível",
+          "prompt": "Apresenta uma equação incompatível com o circuito e pede ao aluno para justificar porque não pode corresponder à análise de malhas."
+        },
+        {
+          "tema": "Interpretação dos Resultados das Correntes",
+          "prompt": "Mostra os valores finais das correntes de malha e pede ao aluno para identificar quais correntes têm sentido contrário ao inicialmente assumido."
+        },
+        {
+          "tema": "Identificação de Corrente Nula",
+          "prompt": "Mostra os resultados das correntes de malha e pede ao aluno para identificar se alguma corrente é igual a zero."
+        },
+        {
+          "tema": "Correspondência Entre Correntes e Malhas",
+          "prompt": "Apresenta os valores das correntes de malha e pede ao aluno para associar cada corrente à respetiva malha do circuito."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "key": "calculo_das_correntes",
+      "title": "Cálculo das Correntes",
+      "prompts": [
+        {
+          "tema": "Valor de Corrente de um Ramo",
+          "prompt": "Mostra a tabela de correntes do circuito e pede ao aluno para indicar o valor da corrente num ramo específico."
+        },
+        {
+          "tema": "Identificação da Corrente com Maior Magnitude",
+          "prompt": "Apresenta os valores das correntes dos ramos e pede ao aluno para identificar qual corrente possui maior magnitude."
+        },
+        {
+          "tema": "Identificação da Corrente com Menor Magnitude",
+          "prompt": "Mostra os valores das correntes dos ramos e pede ao aluno para indicar qual corrente possui menor magnitude."
+        },
+        {
+          "tema": "Sentido da Corrente",
+          "prompt": "Mostra o desenho de uma corrente de ramo e pede ao aluno para identificar o sentido assumido para essa corrente."
+        },
+        {
+          "tema": "Corrente Positiva ou Negativa",
+          "prompt": "Apresenta o valor calculado de uma corrente e pede ao aluno para interpretar se o sentido assumido inicialmente está correto."
+        },
+        {
+          "tema": "Correspondência Corrente-Ramo",
+          "prompt": "Mostra várias correntes identificadas no circuito e pede ao aluno para associar cada corrente ao respetivo ramo."
+        },
+        {
+          "tema": "Relação Entre Corrente de Ramo e Correntes de Malha",
+          "prompt": "Mostra um ramo partilhado entre malhas e pede ao aluno para identificar a relação entre a corrente do ramo e as correntes de malha."
+        },
+        {
+          "tema": "Corrente Resultante de Duas Malhas",
+          "prompt": "Apresenta um ramo comum entre duas malhas e pede ao aluno para calcular ou identificar a expressão da corrente resultante nesse ramo."
+        },
+        {
+          "tema": "Identificação de Corrente Nula",
+          "prompt": "Mostra a tabela de correntes e pede ao aluno para identificar se existe algum ramo com corrente igual ou aproximadamente igual a zero."
+        },
+        {
+          "tema": "Comparação Entre Correntes",
+          "prompt": "Apresenta os valores das correntes dos ramos e pede ao aluno para comparar duas correntes específicas."
+        },
+        {
+          "tema": "Ordenação das Correntes",
+          "prompt": "Mostra os valores das correntes do circuito e pede ao aluno para ordenar as correntes por magnitude."
+        },
+        {
+          "tema": "Identificação do Ramo Mais Percorrido",
+          "prompt": "Mostra a tabela de correntes e pede ao aluno para identificar qual ramo conduz a maior corrente."
+        },
+        {
+          "tema": "Interpretação Física da Corrente",
+          "prompt": "Mostra uma corrente negativa num ramo e pede ao aluno para interpretar o significado físico desse resultado."
+        },
+        {
+          "tema": "Corrente Associada a uma Malha",
+          "prompt": "Mostra as correntes de malha calculadas e pede ao aluno para identificar qual corrente está associada a uma malha específica."
+        },
+        {
+          "tema": "Validação de Corrente de Ramo",
+          "prompt": "Apresenta uma corrente calculada para um ramo e pede ao aluno para indicar se o valor é consistente com as correntes de malha envolvidas."
+        },
+        {
+          "tema": "Deteção de Valor de Corrente Incorreto",
+          "prompt": "Mostra uma tabela de correntes onde um dos valores foi alterado incorretamente e pede ao aluno para identificar o valor inconsistente."
+        },
+        {
+          "tema": "Identificação de Ramos Partilhados por Correntes",
+          "prompt": "Mostra o circuito e pede ao aluno para identificar quais ramos possuem correntes resultantes da combinação de duas correntes de malha."
+        },
+        {
+          "tema": "Correspondência Entre Imagem e Corrente",
+          "prompt": "Apresenta imagens de correntes destacadas no circuito e pede ao aluno para associar cada imagem ao nome correto da corrente."
+        },
+        {
+          "tema": "Leitura da Tabela de Correntes",
+          "prompt": "Mostra a tabela de correntes e pede ao aluno para interpretar os valores e sentidos apresentados."
+        },
+        {
+          "tema": "Corrente em Componentes Específicos",
+          "prompt": "Mostra um componente destacado no circuito e pede ao aluno para indicar qual corrente o atravessa."
+        },
+        {
+          "tema": "Comparação Entre Corrente de Ramo e Corrente de Malha",
+          "prompt": "Apresenta uma corrente de ramo e pede ao aluno para indicar se ela corresponde diretamente a uma corrente de malha ou à combinação de várias."
+        },
+        {
+          "tema": "Identificação de Correntes Iguais",
+          "prompt": "Mostra os valores das correntes dos ramos e pede ao aluno para identificar quais correntes possuem o mesmo valor."
+        },
+        {
+          "tema": "Análise do Sentido Relativo das Correntes",
+          "prompt": "Mostra várias correntes no circuito e pede ao aluno para identificar quais possuem sentidos opostos."
+        },
+        {
+          "tema": "Determinação da Corrente Total",
+          "prompt": "Mostra várias correntes convergindo num nó e pede ao aluno para determinar a corrente total associada ao nó."
+        },
+        {
+          "tema": "Identificação de Corrente Dominante",
+          "prompt": "Apresenta os resultados das correntes do circuito e pede ao aluno para identificar qual corrente domina o comportamento do circuito."
+        },
+        {
+          "tema": "Análise da Distribuição de Correntes",
+          "prompt": "Mostra o desenho geral das correntes do circuito e pede ao aluno para interpretar como a corrente se distribui pelos diferentes ramos."
+        },
+        {
+          "tema": "Interpretação do Valor Fasorial",
+          "prompt": "Apresenta um valor de corrente em formato fasorial e pede ao aluno para interpretar a magnitude e fase associadas."
+        },
+        {
+          "tema": "Conversão para Forma Amigável",
+          "prompt": "Mostra o valor fasorial de uma corrente e pede ao aluno para identificar a representação amigável correspondente."
+        },
+        {
+          "tema": "Identificação de Correntes em Paralelo",
+          "prompt": "Mostra ramos em paralelo no circuito e pede ao aluno para analisar como a corrente se distribui entre eles."
+        },
+        {
+          "tema": "Validação Global das Correntes",
+          "prompt": "Apresenta todas as correntes calculadas do circuito e pede ao aluno para verificar se os resultados são fisicamente coerentes."
+        }
+      ]
+    }
+  ]
+}

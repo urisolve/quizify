@@ -53,7 +53,7 @@
             aria-expanded="false"
           >
             <img
-              src="/assets/images/profile/avatar.png"
+              src="{{#if user.avatar_url}}{{user.avatar_url}}{{else}}{{#if user.avatar}}{{user.avatar}}{{else}}/assets/images/profile/avatar.png{{/if}}{{/if}}"
               alt="User avatar"
               width="38"
               height="38"

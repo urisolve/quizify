@@ -61,7 +61,7 @@ async function practicePlusPage(req, res) {
       flash,
       topicsJson: JSON.stringify(topicsWithSubs),
       generalProgress: totalProgress,
-      userAvatar: req.session.user?.avatar_url || null,
+      userAvatar: req.session.user?.avatar_url || req.session.user?.avatar || null,
       userLevel: req.session.user?.level || 1,
       defaultTopicIndex
      /*  userBadges: badges */

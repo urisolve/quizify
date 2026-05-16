@@ -30,16 +30,19 @@ const { practicePlusPage } = require('../controllers/pages/practicePlusControlle
 router.get('/practice-plus', requireAuthentication, practicePlusPage);
 
 const playgroundController = require('../controllers/pages/playgroundController.js');
+const pmbController = require('../controllers/pages/pmbController');
+const questionController = require('../controllers/pages/questionController');
+
 router.get('/playground', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.showPlayground);
-router.post('/playground/create-pmb', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.createPmb);
-router.post('/playground/create-questions', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.createQuestions);
-router.get ('/playground/review', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.showReviewQuestion);
-router.post('/playground/review/rate', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.submitReviewRating);
-router.get('/pmb-asset/:id/*', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.servePmbAsset);
-router.get('/playground/questions/:id/edit', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.showQuestionEdit);
-router.post('/playground/questions/:id', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.updateQuestionFields);
-router.get('/playground/pmb/review', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.showPmbReview);
-router.post('/playground/pmb/:id/delete', requireAuthentication, requireRole('admin'), playgroundController.deletePmb);
+router.post('/playground/create-pmb', requireAuthentication, requireRole('teacher', 'admin'), pmbController.createPmb);
+router.post('/playground/create-questions', requireAuthentication, requireRole('teacher', 'admin'), questionController.createQuestions);
+router.get('/playground/review', requireAuthentication, requireRole('teacher', 'admin'), questionController.showReviewQuestion);
+router.post('/playground/review/rate', requireAuthentication, requireRole('teacher', 'admin'), questionController.submitReviewRating);
+router.get('/pmb-asset/:id/*', requireAuthentication, requireRole('teacher', 'admin'), pmbController.servePmbAsset);
+router.get('/playground/questions/:id/edit', requireAuthentication, requireRole('teacher', 'admin'), questionController.showQuestionEdit);
+router.post('/playground/questions/:id', requireAuthentication, requireRole('teacher', 'admin'), questionController.updateQuestionFields);
+router.get('/playground/pmb/review', requireAuthentication, requireRole('teacher', 'admin'), pmbController.showPmbReview);
+router.post('/playground/pmb/:id/delete', requireAuthentication, requireRole('admin'), pmbController.deletePmb);
 
 const adminController = require('../controllers/pages/adminController');
 router.get('/admin',             requireAuthentication, requireRole('admin'), adminController.showAdmin);

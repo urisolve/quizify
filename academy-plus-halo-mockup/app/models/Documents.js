@@ -11,9 +11,23 @@ async function initRagTable() {
         size_bytes    INT          DEFAULT NULL,
         content       LONGBLOB     DEFAULT NULL,
         creation_time_ms INT       DEFAULT NULL,
+        difficulty_level TINYINT UNSIGNED DEFAULT NULL,
         created_at    TIMESTAMP    DEFAULT CURRENT_TIMESTAMP
       )
     `);
+
+    // Keep existing databases compatible by adding the column if missing.
+    const [difficultyColumn] = await db.query(
+      `SHOW COLUMNS FROM rag_documents LIKE 'difficulty_level'`
+    );
+    if (!difficultyColumn.length) {
+      await db.query(
+        `ALTER TABLE rag_documents
+           ADD COLUMN difficulty_level TINYINT UNSIGNED DEFAULT NULL
+           AFTER creation_time_ms`
+      );
+    }
+
     console.log('RAG documents table ensured/created.');
   } catch (err) {
     console.error('Error creating RAG table:', err);
@@ -21,11 +35,15 @@ async function initRagTable() {
 }
 
 // Add a new RAG document
-async function addRagDocument({ type_document, filename, content, creation_time_ms = null }) {
+async function addRagDocument({ type_document, filename, content, creation_time_ms = null, difficulty_level = null }) {
+  if (difficulty_level !== null && (!Number.isInteger(difficulty_level) || difficulty_level < 1 || difficulty_level > 5)) {
+    throw new Error('difficulty_level must be an integer between 1 and 5.');
+  }
+
   const [result] = await db.query(
-    `INSERT INTO rag_documents (type_document, filename, size_bytes, content, creation_time_ms)
-       VALUES (?, ?, ?, ?, ?)`,
-    [type_document, filename, content?.length ?? null, content ?? null, creation_time_ms]
+    `INSERT INTO rag_documents (type_document, filename, size_bytes, content, creation_time_ms, difficulty_level)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+    [type_document, filename, content?.length ?? null, content ?? null, creation_time_ms, difficulty_level]
   );
   return result.insertId;
 }
@@ -33,7 +51,7 @@ async function addRagDocument({ type_document, filename, content, creation_time_
 //Get a document by ID
 async function getRagDocumentById(id) {
   const [rows] = await db.query(
-    `SELECT id, type_document, filename, size_bytes, content, created_at
+    `SELECT id, type_document, filename, size_bytes, content, difficulty_level, created_at
        FROM rag_documents WHERE id = ?`,
     [id]
   );
@@ -42,7 +60,7 @@ async function getRagDocumentById(id) {
 
 //Update document details
 async function updateRagDocument(id, updates) {
-  const allowed = ['type_document', 'filename', 'content'];
+  const allowed = ['type_document', 'filename', 'content', 'difficulty_level'];
   const fields = Object.keys(updates).filter((f) => allowed.includes(f));
   if (!fields.length) return;
   

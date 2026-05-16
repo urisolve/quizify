@@ -43,6 +43,14 @@
             <span class="hide-menu">{{ t 'sidebar.ailearningarea' }}</span>
           </a>
         </li>
+        <li class="sidebar-item">
+          <a class="sidebar-link" href="/leaderboard" aria-expanded="false">
+            <span>
+              <i class="ti ti-trophy"></i>
+            </span>
+            <span class="hide-menu">{{ t 'sidebar.leaderboard' }}</span>
+          </a>
+        </li>
         {{#hasAnyRole 'teacher' 'admin'}}
         <li class="sidebar-item">
           <a class="sidebar-link" href="/playground" aria-expanded="false">

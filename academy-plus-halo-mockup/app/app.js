@@ -100,10 +100,11 @@ const hbsHelpers = {
     //console.log(options.data.root.i18n.t(key)); 
     // Access the i18n instance
     const options = maybeOptions || varsOrOptions;
-    const vars =
-      maybeOptions && varsOrOptions && typeof varsOrOptions === 'object'
-        ? varsOrOptions
-        : {};
+    const vars = maybeOptions && varsOrOptions && typeof varsOrOptions === 'object'
+      ? varsOrOptions
+      : (options && options.hash && typeof options.hash === 'object'
+          ? options.hash
+          : {});
 
     const i18n = options.data.root.i18n;
     if (i18n) {
@@ -206,7 +207,7 @@ const { initSubtopicsTable } = require('./models/Subtopic');
 const { initQuestionsTable } = require('./models/Questions');
 const { initTrainingTable } = require('./models/Training');
 const { initUserSubtopicProgressTable } = require('./models/UserSubtopicProgress');
-const { initUsersTable } = require('./models/User');
+const { initUsersTable, syncUserAvatars } = require('./models/User');
 const { initRagTable } = require('./models/Documents');
 
 // Initialize all tables before starting the server
@@ -236,6 +237,7 @@ async function waitForDB(retries = 10, delay = 3000) {
     await initUserSubtopicProgressTable();
     console.log('All tables ensured/created.');
     await seedDatabase([topicsPath, subtopicsPath, usersPath]); // , docsPath, questionsPath
+    await syncUserAvatars();
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
