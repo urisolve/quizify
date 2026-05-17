@@ -19,7 +19,7 @@
         },
         {
           "tema": "Identificação de Ramos Paralelos",
-          "prompt": "Mostra os ramos do circuito e pede ao aluno para identificar quais ramos estão ligados em paralelo."
+          "prompt": "Mostra os ramos do circuito e pede ao aluno para identificar quais ramos estão ligados em paralelo. Os ramos que estão em paralelo compartilham Nós de incidência que podem ser conferidos na tabela dos ramos."
         },
         {
           "tema": "Número de Malhas Principais / Número de Equações de Malha",
