@@ -7,14 +7,25 @@
             <div>
               <h2 class="fw-semibold mb-1">{{t 'leaderboard.leaderboard'}}</h2>
               <p class="text-muted mb-0">
-                {{leaderboard.length}} / {{pageSize}} {{t 'leaderboard.players_per_page'}}
+                {{#if isRatingLeaderboard}}
+                  {{t 'leaderboard.rating_leaderboard'}}
+                {{else}}
+                  {{t 'leaderboard.xp_leaderboard'}}
+                {{/if}}
+                · {{leaderboard.length}} / {{pageSize}} {{t 'leaderboard.players_per_page'}}
                 {{#if totalUsers}} · {{totalUsers}} {{t 'leaderboard.total_students'}}{{/if}}
               </p>
             </div>
-            <div class="badge bg-light-primary text-primary px-3 py-2">
-              {{t 'leaderboard.students_only'}}
-            </div>
           </div>
+
+          <ul class="nav nav-pills mb-4">
+            <li class="nav-item">
+              <a class="nav-link {{#if isRatingLeaderboard}}active{{/if}}" href="/leaderboard?mode=rating">{{t 'leaderboard.rating_leaderboard'}}</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link {{#if isXpLeaderboard}}active{{/if}}" href="/leaderboard?mode=xp">{{t 'leaderboard.xp_leaderboard'}}</a>
+            </li>
+          </ul>
 
           {{#if leaderboard.length}}
             <div class="table-responsive">
@@ -23,7 +34,16 @@
                   <tr>
                     <th style="width: 90px;">{{t 'leaderboard.rank'}}</th>
                     <th>{{t 'leaderboard.user'}}</th>
-                    <th class="text-end">{{t 'leaderboard.points'}}</th>
+                    {{#if isRatingLeaderboard}}
+                      <th class="text-end">{{t 'leaderboard.rating'}}</th>
+                      {{#if isAdmin}}
+                        <th class="text-end">{{t 'leaderboard.rd'}}</th>
+                        <th class="text-end">{{t 'leaderboard.confidence'}}</th>
+                      {{/if}}
+                    {{else}}
+                      <th class="text-end">{{t 'leaderboard.points'}}</th>
+                      <th class="text-end">{{t 'leaderboard.accuracy'}}</th>
+                    {{/if}}
                   </tr>
                 </thead>
                 <tbody>
@@ -47,7 +67,7 @@
                           {{#if (eq rank 1)}}
                             <span class="badge bg-warning text-dark">Top 1</span>
                           {{else if (eq rank 2)}}
-                            <span class="badge text-dark" style="background: linear-gradient(180deg, #D9DEE5 0%, #C0C0C0 100%);">Top 2</span>
+                            <span class="badge text-dark" style="background-color: #D9DEE5;">Top 2</span>
                           {{else if (eq rank 3)}}
                             <span class="badge text-white" style="background-color: #cd7f32;">Top 3</span>
                           {{/if}}
@@ -56,7 +76,21 @@
                           {{/if}}
                         </div>
                       </td>
-                      <td class="text-end fw-semibold">{{points}}</td>
+                      {{#if ../isRatingLeaderboard}}
+                        <td class="text-end fw-semibold">{{rating}}</td>
+                        {{#if ../isAdmin}}
+                          <td class="text-end text-muted">{{rd}}</td>
+                          <td class="text-end fw-semibold">
+                            {{confidence}}%
+                            {{#if provisional}}
+                              <span class="badge bg-warning-subtle text-warning ms-2">{{t 'leaderboard.provisional'}}</span>
+                            {{/if}}
+                          </td>
+                        {{/if}}
+                      {{else}}
+                        <td class="text-end fw-semibold">{{points}}</td>
+                        <td class="text-end fw-semibold">{{accuracy}}%</td>
+                      {{/if}}
                     </tr>
                   {{/each}}
                 </tbody>
@@ -76,15 +110,15 @@
             <nav aria-label="Leaderboard pagination">
               <ul class="pagination mb-0">
                 <li class="page-item {{#unless hasPreviousPage}}disabled{{/unless}}">
-                  <a class="page-link" href="/leaderboard?page={{previousPage}}">{{t 'leaderboard.previous_page'}}</a>
+                  <a class="page-link" href="/leaderboard?mode={{leaderboardMode}}&page={{previousPage}}">{{t 'leaderboard.previous_page'}}</a>
                 </li>
                 {{#each pageNumbers}}
                   <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}" aria-current="page">
-                    <a class="page-link" href="/leaderboard?page={{this}}">{{this}}</a>
+                    <a class="page-link" href="/leaderboard?mode={{../leaderboardMode}}&page={{this}}">{{this}}</a>
                   </li>
                 {{/each}}
                 <li class="page-item {{#unless hasNextPage}}disabled{{/unless}}">
-                  <a class="page-link" href="/leaderboard?page={{nextPage}}">{{t 'leaderboard.next_page'}}</a>
+                  <a class="page-link" href="/leaderboard?mode={{leaderboardMode}}&page={{nextPage}}">{{t 'leaderboard.next_page'}}</a>
                 </li>
               </ul>
             </nav>
@@ -107,7 +141,17 @@
                       <div class="text-muted small">{{t 'leaderboard.your_position'}}</div>
                     </div>
                   </div>
-                  <div class="fw-semibold text-primary">{{currentUser.points}} {{t 'leaderboard.points'}}</div>
+                  <div class="text-end">
+                    {{#if isRatingLeaderboard}}
+                      <div class="fw-semibold text-primary">{{currentUser.rating}} {{t 'leaderboard.rating'}}</div>
+                      {{#if isAdmin}}
+                        <div class="text-muted small">{{t 'leaderboard.rd'}}: {{currentUser.rd}} · {{t 'leaderboard.confidence'}}: {{currentUser.confidence}}%</div>
+                      {{/if}}
+                    {{else}}
+                      <div class="fw-semibold text-primary">{{currentUser.points}} {{t 'leaderboard.points'}}</div>
+                      <div class="text-muted small">{{t 'leaderboard.accuracy'}}: {{currentUser.accuracy}}%</div>
+                    {{/if}}
+                  </div>
                 </div>
               </div>
             {{/unless}}

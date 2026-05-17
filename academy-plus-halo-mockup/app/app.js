@@ -13,6 +13,8 @@ const i18nMiddleware = require('i18next-http-middleware');
 const i18nBackend = require('i18next-fs-backend');
 const session = require('express-session');
 const db = require('./config/db');
+const { getLevelInfo } = require('./utils/level');
+const Rating = require('./models/Rating');
 
 //* Initialize express variable
 const app = express();
@@ -65,9 +67,32 @@ app.use(session({
   cookie: { secure: false, maxAge: 3600000 } // 1 hour sessions
 }));
 
-app.use((req, res, next) => {
+app.use(async (req, res, next) => {
+  try {
+  if (req.session.user) {
+    if (req.session.user.global_rating == null || req.session.user.global_rd == null) {
+      const ratingSnapshot = await Rating.getUserRatingSnapshot(req.session.user.id) || await Rating.getOrCreateUserRating(req.session.user.id);
+      if (ratingSnapshot) {
+        req.session.user.global_rating = ratingSnapshot.global_rating;
+        req.session.user.global_rd = ratingSnapshot.global_rd;
+        req.session.user.rating_provisional = ratingSnapshot.provisional;
+        req.session.user.rating_placement_matches = ratingSnapshot.placement_matches;
+        req.session.user.rating_events = ratingSnapshot.rated_events;
+      }
+    }
+
+    const levelInfo = getLevelInfo(req.session.user.exp || 0);
+    req.session.user = {
+      ...req.session.user,
+      ...levelInfo,
+    };
+  }
+
   res.locals.user = req.session.user;
   next();
+  } catch (err) {
+    next(err);
+  }
 });
 
 
@@ -209,6 +234,7 @@ const { initTrainingTable } = require('./models/Training');
 const { initUserSubtopicProgressTable } = require('./models/UserSubtopicProgress');
 const { initUsersTable, syncUserAvatars } = require('./models/User');
 const { initRagTable } = require('./models/Documents');
+const { initRatingTables } = require('./models/Rating');
 
 // Initialize all tables before starting the server
 async function waitForDB(retries = 10, delay = 3000) {
@@ -235,6 +261,7 @@ async function waitForDB(retries = 10, delay = 3000) {
     await initQuestionsTable();
     await initTrainingTable();
     await initUserSubtopicProgressTable();
+    await initRatingTables();
     console.log('All tables ensured/created.');
     await seedDatabase([topicsPath, subtopicsPath, usersPath]); // , docsPath, questionsPath
     await syncUserAvatars();

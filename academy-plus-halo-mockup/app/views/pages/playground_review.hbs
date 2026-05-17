@@ -60,7 +60,8 @@
  
           {{#if question.image}}
             <img id="question-img" src="{{question.image}}" alt="Question image"
-              class="img-fluid rounded-3 mb-2" style="max-height: 450px; object-fit: contain;">
+              class="img-fluid rounded-3 mb-2 halo-image-zoom-trigger" data-image-zoom="{{question.image}}"
+              data-image-zoom-title="Question image" style="max-height: 450px; object-fit: contain;">
           {{/if}}
  
           <!-- Answers --> 

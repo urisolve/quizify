@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const User = require('../../models/User');
-const { getLevelFromScore, getLevelProgressPercent } = require('../../utils/level');
+const { getLevelInfo } = require('../../utils/level');
+const Rating = require('../../models/Rating');
 
 const registerUser = async (req, res) => {
     const { username, email, password } = req.body;
@@ -70,15 +71,21 @@ const loginUser = async (req, res) => {
         }
 
         const avatarUrl = await User.ensureUserAvatar(user.id, user.username, user.avatar_url);
+        const ratingSnapshot = await Rating.getOrCreateUserRating(user.id);
 
         // Compute level from score (default 0 if missing)
+        const levelInfo = getLevelInfo(user.exp || 0);
         req.session.user = {
             id: user.id,
             username: user.username,
             email: user.email,
             role: user.role,
-            level: getLevelFromScore(user.exp || 0),
-            levelProgress: getLevelProgressPercent(user.exp || 0),
+            ...levelInfo,
+            global_rating: ratingSnapshot.global_rating,
+            global_rd: ratingSnapshot.global_rd,
+            rating_provisional: ratingSnapshot.provisional,
+            rating_placement_matches: ratingSnapshot.placement_matches,
+            rating_events: ratingSnapshot.rated_events,
             avatar_url: avatarUrl,
             avatar: avatarUrl,
             exp: user.exp || 0,

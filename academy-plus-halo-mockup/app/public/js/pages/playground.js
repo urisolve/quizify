@@ -76,6 +76,30 @@
 
   initQuestionPmbSourceControls();
 
+  window.addEventListener('load', () => {
+    const questionOffcanvas = document.getElementById('playground-question-offcanvas');
+    if (!questionOffcanvas || questionOffcanvas.dataset.generatedQuestion !== '1') {
+      return;
+    }
+
+    const bootstrapApi = window.bootstrap?.Offcanvas;
+    if (!bootstrapApi) {
+      return;
+    }
+
+    const offcanvasInstance = bootstrapApi.getOrCreateInstance(questionOffcanvas, {
+      backdrop: 'static',
+      keyboard: false,
+      scroll: false,
+    });
+
+    questionOffcanvas.addEventListener('shown.bs.offcanvas', () => {
+      questionOffcanvas.querySelector('input[name="rating"]')?.focus();
+    }, { once: true });
+
+    offcanvasInstance.show();
+  }, { once: true });
+
   const flashBanner = document.getElementById('playground-flash-banner');
   const flashMessage = document.getElementById('playground-flash-message');
   if (!flashBanner || !flashMessage) {

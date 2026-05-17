@@ -53,6 +53,7 @@ async function practicePlusPage(req, res) {
     // First Incomplete Topic Index
     const firstIncompleteIndex = topicsWithSubs.findIndex(t => t.progress < 100);
     const defaultTopicIndex = firstIncompleteIndex !== -1 ? firstIncompleteIndex : 0;
+    const activeTopic = topicsWithSubs[defaultTopicIndex] || topicsWithSubs[0] || null;
 
     res.renderPage('practice-plus', {
       layout: 'main',
@@ -63,7 +64,8 @@ async function practicePlusPage(req, res) {
       generalProgress: totalProgress,
       userAvatar: req.session.user?.avatar_url || req.session.user?.avatar || null,
       userLevel: req.session.user?.level || 1,
-      defaultTopicIndex
+      defaultTopicIndex,
+      activeTopic,
      /*  userBadges: badges */
     });
   } catch (err) {

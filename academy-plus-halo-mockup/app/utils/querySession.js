@@ -20,6 +20,7 @@ function initializeQuerySession(type, { topicId, subtopicId, questionIds, userPr
     missedIds: [],
     results: [],
     questionTries: Array(questionIds.length).fill(0),
+    attemptCountsByQuestionId: {},
     questionStartTime: Date.now(),
     totalTime: 0,
     userPrevExp: userPrevExp || 0,
@@ -41,11 +42,17 @@ function initializeQuerySession(type, { topicId, subtopicId, questionIds, userPr
 /**
  * Increment tries for current question and return the tries count
  * @param {Object} query - Query session object
+ * @param {number} questionId - Current question id
  * @returns {number} Number of tries for current question
  */
-function incrementQuestionTries(query) {
+function incrementQuestionTries(query, questionId) {
   query.questionTries = query.questionTries || Array(query.questionIds.length).fill(0);
   query.questionTries[query.current] = (query.questionTries[query.current] || 0) + 1;
+  if (questionId != null) {
+    query.attemptCountsByQuestionId = query.attemptCountsByQuestionId || {};
+    query.attemptCountsByQuestionId[questionId] = (query.attemptCountsByQuestionId[questionId] || 0) + 1;
+    return query.attemptCountsByQuestionId[questionId];
+  }
   return query.questionTries[query.current];
 }
 

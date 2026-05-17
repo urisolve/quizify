@@ -35,6 +35,11 @@
     img.style.display      = 'block';
     img.style.margin       = '1rem auto';
     img.style.borderRadius = '.5rem';
+    img.classList.add('halo-image-zoom-trigger');
+    img.setAttribute('data-image-zoom', img.currentSrc || img.src || '');
+    img.setAttribute('data-image-zoom-title', img.alt || 'Image preview');
+    img.setAttribute('tabindex', '0');
+    img.setAttribute('role', 'button');
   });
 
   // 5. Style tables with Bootstrap + responsive wrapper.

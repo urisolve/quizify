@@ -5,6 +5,7 @@ const { logTrainingAttempt, getUserWeeklyStats} = require('../../models/Training
 const { checkAndAwardTopicBadge } = require('../../models/User');
 const { calculateQuestionScore } = require('../../utils/scoreCalculator');
 const { incrementQuestionTries } = require('../../utils/querySession');
+const { recordAnswerRating } = require('../../services/ratingSystem');
 const getWeekStart = require('../../utils/getWeekStart');
 const { pickLocale } = require('../../utils/localize');
 const finalizeQuizStats = require('../../utils/finalizeQuizStats');
@@ -23,6 +24,14 @@ exports.submitAnswer = async (req, res) => {
   const [[question]] = await Questions.getQuestionById(questionId);
   if (!question) return res.status(404).json({ correct: false });
 
+  let ratingTopicId = query.topicId || null;
+  let subtopicInfo = null;
+  if (query.subtopicId && !ratingTopicId) {
+    const [[subtopic]] = await getSubtopicById(query.subtopicId);
+    subtopicInfo = subtopic;
+    ratingTopicId = subtopic?.topic_id || null;
+  }
+
   // Get the current week start from session (set when query started)
   const weekStart = req.session.query.weekStart;
 
@@ -37,7 +46,7 @@ exports.submitAnswer = async (req, res) => {
   // const [[currentDone]] = await getUserQuestionWeeklyTraining(userId, questionId, weekStart);
 
   // --- Increment tries for current question in session ---
-  const tries = incrementQuestionTries(query);
+  const tries = incrementQuestionTries(query, questionId);
 
   // Handle incorrect answer first
   const correctAnswer = pickLocale(question.correct_answer, lang);
@@ -50,6 +59,24 @@ exports.submitAnswer = async (req, res) => {
       score: 0,
       time: questionTime
     });
+
+    if (userId) {
+      const ratingUpdate = await recordAnswerRating({
+        userId,
+        question,
+        topicId: ratingTopicId,
+        attemptNo: tries,
+        success: false,
+        timeSeconds: questionTime,
+        hintsUsed: 0,
+      });
+
+      if (ratingUpdate && req.session.user) {
+        req.session.user.global_rating = ratingUpdate.globalRating;
+        req.session.user.global_rd = ratingUpdate.globalRd;
+        req.session.user.rating_provisional = ratingUpdate.provisional;
+      }
+    }
 
     // For incorrect answer: increment tries only, do not change completed
     // const newTries = (currentDone?.tries ?? 0) + 1;
@@ -112,10 +139,11 @@ exports.submitAnswer = async (req, res) => {
   }
 
   // ---Scoring logic ---
-  let subtopicInfo = null;
   if (query.type === 'subtopic' && query.subtopicId) {
-    const [[subtopic]] = await getSubtopicById(query.subtopicId);
-    subtopicInfo = subtopic;
+    if (!subtopicInfo) {
+      const [[subtopic]] = await getSubtopicById(query.subtopicId);
+      subtopicInfo = subtopic;
+    }
   }
   const weight = subtopicInfo && subtopicInfo.weight ? Number(subtopicInfo.weight) : 1;
 
@@ -131,15 +159,32 @@ exports.submitAnswer = async (req, res) => {
       time: questionTime
     });
 
+  if (userId) {
+    const ratingUpdate = await recordAnswerRating({
+      userId,
+      question,
+      topicId: ratingTopicId,
+      attemptNo: tries,
+      success: true,
+      timeSeconds: questionTime,
+      hintsUsed: 0,
+    });
+
+    if (ratingUpdate && req.session.user) {
+      req.session.user.global_rating = ratingUpdate.globalRating;
+      req.session.user.global_rd = ratingUpdate.globalRd;
+      req.session.user.rating_provisional = ratingUpdate.provisional;
+    }
+  }
+
   // Also add the score earned for this question to the user's total score
   await User.incrementUserExp(userId, score);
   // Fetch the latest score from the DB and update the session
   req.session.user.exp = await User.getUserExp(userId);
 
   // Update level and levelProgress after score changes
-  const { getLevelFromScore, getLevelProgressPercent } = require('../../utils/level');
-  req.session.user.level = getLevelFromScore(req.session.user.exp || 0);
-  req.session.user.levelProgress = getLevelProgressPercent(req.session.user.exp || 0);
+  const { getLevelInfo } = require('../../utils/level');
+  Object.assign(req.session.user, getLevelInfo(req.session.user.exp || 0));
   console.log(`Nível: ${req.session.user.level}, Progresso: ${req.session.user.levelProgress}%`);
   
   

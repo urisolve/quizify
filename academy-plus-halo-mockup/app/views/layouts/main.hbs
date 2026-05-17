@@ -25,11 +25,30 @@
     </div>
   </div>
 
+  <div class="offcanvas halo-image-zoom-offcanvas" tabindex="-1" id="haloImageZoomOffcanvas" aria-labelledby="haloImageZoomOffcanvasLabel" data-bs-backdrop="true" data-bs-scroll="false">
+    <div class="offcanvas-header border-bottom">
+      <div>
+        <h2 class="offcanvas-title fw-semibold mb-1 fs-5" id="haloImageZoomOffcanvasLabel">Image preview</h2>
+        <p class="mb-0 text-muted small" data-image-zoom-caption>Click outside or press Esc to close.</p>
+      </div>
+      <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+    </div>
+    <div class="offcanvas-body d-flex align-items-center justify-content-center p-3 p-lg-4">
+      <img
+        data-image-zoom-preview
+        src=""
+        alt=""
+        class="halo-image-zoom-preview img-fluid"
+      >
+    </div>
+  </div>
+
   <script src="/assets/libs/jquery/dist/jquery.min.js"></script>
   <script src="/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="/assets/js/sidebarmenu.js"></script>
   <script src="/assets/js/app.min.js"></script>
   <script src="/assets/libs/simplebar/dist/simplebar.js"></script>
   <script src="/js/halo.js"></script>
+  <script src="/js/utils/image-zoom.js"></script>
 </body>
 </html>

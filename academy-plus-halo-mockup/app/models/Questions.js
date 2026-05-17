@@ -1,4 +1,5 @@
 const db = require('../config/db');
+const { mapDifficultyToRating } = require('./Rating');
 
 function normalizeTextValue(value, label) {
   if (Array.isArray(value)) {
@@ -84,6 +85,7 @@ async function initQuestionsTable() {
         incorrect_answer JSON NOT NULL,
         feedback JSON DEFAULT NULL,
         difficulty TINYINT DEFAULT 1,
+        difficulty_rating INT NOT NULL DEFAULT 1300,
         model VARCHAR(50) NOT NULL,
         creation_time_ms INT DEFAULT NULL,
         type ENUM('AI Generated','Edited by Human','Created by Human') NOT NULL,
@@ -98,6 +100,30 @@ async function initQuestionsTable() {
         FOREIGN KEY (subtopic_id) REFERENCES subtopics(id) ON DELETE CASCADE,
         FOREIGN KEY (rag_document_id) REFERENCES rag_documents(id) ON DELETE CASCADE
       )
+    `);
+
+    const [difficultyRatingColumn] = await db.query(
+      `SHOW COLUMNS FROM questions LIKE 'difficulty_rating'`
+    );
+    if (!difficultyRatingColumn.length) {
+      await db.query(`
+        ALTER TABLE questions
+          ADD COLUMN difficulty_rating INT NOT NULL DEFAULT 1300
+          AFTER difficulty
+      `);
+    }
+
+    await db.query(`
+      UPDATE questions
+         SET difficulty_rating = CASE difficulty
+           WHEN 1 THEN 800
+           WHEN 2 THEN 1000
+           WHEN 3 THEN 1300
+           WHEN 4 THEN 1600
+           WHEN 5 THEN 1900
+           ELSE 1300
+         END
+       WHERE difficulty_rating IS NULL OR difficulty_rating = 0
     `);
     console.log('Questions table ensured/created.');
   } catch (err) {
@@ -170,6 +196,7 @@ async function createQuestion({
   incorrect_answer,
   feedback = null,
   difficulty = 1,
+  difficulty_rating = null,
   model,
   type,
   creation_time_ms = null
@@ -197,6 +224,10 @@ async function createQuestion({
   if (!model || typeof model !== 'string') {
     throw new Error('createQuestion: model is required.');
   }
+
+  const safeDifficultyRating = Number.isInteger(Number(difficulty_rating))
+    ? Number(difficulty_rating)
+    : mapDifficultyToRating(difficulty);
   const allowedTypes = ['AI Generated', 'Edited by Human', 'Created by Human'];
   if (!allowedTypes.includes(type)) {
     throw new Error(
@@ -207,9 +238,9 @@ async function createQuestion({
   const sql = `
     INSERT INTO questions
       (subtopic_id, rag_document_id, question_type, question_text, image,
-       correct_answer, incorrect_answer, feedback, difficulty,
+       correct_answer, incorrect_answer, feedback, difficulty, difficulty_rating,
        model, type, number_tries, number_corrects, creation_time_ms)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
   `;
 
   const params = [
@@ -222,6 +253,7 @@ async function createQuestion({
     JSON.stringify(incorrect_answer),
     feedback === null ? null : JSON.stringify(feedback),
     difficulty,
+    safeDifficultyRating,
     model,
     type,
     creation_time_ms
@@ -240,7 +272,7 @@ function deleteQuestion(questionId) {
 function updateQuestion(questionId, updates) {
   const allowedFields = [
     'question_type', 'question_text', 'image', 'correct_answer',
-    'incorrect_answer', 'feedback', 'difficulty',
+    'incorrect_answer', 'feedback', 'difficulty', 'difficulty_rating',
     'number_tries', 'number_corrects',
     'rating_sum_teacher', 'rating_count_teacher',
     'rating_sum_student', 'rating_count_student',
@@ -269,6 +301,10 @@ function updateQuestion(questionId, updates) {
         'Update failed: incorrect_answer must be [[PT...], [EN...]] with ≥3 items per language.'
       );
     }
+  }
+
+  if (updates.difficulty !== undefined && updates.difficulty_rating === undefined) {
+    updates.difficulty_rating = mapDifficultyToRating(updates.difficulty);
   }
 
   // Filter fields and handle JSON conversion

@@ -28,6 +28,12 @@ const leaderboardController = require('../controllers/api/leaderboardController'
 const queryRoutes = require('./api/query');
 router.use('/query', queryRoutes);
 
+const ratingController = require('../controllers/api/ratingController');
+router.get('/ratings/me', requireAuthentication, ratingController.getMyRating);
+router.get('/ratings/leaderboard', ratingController.getGlobalLeaderboard);
+router.get('/ratings/leaderboard/topic/:topicId', ratingController.getTopicLeaderboard);
+router.get('/ratings/leaderboard/season', ratingController.getSeasonLeaderboard);
+
 router.post('/subtopic-progress', requireAuthentication, subtopicProgressController.updateSubtopicProgress);
 
 // GET /api/leaderboard?sort=score&limit=10
