@@ -210,6 +210,7 @@ async function showReviewQuestion(req, res) {
     }
     const seenIds = req.session.seenReviewQuestions[mode];
 
+    const userId = req.session.user?.id;
     const whereParts = [];
     const params = [];
 
@@ -221,7 +222,10 @@ async function showReviewQuestion(req, res) {
            AND rating_sum_student / rating_count_student < 2.5)
       )`);
     } else if (mode === 'unrated') {
-      whereParts.push(`(rating_count_teacher = 0 AND rating_count_student = 0)`);
+      whereParts.push(`id NOT IN (
+        SELECT question_id FROM question_feedback WHERE user_id = ?
+      )`);
+      params.push(userId);
     }
 
     if (seenIds.length) {
