@@ -238,8 +238,7 @@ async function showReviewQuestion(req, res) {
       `SELECT id, subtopic_id, rag_document_id, question_type,
               question_text, image, correct_answer, incorrect_answer,
               feedback, difficulty, number_tries, number_corrects,
-              rating_sum_teacher, rating_count_teacher,
-              rating_sum_student, rating_count_student
+              type, model
          FROM questions
          ${whereClause}
          ORDER BY RAND()
@@ -289,13 +288,6 @@ async function showReviewQuestion(req, res) {
     const flash = req.session.flash || null;
     delete req.session.flash;
 
-    const teacherAvg = q.rating_count_teacher
-      ? (Number(q.rating_sum_teacher) / Number(q.rating_count_teacher)).toFixed(2)
-      : null;
-    const studentAvg = q.rating_count_student
-      ? (Number(q.rating_sum_student) / Number(q.rating_count_student)).toFixed(2)
-      : null;
-
     const imagePath = q.image ? (String(q.image).startsWith('/') ? q.image : `/${q.image}`) : null;
 
     res.renderPage('playground_review', {
@@ -310,10 +302,8 @@ async function showReviewQuestion(req, res) {
         id: q.id,
         question_type: q.question_type,
         difficulty: q.difficulty,
-        rating_count_teacher: q.rating_count_teacher,
-        rating_avg_teacher: teacherAvg,
-        rating_count_student: q.rating_count_student,
-        rating_avg_student: studentAvg,
+        type: q.type,
+        model: q.model,
         image: imagePath,
         question_text: pickLocale(q.question_text, lang),
         feedback: pickLocale(q.feedback, lang)
