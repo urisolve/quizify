@@ -156,10 +156,6 @@ async function getRandomQuestionBySubtopic(subtopicId, limit, userId = null) {
     `SELECT q.id
       FROM questions q
       WHERE q.subtopic_id = ?
-        -- teacher side: unrated, or average above 2.5
-      AND (q.rating_count_teacher = 0 OR q.rating_sum_teacher / q.rating_count_teacher > 2.5)
-      -- student side: unrated, or average above 2.5
-      AND (q.rating_count_student = 0 OR q.rating_sum_student / q.rating_count_student > 2.5)
         ${passedFilter}
       ORDER BY RAND()
       LIMIT ?`,

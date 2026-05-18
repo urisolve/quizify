@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
  
   // Handle form submission
+  const submitBtn = document.querySelector('button[form="answer-form"]');
   const form = document.getElementById('answer-form');
   if (form) {
     form.addEventListener('submit', async function (e) {
@@ -25,74 +26,89 @@ document.addEventListener('DOMContentLoaded', () => {
       const selected = document.querySelector('.answer-option input[type="radio"]:checked');
       if (!selected) return;
 
-      const answerText = selected.parentElement.querySelector('span:last-child').textContent.trim();
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.querySelector('.btn-label')?.classList.add('d-none');
+        submitBtn.querySelector('.btn-loading')?.classList.remove('d-none');
+      }
 
-      const res = await fetch('/api/query/submit-answer', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ answer: answerText })
-      });
-      const data = await res.json();
+      try {
+        const answerText = selected.parentElement.querySelector('span:last-child').textContent.trim();
 
-      const selectedLabel = selected ? selected.parentElement : null;
+        const res = await fetch('/api/query/submit-answer', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ answer: answerText })
+        });
+        const data = await res.json();
 
-      // Remove previous feedback classes
-      document.querySelectorAll('.answer-option').forEach(label => {
-        label.classList.remove('answer-correct', 'answer-incorrect');
-      });
+        const selectedLabel = selected ? selected.parentElement : null;
 
-      if (data.correct) {
-        if (selectedLabel) selectedLabel.classList.add('answer-correct');
-        // Update progress bar
-        if (typeof data.progress === 'number') {
-          const progressBar = document.querySelector('.query-progress-fill');
-          if (progressBar) progressBar.style.width = `${data.progress}%`;
-        }
-        // Play correct answer sound
-        const correctAudio = document.getElementById('correct-sound');
-        if (correctAudio) {
-          correctAudio.volume = 0.15;
-          correctAudio.play();
-        }
+        // Remove previous feedback classes
+        document.querySelectorAll('.answer-option').forEach(label => {
+          label.classList.remove('answer-correct', 'answer-incorrect');
+        });
 
-        if (data.roundUp) {
-          setTimeout(() => window.location.reload(), 2000);
-          return;
-        }
-
-        setTimeout(() => {
-          if (data.complete) {
-            window.location.href = '/query-complete';
-          } else {
-            window.location.reload();
+        if (data.correct) {
+          if (selectedLabel) selectedLabel.classList.add('answer-correct');
+          // Update progress bar
+          if (typeof data.progress === 'number') {
+            const progressBar = document.querySelector('.query-progress-fill');
+            if (progressBar) progressBar.style.width = `${data.progress}%`;
           }
-        }, 1000);
-      } else {
-        if (selectedLabel) selectedLabel.classList.add('answer-incorrect');
-        // Update progress bar
-        if (typeof data.progress === 'number') {
-          const progressBar = document.querySelector('.query-progress-fill');
-          if (progressBar) progressBar.style.width = `${data.progress}%`;
-        }
-
-        const wrongAudio = document.getElementById('wrong-sound');
-        if (wrongAudio) {
-          wrongAudio.volume = 0.35;
-          wrongAudio.play();
-        }
-        
-        if (data.roundUp) {
-          setTimeout(() => window.location.reload(), 2000);
-          return;
-        }
-
-        setTimeout(() => {
-          if (data.complete) {
-            window.location.href = '/query-complete';
-          } else {
-            window.location.reload();
+          // Play correct answer sound
+          const correctAudio = document.getElementById('correct-sound');
+          if (correctAudio) {
+            correctAudio.volume = 0.15;
+            correctAudio.play();
           }
-        }, 2000);
+
+          if (data.roundUp) {
+            setTimeout(() => window.location.reload(), 2000);
+            return;
+          }
+
+          setTimeout(() => {
+            if (data.complete) {
+              window.location.href = '/query-complete';
+            } else {
+              window.location.reload();
+            }
+          }, 1000);
+        } else {
+          if (selectedLabel) selectedLabel.classList.add('answer-incorrect');
+          // Update progress bar
+          if (typeof data.progress === 'number') {
+            const progressBar = document.querySelector('.query-progress-fill');
+            if (progressBar) progressBar.style.width = `${data.progress}%`;
+          }
+
+          const wrongAudio = document.getElementById('wrong-sound');
+          if (wrongAudio) {
+            wrongAudio.volume = 0.35;
+            wrongAudio.play();
+          }
+          
+          if (data.roundUp) {
+            setTimeout(() => window.location.reload(), 2000);
+            return;
+          }
+
+          setTimeout(() => {
+            if (data.complete) {
+              window.location.href = '/query-complete';
+            } else {
+              window.location.reload();
+            }
+          }, 2000);
+        }
+      } catch (err) {
+        console.error('[query-plus] submit failed:', err);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.querySelector('.btn-label')?.classList.remove('d-none');
+          submitBtn.querySelector('.btn-loading')?.classList.add('d-none');
+        }
       }
     });
   }
