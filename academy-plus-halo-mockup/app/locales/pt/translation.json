@@ -243,7 +243,7 @@
         "question_created": "Pergunta criada com sucesso em {{elapsedSec}} s.",
         "question_failed": "Falha ao criar pergunta: {{error}}",
         "no_questions": "Sem perguntas para rever.",
-        "rating_saved": "Avaliação {{rating}} guardada para a questão #{{questionId}}.",
+        "rating_saved": "Avaliação guardada para a questão #{{questionId}}.",
         "rating_failed": "Falha ao guardar avaliação: {{error}}",
         "no_critical_questions": "Sem questões críticas para rever.",
         "no_unrated_questions": "Sem questões por classificar.",
@@ -340,5 +340,22 @@
         "role_student": "Estudante",
         "role_teacher": "Docente",
         "role_admin": "Administrador"
+    },
+    "feedback": {
+        "metrics_title": "Avalia cada métrica entre 1 (Discordo totalmente) e 5 (Concordo totalmente)",
+        "comment_label": "Comentário",
+        "comment_placeholder": "Notas adicionais para esta questão...",
+        "m1_title": "Correção técnica",
+        "m1_statement": "Acho que este conteúdo está tecnicamente correto.",
+        "m2_title": "Clareza e Ambiguidade",
+        "m2_statement": "O conteúdo é claro e não me parece ambíguo.",
+        "m3_title": "Adequação ao tópico",
+        "m3_statement": "Este conteúdo está alinhado com o tópico ou subtópico que está a ser trabalhado.",
+        "m4_title": "Adequação da dificuldade",
+        "m4_statement": "A dificuldade desta questão é adequada ao meu nível atual.",
+        "m5_title": "Qualidade Visual",
+        "m5_statement": "A imagem/esquema ajuda-me a compreender o circuito ou o passo da resolução.",
+        "m6_title": "Apoio ao raciocínio",
+        "m6_statement": "O conteúdo ajudou-me a perceber o raciocínio necessário, e não apenas a escolher uma resposta."
     }
 }

@@ -165,6 +165,7 @@ const hbsHelpers = {
   eq: function (a, b) {
     return a === b;
   },
+
   // range helper
   // Generates an array of numbers from 0 to count-1
   range: function (count) {
@@ -173,6 +174,17 @@ const hbsHelpers = {
       result.push(i);
     }
     return result;
+  },
+
+  rangestart: function (start, end) {
+    const arr = [];
+    for (let i = parseInt(start, 10); i <= parseInt(end, 10); i++) arr.push(i);
+    return arr;
+  },
+
+  concat: function () {
+    // last arg is the Handlebars options object — drop it.
+    return Array.prototype.slice.call(arguments, 0, -1).join('');
   },
 
   // JSON stringify helper
@@ -235,6 +247,7 @@ const { initUserSubtopicProgressTable } = require('./models/UserSubtopicProgress
 const { initUsersTable, syncUserAvatars } = require('./models/User');
 const { initRagTable } = require('./models/Documents');
 const { initRatingTables } = require('./models/Rating');
+const { initQuestionFeedbackTable } = require('./models/QuestionFeedback');
 
 // Initialize all tables before starting the server
 async function waitForDB(retries = 10, delay = 3000) {
@@ -262,6 +275,7 @@ async function waitForDB(retries = 10, delay = 3000) {
     await initTrainingTable();
     await initUserSubtopicProgressTable();
     await initRatingTables();
+    await initQuestionFeedbackTable();
     console.log('All tables ensured/created.');
     await seedDatabase([topicsPath, subtopicsPath, usersPath]); // , docsPath, questionsPath
     await syncUserAvatars();

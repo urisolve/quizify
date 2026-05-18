@@ -1,5 +1,6 @@
 const db = require('../../config/db');
 const { createQuestion } = require('../../models/Questions');
+const { addQuestionFeedback } = require('../../models/QuestionFeedback');
 const { pickLocale, pickLocaleArray } = require('../../utils/localize');
 const {
   buildRagPayload,
@@ -271,6 +272,16 @@ async function showReviewQuestion(req, res) {
       ...incorrects.slice(0, 3),
     ]);
 
+    const [feedbackRows] = await db.query(
+      `SELECT m1, m2, m3, m4, m5, m6, comment
+        FROM question_feedback
+        WHERE question_id = ? AND user_id = ?
+        LIMIT 1`,
+      [q.id, req.session.user.id]
+    );
+    // Default to all-zero so the template can use the same lookup unconditionally.
+    const previousFeedback = feedbackRows[0] || { m1: 0, m2: 0, m3: 0, m4: 0, m5: 0, m6: 0, comment: '' };
+
     const flash = req.session.flash || null;
     delete req.session.flash;
 
@@ -290,6 +301,7 @@ async function showReviewQuestion(req, res) {
       type: 'subtopic',
       subtopicId: q.subtopic_id,
       mode,
+      previousFeedback,
       question: {
         id: q.id,
         question_type: q.question_type,
@@ -318,27 +330,26 @@ async function submitReviewRating(req, res) {
 
   try {
     questionId = parseInt(req.body.questionId, 10);
-    const rating = parseInt(req.body.rating, 10);
-
     if (!questionId) throw new Error('Missing questionId.');
-    if (!rating || rating < 1 || rating > 5) throw new Error('Rating must be between 1 and 5.');
+    console.log(`Question ID: ${questionId}`);
 
-    const [result] = await db.query(
-      `UPDATE questions
-          SET rating_sum_teacher   = rating_sum_teacher + ?,
-              rating_count_teacher = rating_count_teacher + 1
-        WHERE id = ?`,
-      [rating, questionId]
-    );
-
-    if (!result.affectedRows) {
-      throw new Error(`No question found with id ${questionId}.`);
-    }
+    // Detailed feedback row.
+    await addQuestionFeedback({
+      questionId,
+      userId: req.session.user.id,
+      m1: req.body.m1,
+      m2: req.body.m2,
+      m3: req.body.m3,
+      m4: req.body.m4,
+      m5: req.body.m5,
+      m6: req.body.m6,
+      comment: req.body.comment,
+    });
 
     req.session.flash = {
       type: 'success',
       messageKey: 'flashes.rating_saved',
-      messageVars: { rating, questionId }
+      messageVars: { questionId }
     };
   } catch (err) {
     console.error('[questions] submitReviewRating failed:', err);

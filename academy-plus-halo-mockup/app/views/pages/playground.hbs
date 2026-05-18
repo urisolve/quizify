@@ -347,36 +347,43 @@
                 <input type="hidden" name="questionId" value="{{flash.generatedQuestion.id}}">
                 <input type="hidden" name="return_to" value="playground">
 
-                <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
-                  <input type="radio" name="rating" value="1" required class="mt-1">
-                  <div><span class="badge bg-danger me-2">1</span>
-                  <span class="fw-semibold">{{ t 'playgroundreview.scaleone' }}</span></div>
-                </label>
-                <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
-                  <input type="radio" name="rating" value="2" required class="mt-1">
-                  <div><span class="badge bg-warning text-dark me-2">2</span>
-                  <span class="fw-semibold">{{ t 'playgroundreview.scaletwo' }}</span></div>
-                </label>
-                <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
-                  <input type="radio" name="rating" value="3" required class="mt-1">
-                  <div><span class="badge bg-secondary me-2">3</span>
-                  <span class="fw-semibold">{{ t 'playgroundreview.scalethree' }}</span></div>
-                </label>
-                <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
-                  <input type="radio" name="rating" value="4" required class="mt-1">
-                  <div><span class="badge bg-info me-2">4</span>
-                  <span class="fw-semibold">{{ t 'playgroundreview.scalefour' }}</span></div>
-                </label>
-                <label class="likert-option border rounded-3 p-3 d-flex align-items-start gap-3" style="cursor: pointer;">
-                  <input type="radio" name="rating" value="5" required class="mt-1">
-                  <div><span class="badge bg-success me-2">5</span>
-                  <span class="fw-semibold">{{ t 'playgroundreview.scalefive' }}</span></div>
-                </label>
+                <p class="fw-semibold mb-2">{{ t 'feedback.metrics_title' }}</p>
+
+                {{#each (rangestart 1 6) as |n|}}
+                  <div class="border rounded-3 p-3">
+                    <div class="row">
+                      <div class="col-3 fw-semibold">{{t (concat 'feedback.m' n '_title')}}</div>
+                      <div class="col-6 text-muted small">{{t (concat 'feedback.m' n '_statement')}}</div>
+                      <div class="col-3">
+                        <div class="btn-group w-100" role="group" aria-label="M{{n}}">
+                          {{#each (rangestart 1 5) as |v|}}
+                            <input type="radio" class="btn-check"
+                                  name="m{{n}}" id="offcanvas-m{{n}}-{{v}}" value="{{v}}">
+                            <label class="btn btn-sm btn-outline-secondary"
+                                  for="offcanvas-m{{n}}-{{v}}">{{v}}</label>
+                          {{/each}}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {{/each}}
+
+                <div class="mt-3">
+                  <label class="form-label fw-semibold" for="offcanvas-comment">
+                    {{ t 'feedback.comment_label' }}
+                  </label>
+                  <textarea class="form-control" id="offcanvas-comment" name="comment" rows="3"
+                            placeholder="{{ t 'feedback.comment_placeholder' }}"></textarea>
+                </div>
 
                 <div class="d-flex gap-2 mt-3">
                   <button type="submit" class="btn btn-primary py-2 fw-semibold flex-grow-1">
                     <i class="ti ti-send me-2"></i>{{ t 'playgroundreview.submiteval' }}
                   </button>
+                  <a href="/playground/questions/{{flash.generatedQuestion.id}}/edit"
+                    class="btn btn-outline-primary py-2 fw-semibold">
+                    <i class="ti ti-pencil me-2"></i>{{ t 'playground.edit_question' }}
+                  </a>
                 </div>
               </form>
             </div>

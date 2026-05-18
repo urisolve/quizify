@@ -243,7 +243,7 @@
         "question_created": "Question created successfully in {{elapsedSec}} s.",
         "question_failed": "Failed to create question: {{error}}",
         "no_questions": "No questions to review.",
-        "rating_saved": "Rating {{rating}} saved for question #{{questionId}}.",
+        "rating_saved": "Rating saved for question #{{questionId}}.",
         "rating_failed": "Failed to save rating: {{error}}",
         "no_critical_questions": "No critical questions to review.",
         "no_unrated_questions": "No unrated questions to review.",
@@ -340,5 +340,22 @@
         "role_student": "Student",
         "role_teacher": "Teacher",
         "role_admin": "Administrator"
+    },
+    "feedback": {
+        "metrics_title": "Rate each metric between 1 (Strongly Disagree) and 5 (Strongly Agree)",
+        "comment_label": "Comment",
+        "comment_placeholder": "Additional notes for this question...",
+        "m1_title": "Technical Correctness",
+        "m1_statement": "I think this content is technically correct.",
+        "m2_title": "Clarity and Ambiguity",
+        "m2_statement": "The content is clear and does not seem ambiguous to me.",
+        "m3_title": "Relevance to the Topic",
+        "m3_statement": "This content is aligned with the topic or subtopic being addressed.",
+        "m4_title": "Difficulty Appropriateness",
+        "m4_statement": "The difficulty of this question is appropriate to my current level.",
+        "m5_title": "Visual Quality",
+        "m5_statement": "The image/diagram helps me understand the circuit or the step of the solution.",
+        "m6_title": "Support for reasoning",
+        "m6_statement": "The content helped me understand the necessary reasoning, not just to choose an answer."
     }
 }
