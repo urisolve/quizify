@@ -66,7 +66,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // ---- Per-question Likert rating (student) ----
   // Toggle the collapsible Likert section.
   document.querySelectorAll('.rate-question-toggle').forEach(function (btn) {
     btn.addEventListener('click', function () {
@@ -81,11 +80,11 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.rate-question-form').forEach(function (form) {
     form.querySelectorAll('.rate-likert-option input[type="radio"]').forEach(function (input) {
       input.addEventListener('change', function () {
-        form.querySelectorAll('.rate-likert-option').forEach(function (opt) {
+        document.querySelectorAll('.likert-option').forEach(function (opt) {
           opt.classList.remove('border-primary', 'bg-primary-subtle');
         });
         if (input.checked) {
-          const parent = input.closest('.rate-likert-option');
+          const parent = input.closest('.likert-option');
           if (parent) parent.classList.add('border-primary', 'bg-primary-subtle');
         }
       });
@@ -96,8 +95,7 @@ document.addEventListener('DOMContentLoaded', function() {
       e.preventDefault();
 
       const questionId = form.dataset.questionId;
-      const ratingInput = form.querySelector('input[name="rating"]:checked');
-      if (!questionId || !ratingInput) return;
+      if (!questionId) return;
 
       const submitBtn = form.querySelector('button[type="submit"]');
       const successEl = form.querySelector('.rate-success');
@@ -107,23 +105,24 @@ document.addEventListener('DOMContentLoaded', function() {
       submitBtn.disabled = true;
       if (errorEl) errorEl.classList.add('d-none');
 
+      // Send every field — questionId, m1..m6, comment — via FormData.
+      const formData = new FormData(form);
+      const body = Object.fromEntries(formData.entries());
+
       try {
         const res = await fetch('/query-complete/rate-question', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            questionId: parseInt(questionId, 10),
-            rating: parseInt(ratingInput.value, 10)
-          })
+          body: JSON.stringify(body)
         });
 
         if (!res.ok) {
-          const body = await res.json().catch(() => ({}));
-          throw new Error(body.error || `HTTP ${res.status}`);
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.error || `HTTP ${res.status}`);
         }
 
         // Success: lock the form and show the thanks message.
-        form.querySelectorAll('input, button').forEach(function (el) { el.disabled = true; });
+        form.querySelectorAll('input, button, textarea').forEach((el) => { el.disabled = true; });
         if (successEl) successEl.classList.remove('d-none');
       } catch (err) {
         console.error('Rating submit failed:', err);

@@ -1,4 +1,5 @@
 const {getUserWeeklyStats} = require('../../models/Training');
+const { addQuestionFeedback } = require('../../models/QuestionFeedback');
 const getWeekStart = require('../../utils/getWeekStart');
 const { getLevelProgressPercent, getLevelFromScore } = require('../../utils/level');
 const { calculatePerformanceBolts } = require('../../utils/performanceCalculator');
@@ -11,6 +12,7 @@ async function showQueryComplete(req, res) {
     // If coming fresh from a quiz, process and cache the result
     if (req.session.query) {
         const quiz = req.session.query;
+        const userId = req.session.user?.id;
 
         const weekStart = quiz?.weekStart || getWeekStart(); // Use session weekStart if available
         const weeklyStats = await getUserWeeklyStats(userId, weekStart);
@@ -60,6 +62,25 @@ async function showQueryComplete(req, res) {
         else if (filledBolts === 1) { performanceMessageKey = 'query_complete.nice_try'; } 
         else { performanceMessageKey = 'query_complete.keep_going'; }
 
+        
+        if (userId && Array.isArray(results) && results.length) {
+        const ids = results.map(r => r.questionId).filter(Boolean);
+        if (ids.length) {
+            const placeholders = ids.map(() => '?').join(',');
+            const [fbRows] = await db.query(
+            `SELECT question_id, m1, m2, m3, m4, m5, m6, comment
+                FROM question_feedback
+                WHERE user_id = ? AND question_id IN (${placeholders})`,
+            [userId, ...ids]
+            );
+            const byId = new Map(fbRows.map(r => [r.question_id, r]));
+            for (const r of results) {
+            r.previousFeedback = byId.get(r.questionId) ||
+                { m1: 0, m2: 0, m3: 0, m4: 0, m5: 0, m6: 0, comment: '' };
+            }
+        }
+        }
+
         // Cache for language switches / reloads
         req.session.queryComplete = {
             score,
@@ -93,31 +114,26 @@ async function showQueryComplete(req, res) {
 };
 
 // AJAX endpoint: student rates a question on the 1–5 Likert scale.
-// Increments rating_sum_student / rating_count_student on the questions row.
 async function rateQuestionByStudent(req, res) {
     try {
         const questionId = parseInt(req.body.questionId, 10);
-        const rating = parseInt(req.body.rating, 10);
- 
         if (!questionId) {
             return res.status(400).json({ error: 'Missing questionId.' });
         }
-        if (!rating || rating < 1 || rating > 5) {
-            return res.status(400).json({ error: 'Rating must be between 1 and 5.' });
-        }
- 
-        const [result] = await db.query(
-            `UPDATE questions
-                SET rating_sum_student   = rating_sum_student + ?,
-                    rating_count_student = rating_count_student + 1
-              WHERE id = ?`,
-            [rating, questionId]
-        );
- 
-        if (!result.affectedRows) {
-            return res.status(404).json({ error: `No question found with id ${questionId}.` });
-        }
- 
+        console.log(`Question ID: ${questionId}`);
+        
+        await addQuestionFeedback({
+            questionId,
+            userId: req.session.user.id,
+            m1: req.body.m1,
+            m2: req.body.m2,
+            m3: req.body.m3,
+            m4: req.body.m4,
+            m5: req.body.m5,
+            m6: req.body.m6,
+            comment: req.body.comment,
+        });
+    
         return res.json({ success: true });
     } catch (err) {
         console.error('[query-complete] rateQuestionByStudent failed:', err);
