@@ -202,6 +202,91 @@
       </section>
     </div>
 
+
+    <!-- MANDATORY FEEDBACK -->
+    {{#if mandatoryFeedback}}
+      <div class="modal fade" id="mandatoryFeedbackModal" tabindex="-1"
+          data-bs-backdrop="static" data-bs-keyboard="false"
+          aria-labelledby="mandatoryFeedbackTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title fw-semibold" id="mandatoryFeedbackTitle">
+                <i class="ti ti-star me-2 text-warning"></i>{{ t 'query_complete.mandatory_title' }}
+              </h5>
+              {{!-- No close button --}}
+            </div>
+
+            <div class="modal-body">
+              <p class="text-muted small mb-3">{{ t 'query_complete.mandatory_subtitle' }}</p>
+
+              <div class="border rounded-3 p-3 bg-light mb-3">
+                <p class="fw-semibold mb-2">{{loc mandatoryFeedback.questionText}}</p>
+                <p class="mb-0 text-success small">
+                  <span class="fw-semibold">{{t 'query_complete.correctanswer'}}</span>
+                  {{loc mandatoryFeedback.correctAnswer}}
+                </p>
+                {{#if (loc mandatoryFeedback.feedback)}}
+                  <p class="mt-2 mb-0 text-muted fst-italic small">
+                    <i class="ti ti-info-circle me-1"></i>{{loc mandatoryFeedback.feedback}}
+                  </p>
+                {{/if}}
+              </div>
+
+              <form id="mandatory-feedback-form" class="d-grid gap-2">
+                <input type="hidden" name="questionId" value="{{mandatoryFeedback.questionId}}">
+
+                <p class="mb-2 small fw-semibold">{{t 'feedback.metrics_title'}}</p>
+
+                {{#each (rangestart 1 6) as |n|}}
+                  <div class="border rounded-3 p-2 mb-2">
+                    <div class="row align-items-center g-2">
+                      <div class="col-3 fw-semibold small">{{t (concat 'feedback.m' n '_title')}}</div>
+                      <div class="col-5 text-muted small">{{t (concat 'feedback.m' n '_statement')}}</div>
+                      <div class="col-4">
+                        <div class="btn-group btn-group-sm w-100" role="group" aria-label="M{{n}}">
+                          {{#each (rangestart 1 5) as |v|}}
+                            <input type="radio" class="btn-check"
+                                  name="m{{n}}"
+                                  id="mf-m{{n}}-{{v}}"
+                                  value="{{v}}">
+                            <label class="btn btn-sm btn-outline-secondary"
+                                  for="mf-m{{n}}-{{v}}">{{v}}</label>
+                          {{/each}}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {{/each}}
+
+                <div class="mt-2">
+                  <label class="form-label fw-semibold small" for="mf-comment">
+                    {{t 'feedback.comment_label'}}
+                  </label>
+                  <textarea class="form-control form-control-sm"
+                            id="mf-comment" name="comment" rows="2"
+                            placeholder="{{t 'feedback.comment_placeholder'}}"></textarea>
+                </div>
+
+                <button type="submit" class="btn btn-primary fw-semibold mt-3">
+                  <span class="btn-label">
+                    <i class="ti ti-send me-1"></i>{{t 'query_complete.submit_rating'}}
+                  </span>
+                  <span class="btn-loading d-none">
+                    <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                    {{t 'query_complete.submitting'}}
+                  </span>
+                </button>
+
+                <div id="mandatory-feedback-error"
+                    class="alert alert-danger d-none mb-0 small mt-2"></div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    {{/if}}
+
   </div>
 </div>
 

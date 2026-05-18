@@ -75,8 +75,8 @@ async function showQueryComplete(req, res) {
             );
             const byId = new Map(fbRows.map(r => [r.question_id, r]));
             for (const r of results) {
-            r.previousFeedback = byId.get(r.questionId) ||
-                { m1: 0, m2: 0, m3: 0, m4: 0, m5: 0, m6: 0, comment: '' };
+                r.previousFeedback = byId.get(r.questionId) || { m1: 0, m2: 0, m3: 0, m4: 0, m5: 0, m6: 0, comment: '' };
+                r.hasFeedback = byId.has(r.questionId);
             }
         }
         }
@@ -97,6 +97,19 @@ async function showQueryComplete(req, res) {
             totalTimeFormatted
         };
 
+        // Roll for a mandatory feedback prompt once per finished quiz.
+        const candidates = results.filter(r => !r.hasFeedback && r.questionId);
+
+        console.log('[mandatory] results count:', results.length,
+            '| candidates count:', candidates.length,
+            '| details:', results.map(r => ({ qid: r.questionId, hasFeedback: r.hasFeedback })));
+
+        if (candidates.length && Math.random() < 0.10) {
+            const picked = candidates[Math.floor(Math.random() * candidates.length)];
+            req.session.queryComplete.mandatoryFeedbackQid = picked.questionId;
+            console.log('[mandatory] picked qid:', picked.questionId);
+        }
+
         // Now it's safe to clear the session
         delete req.session.query;
     }
@@ -106,10 +119,40 @@ async function showQueryComplete(req, res) {
         return res.redirect('/practice-plus');
     }
 
+    let mandatoryFeedback = null;
+    const cachedQid = req.session.queryComplete?.mandatoryFeedbackQid;
+    console.log('CACHED QID FROM SESSION:', cachedQid);
+
+    if (cachedQid && userId) {
+    const [fb] = await db.query(
+        'SELECT 1 FROM question_feedback WHERE user_id = ? AND question_id = ? LIMIT 1',
+        [userId, cachedQid]
+    );
+    console.log('DB QUERY RESULT (fb):', fb);
+
+    if (fb.length) {
+        // User already gave feedback — clear and skip the popup.
+        delete req.session.queryComplete.mandatoryFeedbackQid;
+    } else {
+        const r = (req.session.queryComplete.results || []).find(x => x.questionId === cachedQid);
+        if (r) {
+            mandatoryFeedback = {
+                questionId: r.questionId,
+                questionText: r.questionText,
+                correctAnswer: r.correctAnswer,
+                feedback: r.feedback,
+            };
+        } else {
+            delete req.session.queryComplete.mandatoryFeedbackQid;
+        }
+    }
+    }
+
     res.renderPage('query_complete', {
         layout: 'main',
         headerTitle: 'Query Complete',
-        ...req.session.queryComplete
+        ...req.session.queryComplete,
+        mandatoryFeedback
     });
 };
 

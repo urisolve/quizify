@@ -58,7 +58,10 @@
         "rate_4": "Interesting question, promotes reflection",
         "rate_5": "Excellent question, gives new perspective on the problem",
         "submit_rating": "Submit rating",
-        "rating_thanks": "Thanks for your rating!"
+        "rating_thanks": "Thanks for your rating!",
+        "mandatory_title": "Quick feedback",
+        "mandatory_subtitle": "To help us improve, please share your feedback on this question before continuing.",
+        "submitting": "Submitting..."
     },
     "header": {
         "logout": "Logout",

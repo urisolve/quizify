@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const fillPrev = document.getElementById('points-bar-fill-prev');
   const fillNew = document.getElementById('points-bar-fill-new');
   const barContainer = document.querySelector('.points-bar-container');
+  const mandatoryModalEl = document.getElementById('mandatoryFeedbackModal');
+
   if (fillPrev && fillNew && barContainer) {
     const percentPrev = Number(barContainer.dataset.percentPrev) || 0;
     const percent = Number(barContainer.dataset.percent) || 0;
@@ -64,6 +66,48 @@ document.addEventListener('DOMContentLoaded', function() {
       audio.volume = 0.1;
       audio.play();
     }
+  }
+
+  // show mandatory feedback
+  if (mandatoryModalEl) {
+    const modal = new bootstrap.Modal(mandatoryModalEl);
+    modal.show();
+
+    const form = document.getElementById('mandatory-feedback-form');
+    const errorEl = document.getElementById('mandatory-feedback-error');
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      errorEl.classList.add('d-none');
+
+      submitBtn.disabled = true;
+      submitBtn.querySelector('.btn-label')?.classList.add('d-none');
+      submitBtn.querySelector('.btn-loading')?.classList.remove('d-none');
+
+      const formData = new FormData(form);
+      const body = Object.fromEntries(formData.entries());
+
+      try {
+        const res = await fetch('/query-complete/rate-question', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+        });
+        if (!res.ok) {
+          const errBody = await res.json().catch(() => ({}));
+          throw new Error(errBody.error || `HTTP ${res.status}`);
+        }
+        modal.hide();
+      } catch (err) {
+        console.error('[mandatory-feedback] submit failed:', err);
+        errorEl.textContent = err.message;
+        errorEl.classList.remove('d-none');
+        submitBtn.disabled = false;
+        submitBtn.querySelector('.btn-label')?.classList.remove('d-none');
+        submitBtn.querySelector('.btn-loading')?.classList.add('d-none');
+      }
+    });
   }
 
   // Toggle the collapsible Likert section.

@@ -59,7 +59,10 @@
         "rate_4": "Questão interessante, promove reflexão",
         "rate_5": "Questão excelente, proporciona nova perspectiva sobre o problema",
         "submit_rating": "Submeter avaliação",
-        "rating_thanks": "Obrigada pela tua avaliação!"
+        "rating_thanks": "Obrigada pela tua avaliação!",
+        "mandatory_title": "Avaliação obrigatória",
+        "mandatory_subtitle": "Para nos ajudares a melhorar, partilha o teu feedback sobre esta questão antes de continuares.",
+        "submitting": "A submeter..."
     },
     "header": {
         "logout": "Sair",
