@@ -154,6 +154,7 @@ async function createQuestions(req, res) {
     const newQuestionId = await createQuestion({
       subtopic_id: subtopicId,
       rag_document_id: pmb.ragDocumentId,
+      prompt_id: promptInfo.promptId,
       question_type: 'EM',
       question_text: dupBilingual(question.question_text),
       image: question.circuit_image,
@@ -165,6 +166,26 @@ async function createQuestions(req, res) {
       type: 'AI Generated',
       creation_time_ms: elapsedMs,
     });
+
+    await db.query(
+      'UPDATE prompts   SET number_questions = number_questions + 1 WHERE id = ?',
+      [promptInfo.promptId]
+    );
+    await db.query(
+      'UPDATE subtopics SET number_questions = number_questions + 1 WHERE id = ?',
+      [subtopicId]
+    );
+
+    const [[topicRow]] = await db.query(
+      'SELECT topic_id FROM subtopics WHERE id = ? LIMIT 1',
+      [subtopicId]
+    );
+    if (topicRow?.topic_id) {
+      await db.query(
+        'UPDATE topics SET number_questions = number_questions + 1 WHERE id = ?',
+        [topicRow.topic_id]
+      );
+    }
 
     req.session.flash = {
       type: 'success',
@@ -185,6 +206,7 @@ async function createQuestions(req, res) {
         elapsedSec: (elapsedMs / 1000).toFixed(1),
       },
     };
+
   } catch (err) {
     console.error('[questions] createQuestions failed:', err);
     if (rawText) {

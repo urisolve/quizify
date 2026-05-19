@@ -14,6 +14,7 @@ async function initSubtopicsTable() {
         locked BOOLEAN NOT NULL DEFAULT TRUE,
         unlock_progress INT DEFAULT 0,
         number_questions INT DEFAULT 0,
+        quiz_size INT DEFAULT 5,
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
         time_spent INT DEFAULT 0,

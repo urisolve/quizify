@@ -77,6 +77,7 @@ async function initQuestionsTable() {
       CREATE TABLE IF NOT EXISTS questions (
         id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
         subtopic_id INT NOT NULL,
+        prompt_id INT DEFAULT NULL,
         rag_document_id INT DEFAULT NULL,
         question_type VARCHAR(10) NOT NULL,
         question_text JSON NOT NULL,
@@ -98,6 +99,7 @@ async function initQuestionsTable() {
         rating_count_student INT DEFAULT 0,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         FOREIGN KEY (subtopic_id) REFERENCES subtopics(id) ON DELETE CASCADE,
+        FOREIGN KEY (prompt_id) REFERENCES prompts(id) ON DELETE CASCADE,
         FOREIGN KEY (rag_document_id) REFERENCES rag_documents(id) ON DELETE CASCADE
       )
     `);
@@ -195,7 +197,8 @@ async function createQuestion({
   difficulty_rating = null,
   model,
   type,
-  creation_time_ms = null
+  creation_time_ms = null,
+  prompt_id = null
 }) {
   // validation
   if (!subtopic_id || !question_type) {
@@ -233,15 +236,16 @@ async function createQuestion({
 
   const sql = `
     INSERT INTO questions
-      (subtopic_id, rag_document_id, question_type, question_text, image,
+      (subtopic_id, rag_document_id, prompt_id, question_type, question_text, image,
        correct_answer, incorrect_answer, feedback, difficulty, difficulty_rating,
        model, type, number_tries, number_corrects, creation_time_ms)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, 0, ?)
   `;
 
   const params = [
     subtopic_id,
     rag_document_id,
+    prompt_id,
     question_type,
     JSON.stringify(question_text),
     image,

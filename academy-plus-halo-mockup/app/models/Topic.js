@@ -14,6 +14,7 @@ async function initTopicsTable() {
         date_unlock TIMESTAMP DEFAULT NULL,
         number_subtopics INT NOT NULL DEFAULT 0,
         number_questions INT DEFAULT 0,
+        quiz_size INT DEFAULT 5,
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
         time_spent INT DEFAULT 0

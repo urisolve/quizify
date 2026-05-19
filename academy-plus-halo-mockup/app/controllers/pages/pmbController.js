@@ -130,12 +130,64 @@ async function deletePmb(req, res) {
       throw new Error('Invalid PMB id.');
     }
 
-    const [qRows] = await db.query(
-      `SELECT COUNT(*) AS n FROM questions WHERE rag_document_id = ?`,
+    // Snapshot every question that's about to be cascade-deleted.
+    const [questions] = await db.query(
+      `SELECT id, subtopic_id, prompt_id FROM questions WHERE rag_document_id = ?`,
       [id]
     );
-    const deletedQuestions = Number(qRows[0]?.n || 0);
+    const deletedQuestions = questions.length;
 
+    // Bucket the deletions per counter.
+    const subtopicCounts = new Map();
+    const promptCounts   = new Map();
+    for (const q of questions) {
+      if (q.subtopic_id) {
+        subtopicCounts.set(q.subtopic_id, (subtopicCounts.get(q.subtopic_id) || 0) + 1);
+      }
+      if (q.prompt_id) {
+        promptCounts.set(q.prompt_id, (promptCounts.get(q.prompt_id) || 0) + 1);
+      }
+    }
+
+    // Derive topic counts from the affected subtopics.
+    const topicCounts = new Map();
+    if (subtopicCounts.size) {
+      const sids = [...subtopicCounts.keys()];
+      const placeholders = sids.map(() => '?').join(',');
+      const [subtopicRows] = await db.query(
+        `SELECT id, topic_id FROM subtopics WHERE id IN (${placeholders})`,
+        sids
+      );
+      for (const s of subtopicRows) {
+        const n = subtopicCounts.get(s.id) || 0;
+        if (s.topic_id && n > 0) {
+          topicCounts.set(s.topic_id, (topicCounts.get(s.topic_id) || 0) + n);
+        }
+      }
+    }
+
+    // Decrement counters. GREATEST(0, …) prevents underflow if the
+    //    aggregate columns ever drifted out of sync with reality.
+    for (const [sid, n] of subtopicCounts) {
+      await db.query(
+        `UPDATE subtopics SET number_questions = GREATEST(0, number_questions - ?) WHERE id = ?`,
+        [n, sid]
+      );
+    }
+    for (const [pid, n] of promptCounts) {
+      await db.query(
+        `UPDATE prompts SET number_questions = GREATEST(0, number_questions - ?) WHERE id = ?`,
+        [n, pid]
+      );
+    }
+    for (const [tid, n] of topicCounts) {
+      await db.query(
+        `UPDATE topics SET number_questions = GREATEST(0, number_questions - ?) WHERE id = ?`,
+        [n, tid]
+      );
+    }
+
+    // Delete the PMB row. CASCADE removes the linked questions.
     const [del] = await db.query(
       `DELETE FROM rag_documents WHERE id = ? AND type_document = 'pmb'`,
       [id]
