@@ -1,41 +1,8 @@
-const fs = require('fs/promises');
-const path = require('path');
-
-const PROMPTS_FILE = path.join(__dirname, '..', '..', 'data', 'prompts.json');
-
-let cache = {
-  mtimeMs: 0,
-  data: null,
-};
+const db = require('../../config/db');
 
 function normalizeId(value) {
   const parsed = parseInt(value, 10);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : null;
-}
-
-function pickRandom(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
-async function loadPromptsFile() {
-  const stat = await fs.stat(PROMPTS_FILE);
-  if (cache.data && cache.mtimeMs === stat.mtimeMs) {
-    return cache.data;
-  }
-
-  const raw = await fs.readFile(PROMPTS_FILE, 'utf8');
-  const parsed = JSON.parse(raw);
-
-  if (!parsed || !Array.isArray(parsed.subtopics)) {
-    throw new Error('prompts.json must contain a top-level "subtopics" array.');
-  }
-
-  cache = {
-    mtimeMs: stat.mtimeMs,
-    data: parsed,
-  };
-
-  return parsed;
 }
 
 async function getRandomPromptForSubtopic(subtopicId) {
@@ -44,29 +11,51 @@ async function getRandomPromptForSubtopic(subtopicId) {
     throw new Error(`Invalid subtopic id: ${subtopicId}`);
   }
 
-  const data = await loadPromptsFile();
-  const subtopic = data.subtopics.find((entry) => normalizeId(entry.id) === normalizedId);
-
-  if (!subtopic) {
-    throw new Error(`No prompt configuration found for subtopic ${normalizedId}.`);
+  // Subtopic metadata (for the return shape callers already use).
+  const [subtopicRows] = await db.query(
+    'SELECT id, subtopic_key, title FROM subtopics WHERE id = ? LIMIT 1',
+    [normalizedId]
+  );
+  if (!subtopicRows.length) {
+    throw new Error(`No subtopic found with id ${normalizedId}.`);
   }
+  const subtopic = subtopicRows[0];
 
-  const prompts = Array.isArray(subtopic.prompts) ? subtopic.prompts.filter((entry) => entry && typeof entry.prompt === 'string' && entry.prompt.trim()) : [];
-  if (!prompts.length) {
+
+  // One random prompt for this subtopic.
+  const [promptRows] = await db.query(
+    `SELECT id, subject, prompt, system, messages, reference_documents, version
+       FROM prompts
+      WHERE subtopic_id = ?
+        AND prompt IS NOT NULL
+        AND TRIM(prompt) <> ''
+      ORDER BY RAND()
+      LIMIT 1`,
+    [normalizedId]
+  );
+  if (!promptRows.length) {
     throw new Error(`Subtopic ${normalizedId} has no prompts configured.`);
   }
 
-  const chosen = pickRandom(prompts);
+  const chosen = promptRows[0];
+
   return {
-    subtopicId: normalizedId,
-    subtopicKey: subtopic.key || null,
-    subtopicTitle: subtopic.title || null,
-    subsubtopic: chosen.tema || chosen.subsubtopic || chosen.title || null,
-    prompt: chosen.prompt.trim(),
+    // Identity
+    promptId:        chosen.id,
+    subtopicId:      normalizedId,
+    subtopicKey:     subtopic.subtopic_key || null,
+    subtopicTitle:   subtopic.title || null,    // raw [PT, EN] JSON — localize at render
+    // Content
+    subsubtopic:     chosen.subject || null,    // kept for backwards-compat with controller code
+    prompt:          String(chosen.prompt).trim(),
+    system:          chosen.system || null,
+    messages:        chosen.messages || null,
+    reference_documents: chosen.reference_documents || null,
+    version:         chosen.version || null,
   };
+
 }
 
 module.exports = {
-  getRandomPromptForSubtopic,
-  loadPromptsFile,
+  getRandomPromptForSubtopic
 };

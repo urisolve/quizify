@@ -10,13 +10,12 @@
             </span>
             {{#if (eq type 'subtopic')}}
               <div>
-                <h2 class="fw-semibold mb-0 fs-4">{{subtopicT subtopicId 'name'}}</h2>
-                <p class="mb-0 text-muted small" style="text-align: justify;">{{subtopicT subtopicId 'description'}}</p>
+                <h2 class="fw-semibold mb-0 fs-4">{{loc subtopic.title}}</h2>
+                <p class="mb-0 text-muted small" style="text-align: justify;">{{loc subtopic.description}}</p>
               </div>
             {{else}}
               <div>
-                <h2 class="fw-semibold mb-0 fs-4">{{topicT topicId 'name'}}</h2>
-                <p class="mb-0 text-muted small" style="text-align: justify;">{{topicT topicId 'description'}}</p>
+                <h2 class="fw-semibold mb-0 fs-4">{{loc topic.title}}</h2>
               </div>
             {{/if}}
           </div>

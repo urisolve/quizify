@@ -181,7 +181,7 @@
                 <label class="form-label fw-semibold mb-1" for="subtopicId"> {{t 'playground.subtopic_label'}}</label>
                 <select class="form-select" id="subtopicId" name="subtopicId" required>
                   {{#each subtopics}}
-                    <option value="{{this.id}}">{{subtopicT this.id 'name'}}</option>
+                    <option value="{{this.id}}">{{loc this.title}}</option>
                   {{/each}}
                 </select>
               </div>

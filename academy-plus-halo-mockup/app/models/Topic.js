@@ -6,8 +6,9 @@ async function initTopicsTable() {
     await db.query(`
       CREATE TABLE IF NOT EXISTS topics (
         id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        description TEXT DEFAULT NULL,
+        topic_key VARCHAR(255) NOT NULL,
+        title JSON NOT NULL,
+        generation_mode VARCHAR(255) NOT NULL,
         badge JSON DEFAULT NULL,
         locked BOOLEAN NOT NULL DEFAULT TRUE,
         date_unlock TIMESTAMP DEFAULT NULL,

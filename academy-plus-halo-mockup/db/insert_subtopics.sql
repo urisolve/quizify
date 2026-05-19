@@ -1,48 +1,23 @@
 -- SQL Script to insert subtopics from Fundamentos de circuitos elétricos dataset
 
 -- Insert Subtopics
-INSERT INTO subtopics (id, topic_id, title, description, image, locked, unlock_progress, number_questions, number_tries, number_corrects, time_spent, rag_prompt, rag_system, rag_messages, rag_reference_documents) VALUES
+INSERT INTO subtopics (id, topic_id, subtopic_key, title, description, image, locked, unlock_progress, number_questions, number_tries, number_corrects, time_spent) VALUES
+-- Topic 1
+(1, 1, 'terminologia_circuitos_eletricos', JSON_ARRAY('Terminologia de Circuitos Elétricos','Electrical Circuit Terminology'), JSON_ARRAY('',''), image, TRUE, 0, 0, 0, 0, 0),
+(2, 1, 'lei_kirchhoff_malhas', JSON_ARRAY('Lei de Kirchhoff das Malhas','Kirchhoffs Loop Law'), JSON_ARRAY('',''), image, TRUE, 0, 0, 0, 0, 0),
+(3, 1, 'passos_metodo', JSON_ARRAY('Interpretação sequencial dos passos do método','Sequential interpretation of the method steps'), JSON_ARRAY('',''), image, TRUE, 0, 0, 0, 0, 0),
+(4, 1, 'fontes_corrente', JSON_ARRAY('Tratamento de fontes de corrente','Treatment of current sources'), JSON_ARRAY('',''), image, TRUE, 0, 0, 0, 0, 0),
+(5, 1, 'corrente_malha_ramo', JSON_ARRAY('Relação entre corrente de malha e corrente nos ramos','Relationship between mesh current and branch current'), JSON_ARRAY('',''), image, TRUE, 0, 0, 0, 0, 0),
+(6, 1, 'sentidos_correntes', JSON_ARRAY('Interpretação de sentidos de correntes','Interpretation of current directions'), JSON_ARRAY('',''), image, TRUE, 0, 0, 0, 0, 0),
+-- Topic 2
+(7, 2, 'interpretacao_circuito', JSON_ARRAY('Interpretação de Circuito','Circuit Interpretation'), JSON_ARRAY('Contar e Identificar os R ramos, N nós e C fontes de corrente do circuito','Counting and Identifying the R branches, N nodes, and M main loops of the circuit'), NULL, TRUE, 0, 0, 0, 0, 0),
+(8, 2, 'escolha_das_malhas', JSON_ARRAY('Escolha das Malhas','Loop Selection'), JSON_ARRAY('Selecionar e marcar Ma Malhas Auxiliares e Mp malhas principais','Selecting and marking C Auxiliary Loops and M main loops'), NULL, TRUE, 0, 0, 0, 0, 0),
+(9, 2, 'escrita_de_equacoes', JSON_ARRAY('Escrita de Equações','Equation Writing'), JSON_ARRAY('Construir as Mp equações de malha, com base na Lei das Malhas e considerando as correntes de malha que influenciam cada carga','Constructing the M loop equations, based on Loop Law and considering the loop currents that influence each load'), NULL, TRUE, 0, 0, 0, 0, 0),
+(10, 2, 'calculo_das_correntes', JSON_ARRAY('Cálculo das Correntes','Current Calculation'), JSON_ARRAY('Calcular as correntes nos ramos','Calculating the currents in the branches'), NULL, TRUE, 0, 0, 0, 0, 0)
 
--- Topic 1: Método das Correntes nas Malhas
-(1, 1, 'Interpretação de Circuito', 'Contar e Identificar os R ramos, N nós e C fontes de corrente do circuito', NULL, TRUE, 0, 5, 0, 0, 0,'
-Generate ONE multiple-choice question grounded in the section "Informações Topológicas" of the attached pedagogical document.
-The question must focus on counting and identifying R ramos, N nós, or C fontes de corrente of the circuit, drawing strictly from one of the subsections "Nós", "Ramos", or "Número de Equações".
-Requirements:
-- Ask about topology (counting or identifying), not about numeric KVL/KCL solving.
-- The correct answer must be directly supported by the grounding document.
-- Provide at least 3 plausible but incorrect distractors in Portuguese.
-- Feedback must be a short pedagogical hint that helps the student think about the problem WITHOUT revealing the correct answer or showing the calculation.
-- Return the image path of the schematic.
-- Difficulty: introductory.', NULL, NULL, NULL),
-(2, 1, 'Escolha das Malhas', 'Selecionar e marcar Ma Malhas Auxiliares e Mp malhas principais', NULL, TRUE, 0, 5, 0, 0, 0,'
-Generate ONE multiple-choice question grounded in the section "Escolha das Malhas" (or equivalent) of the attached pedagogical document.
-The question must focus on selecting and marking Ma Malhas Auxiliares (auxiliary meshes) and Mp Malhas Principais (principal meshes) — for example: "which set of branches forms a valid principal mesh?", "how many auxiliary meshes are needed?", or "which mesh choice is incorrect for this circuit?".
-Requirements:
-- The correct answer must be directly supported by the grounding document.
-- Provide at least 3 plausible but incorrect distractors in Portuguese.
-- Feedback must be a short pedagogical hint that helps the student think about the problem WITHOUT revealing the correct answer or showing the calculation.
-- Return an image path of the selected meshes diagram (e.g., "mesh-exports/04-selected-combined/selected-meshes.png").
-- Difficulty: introductory.', NULL, NULL, NULL),
-(3, 1, 'Escrita de Equações', 'Construir as Mp equações de malha, com base na Lei das Malhas e considerando as correntes de malha que influenciam cada carga', NULL, TRUE, 0, 5, 0, 0, 0,'
-Generate ONE multiple-choice question grounded in the section about mesh equations / Lei das Malhas in the attached pedagogical document.
-The question must focus on building the M mesh equations using Kirchhoff\'s Voltage Law and reasoning about which mesh currents pass through each load (carga). For example: "which mesh equation correctly describes Mp1?", "what is the signed coefficient of Ia2 on the load R3?", or "which term is missing from the KVL equation for mesh Mp2?".
-Requirements:
-- The correct answer must be directly supported by the grounding document.
-- Provide at least 3 plausible but incorrect distractors in Portuguese (commonly: wrong sign, missing current, wrong load).
-- Feedback must be a short pedagogical hint that helps the student think about the problem WITHOUT revealing the correct answer or showing the calculation.
-- Return an image path of the selected resolution meshes under discussion (e.g., a specific mesh image or the combined meshes image).
-- Difficulty: introductory to intermediate.', NULL, NULL, NULL),
-(4, 1, 'Cálculo das Correntes', 'Calcular as correntes nos ramos', NULL, TRUE, 0, 5, 0, 0, 0,'
-Generate ONE multiple-choice question grounded in the section about computing branch currents in the attached pedagogical document.
-The question must focus on calculating the currents in the branches once the mesh currents are known — for example: "what is the current in branch 5?", "how does Ia1 combine with Ia2 to produce I3?", or "what is the sign convention for the branch current relative to the chosen mesh direction?".
-Requirements:
-- The correct answer must be directly supported by the grounding document.
-- Provide at least 3 plausible but incorrect distractors in Portuguese (e.g. wrong sign, swapped currents, omitted term).
-- Feedback must be a short pedagogical hint that helps the student think about the problem WITHOUT revealing the correct answer or showing the calculation.
-- Return an image path of the branch currents figure (e.g., something under "current-exports/" or "branch-exports/").
-- Difficulty: intermediate.', NULL, NULL, NULL)
 ON DUPLICATE KEY UPDATE
   topic_id = VALUES(topic_id),
+  subtopic_key = VALUES(subtopic_key),
   title = VALUES(title),
   description = VALUES(description),
   image = VALUES(image),
@@ -51,8 +26,4 @@ ON DUPLICATE KEY UPDATE
   number_questions = VALUES(number_questions),
   number_tries = VALUES(number_tries),
   number_corrects = VALUES(number_corrects),
-  time_spent = VALUES(time_spent),
-  rag_prompt = VALUES(rag_prompt),
-  rag_system = VALUES(rag_system),
-  rag_messages = VALUES(rag_messages),
-  rag_reference_documents = VALUES(rag_reference_documents);
+  time_spent = VALUES(time_spent);

@@ -7,8 +7,9 @@ async function initSubtopicsTable() {
       CREATE TABLE IF NOT EXISTS subtopics (
         id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
         topic_id INT NOT NULL,
-        title VARCHAR(255) NOT NULL,
-        description TEXT DEFAULT NULL,
+        subtopic_key VARCHAR(255) NOT NULL,
+        title JSON NOT NULL,
+        description JSON NOT NULL,
         image VARCHAR(255) DEFAULT NULL,
         locked BOOLEAN NOT NULL DEFAULT TRUE,
         unlock_progress INT DEFAULT 0,
@@ -16,10 +17,6 @@ async function initSubtopicsTable() {
         number_tries INT DEFAULT 0,
         number_corrects INT DEFAULT 0,
         time_spent INT DEFAULT 0,
-        rag_prompt TEXT DEFAULT NULL,
-        rag_system TEXT DEFAULT NULL,
-        rag_messages JSON DEFAULT NULL,
-        rag_reference_documents JSON DEFAULT NULL,
         FOREIGN KEY (topic_id) REFERENCES topics(id) ON DELETE CASCADE
       )
     `);

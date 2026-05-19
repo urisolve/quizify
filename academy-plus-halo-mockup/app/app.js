@@ -28,6 +28,7 @@ const PORT = process.env.PORT;
 const seedDatabase = require('../db/seed');
 const topicsPath = path.join(__dirname, '../db/insert_topics.sql');
 const subtopicsPath = path.join(__dirname, '../db/insert_subtopics.sql');
+const promptsPath = path.join(__dirname, '../db/insert_prompts.sql');
 //const questionsPath = path.join(__dirname, '../db/insert_questions.sql');
 const usersPath = path.join(__dirname, '../db/insert_users.sql');
 //const docsPath = path.join(__dirname, '../db/insert_docs.sql');
@@ -241,6 +242,7 @@ app.use('/api', apiRoutes);
 // Table initialization imports
 const { initTopicsTable } = require('./models/Topic');
 const { initSubtopicsTable } = require('./models/Subtopic');
+const { initPromptsTable } = require('./models/Prompts');
 const { initQuestionsTable } = require('./models/Questions');
 const { initTrainingTable } = require('./models/Training');
 const { initUserSubtopicProgressTable } = require('./models/UserSubtopicProgress');
@@ -269,6 +271,7 @@ async function waitForDB(retries = 10, delay = 3000) {
     await waitForDB();
     await initTopicsTable();
     await initSubtopicsTable();
+    await initPromptsTable();
     await initRagTable();
     await initUsersTable();
     await initQuestionsTable();
@@ -277,7 +280,7 @@ async function waitForDB(retries = 10, delay = 3000) {
     await initRatingTables();
     await initQuestionFeedbackTable();
     console.log('All tables ensured/created.');
-    await seedDatabase([topicsPath, subtopicsPath, usersPath]); // , docsPath, questionsPath
+    await seedDatabase([topicsPath, subtopicsPath, usersPath, promptsPath]); // , docsPath, questionsPath
     await syncUserAvatars();
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

@@ -28,7 +28,7 @@
                 class="btn w-100 text-start topic-selector-btn {{#if (eq @index ../defaultTopicIndex)}}btn-primary{{else}}btn-outline-secondary{{/if}}"
                 data-topic-index="{{@index}}"
               >
-                <span class="d-block fw-medium">{{topicT id 'name'}}</span>
+                <span class="d-block fw-medium">{{loc title}}</span>
                 <div class="progress mt-2" style="height: 5px;">
                   <div class="progress-bar"
                     role="progressbar"
@@ -57,8 +57,7 @@
                     <i class="ti ti-brain"></i>
                   </span>
                   <div>
-                    <h2 class="card-title fw-semibold mb-0">{{topicT id 'name'}}</h2>
-                    <p class="mb-0 text-muted small">{{topicT id 'description'}}</p>
+                    <h2 class="card-title fw-semibold mb-0">{{loc title}}</h2>
                   </div>
                 </div>
               </div>
@@ -77,11 +76,11 @@
                   <div class="flex-grow-1">
                     <div class="d-flex align-items-start justify-content-between gap-2">
                       <div>
-                        <h3 class="fs-5 fw-semibold mb-1">{{subtopicT id 'name'}}</h3>
-                        <p class="mb-0 text-muted small" style="text-align: justify;">{{subtopicT id 'description'}}</p>
+                        <h3 class="fs-5 fw-semibold mb-1">{{loc title}}</h3>
+                        <p class="mb-0 text-muted small" style="text-align: justify;">{{loc description}}</p>
                       </div>                      
                       {{#if image}}
-                        <img class="rounded-2" src="{{image}}" alt="{{subtopicT id 'name'}}" style="width: 100px; object-fit: cover; flex-shrink: 0;" />
+                        <img class="rounded-2" src="{{image}}" alt="{{loc title}}" style="width: 100px; object-fit: cover; flex-shrink: 0;" />
                       {{/if}}
                     </div>
                   </div>
@@ -133,7 +132,7 @@
           <div class="flex-grow-1">
             <div class="d-flex align-items-center justify-content-between gap-3 flex-wrap mb-2">
               <div>
-                <h3 class="fw-semibold mb-1">Progresso do Tópico {{topicT activeTopic.id 'name'}}</h3>
+                <h3 class="fw-semibold mb-1">Progresso do Tópico {{loc activeTopic.title}}</h3>
                 <div class="text-muted small">Conteúdo bloqueado até atingir o próximo marco.</div>
               </div>
               <div class="badge bg-dark text-white px-3 py-2">5000XP</div>

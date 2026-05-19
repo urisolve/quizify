@@ -1,7 +1,5 @@
 const db = require('../config/db');
 
-
-
 function getTopics() { 
   return db.query('SELECT * FROM topics ORDER BY id'); 
 }
@@ -53,6 +51,7 @@ function getUserSubtopicProgressForTopic(userId, topicId) {
     [userId, topicId]
   );
 }
+
 function getTopicBadge(topicId) { 
   return db.query('SELECT badge FROM topics WHERE id = ?', [topicId]); 
 }
@@ -66,7 +65,8 @@ function setUserConquests(userId, conquestJson) {
 }
 
 function getSubtopicById(subtopicId) { 
-  return db.query('SELECT topic_id, title, number_questions FROM subtopics WHERE id = ?', [subtopicId]); 
+  return db.query('SELECT topic_id, title, description, number_questions FROM subtopics WHERE id = ?',
+    [subtopicId]); 
 }
 
 module.exports = {

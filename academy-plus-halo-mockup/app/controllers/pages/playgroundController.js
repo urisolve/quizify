@@ -5,7 +5,9 @@ async function showPlayground(req, res) {
     const flash = req.session.flash || null;
     delete req.session.flash;
 
-    const [subtopicRows] = await db.query(`SELECT id FROM subtopics ORDER BY id`);
+    const [subtopicRows] = await db.query(`SELECT id, title FROM subtopics ORDER BY id`);
+    const subtopics = subtopicRows.map((s) => ({ id: s.id, title: s.title }));
+
     const [pmbRows] = await db.query(
       `SELECT id, filename, size_bytes, difficulty_level
          FROM rag_documents
@@ -18,8 +20,8 @@ async function showPlayground(req, res) {
       headerTitle: 'Playground',
       user: req.session.user,
       flash,
+      subtopics,
       reviewBatch: req.session.reviewBatch || null,
-      subtopics: subtopicRows.map((row) => ({ id: row.id })),
       pmbs: pmbRows.map((row) => ({
         id: row.id,
         filename: row.filename,

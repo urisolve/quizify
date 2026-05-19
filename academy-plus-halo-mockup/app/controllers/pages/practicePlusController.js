@@ -9,17 +9,6 @@ async function practicePlusPage(req, res) {
     const flash = req.session.flash;
     delete req.session.flash;
 
-    // Fetch user info (adjust fields as needed)
- /*    const [[user]] = await db.query('SELECT avatar_url, conquest FROM users WHERE id = ?', [userId]);
-    let badges = [];
-    if (user && user.conquest) {
-      try {
-        badges = JSON.parse(user.conquest);
-      } catch (e) {
-        badges = [];
-      }
-    }
- */
     const [topics] = await getTopics();
     const [subtopics] = await getSubtopics();
     const [subtopicProgressRows] = await getUserSubtopicProgress(userId);

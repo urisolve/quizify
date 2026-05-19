@@ -25,15 +25,18 @@ const queryPlusController = async (req, res) => {
   const lang = req.language;
 
   let headerTitle = 'Practice Question';
+  let subtopic = null;
+  let topic = null;
   
   // Get title based on query type
   if (query.type === 'subtopic' && query.subtopicId) {
-    const [[subtopic]] = await getSubtopicById(query.subtopicId);
+    const [[row]] = await getSubtopicById(query.subtopicId);
+    subtopic = row || null;
     headerTitle = subtopic ? subtopic.title : 'Subtopic';
   } else if (query.type === 'topic' && query.topicId) {
     const [topics] = await getTopics();
-    const topic = topics.find(t => t.id == query.topicId);
-    headerTitle = topic ? `${topic.name} Quiz` : 'Topic';
+    topic = topics.find((t) => t.id == query.topicId) || null;
+    headerTitle = topic ? topic.title : 'Topic';
   }
 
   // Get the current question
@@ -76,6 +79,8 @@ const queryPlusController = async (req, res) => {
     headerTitle,
     topicId: query.topicId || null,
     subtopicId: query.subtopicId || null,
+    topic,
+    subtopic,
     question: questionData,
     answers,
     progress,

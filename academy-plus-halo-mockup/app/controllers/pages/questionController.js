@@ -15,6 +15,7 @@ const {
   pickRandomPmbGrounding,
   pickRandomPmbGroundingByDifficulty,
 } = require('../../services/playground/questionService');
+const { getSubtopicById } = require('../../models/practicePlusModel');
 const { getRandomPromptForSubtopic } = require('../../services/playground/promptService');
 
 const JSON_SCHEMA_INSTRUCTIONS = `
@@ -263,6 +264,7 @@ async function showReviewQuestion(req, res) {
     }
 
     const q = rows[0];
+    const [[subtopicRow]] = await getSubtopicById(q.subtopic_id);
     seenIds.push(q.id);
 
     const incorrects = pickLocaleArray(q.incorrect_answer, lang)
@@ -296,6 +298,8 @@ async function showReviewQuestion(req, res) {
       user: req.session.user,
       type: 'subtopic',
       subtopicId: q.subtopic_id,
+      title:       subtopicRow?.title || null,
+      description: subtopicRow?.description || null,
       mode,
       previousFeedback,
       question: {
