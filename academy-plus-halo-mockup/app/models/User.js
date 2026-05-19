@@ -91,7 +91,7 @@ const initUsersTable = async () => {
                         password_hash VARCHAR(255) NOT NULL,
                         name VARCHAR(50) DEFAULT NULL,
                         date_of_birth DATE DEFAULT NULL,
-                        role ENUM('student', 'teacher', 'admin') NOT NULL DEFAULT 'student',
+                        role ENUM('start', 'student', 'teacher', 'admin') NOT NULL DEFAULT 'start',
                         exp INT NOT NULL DEFAULT 0,
                         hide_name BOOLEAN NOT NULL DEFAULT FALSE,
                         private_account BOOLEAN NOT NULL DEFAULT FALSE,
@@ -108,9 +108,9 @@ const initUsersTable = async () => {
 };
 
 // Create User
-const createUser = async ({ username, email, passwordHash, role = 'student' }) => {
-    const allowedRoles = ['student', 'teacher', 'admin'];
-    const safeRole = allowedRoles.includes(role) ? role : 'student';
+const createUser = async ({ username, email, passwordHash, role = 'start' }) => {
+    const allowedRoles = ['start', 'student', 'teacher', 'admin'];
+    const safeRole = allowedRoles.includes(role) ? role : 'start';
 
     const [result] = await db.query(
         'INSERT INTO users (username, email, password_hash, role, badges) VALUES (?, ?, ?, ?, JSON_ARRAY())',
@@ -188,7 +188,7 @@ const updateUserPassword = async (id, hashedPassword) => {
 
 // Update User Role
 const updateUserRole = async (userId, role) => {
-    const allowedRoles = ['student', 'teacher', 'admin'];
+    const allowedRoles = ['start', 'student', 'teacher', 'admin'];
     if (!allowedRoles.includes(role)) {
         throw new Error(`Invalid role: ${role}`);
     }

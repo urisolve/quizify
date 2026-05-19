@@ -85,7 +85,8 @@
         "contributors": "Contributors",
         "publications": "Publications",
         "contactus": "Contact Us",
-        "admin": "Admin Area"
+        "admin": "Admin Area",
+        "quizinicial": "First Quiz"
     },
     "statistics": {
         "statistics": "Statistics",
@@ -342,7 +343,8 @@
         "password_hint": "Minimum 8 characters, including uppercase, numbers, and symbols.",
         "role_student": "Student",
         "role_teacher": "Teacher",
-        "role_admin": "Administrator"
+        "role_admin": "Administrator",
+        "role_start": "Start"
     },
     "feedback": {
         "metrics_title": "Rate each metric between 1 (Strongly Disagree) and 5 (Strongly Agree)",

@@ -31,6 +31,7 @@ const subtopicsPath = path.join(__dirname, '../db/insert_subtopics.sql');
 const promptsPath = path.join(__dirname, '../db/insert_prompts.sql');
 //const questionsPath = path.join(__dirname, '../db/insert_questions.sql');
 const usersPath = path.join(__dirname, '../db/insert_users.sql');
+const questionarioinicialPath = path.join(__dirname, '../db/insert_questionarioinicial.sql');
 //const docsPath = path.join(__dirname, '../db/insert_docs.sql');
 
 //* i18next configuration
@@ -250,6 +251,7 @@ const { initUsersTable, syncUserAvatars } = require('./models/User');
 const { initRagTable } = require('./models/Documents');
 const { initRatingTables } = require('./models/Rating');
 const { initQuestionFeedbackTable } = require('./models/QuestionFeedback');
+const { initQuestionsQuestionarioInicialTable } = require('./models/QuestionarioInicial');
 
 // Initialize all tables before starting the server
 async function waitForDB(retries = 10, delay = 3000) {
@@ -279,8 +281,9 @@ async function waitForDB(retries = 10, delay = 3000) {
     await initUserSubtopicProgressTable();
     await initRatingTables();
     await initQuestionFeedbackTable();
+    await initQuestionsQuestionarioInicialTable();
     console.log('All tables ensured/created.');
-    await seedDatabase([topicsPath, subtopicsPath, usersPath, promptsPath]); // , docsPath, questionsPath
+    await seedDatabase([topicsPath, subtopicsPath, usersPath, promptsPath, questionarioinicialPath]); // , docsPath, questionsPath
     await syncUserAvatars();
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

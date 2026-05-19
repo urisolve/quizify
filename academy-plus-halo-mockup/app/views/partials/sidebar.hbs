@@ -36,6 +36,15 @@
           <span class="hide-menu">{{ t 'sidebar.learningarea' }}</span>
         </li>
         <li class="sidebar-item">
+          <a class="sidebar-link" href="/questionario_inicial" aria-expanded="false">
+            <span>
+              <i class="ti ti-brain"></i>
+            </span>
+            <span class="hide-menu">{{ t 'sidebar.quizinicial' }}</span>
+          </a>
+        </li>
+        {{#hasAnyRole 'student' 'teacher' 'admin'}}
+        <li class="sidebar-item">
           <a class="sidebar-link" href="/practice-plus" aria-expanded="false">
             <span>
               <i class="ti ti-brain"></i>
@@ -51,6 +60,7 @@
             <span class="hide-menu">{{ t 'sidebar.leaderboard' }}</span>
           </a>
         </li>
+        {{/hasAnyRole}}
         {{#hasAnyRole 'teacher' 'admin'}}
         <li class="sidebar-item">
           <a class="sidebar-link" href="/playground" aria-expanded="false">

@@ -86,7 +86,8 @@
         "contributors": "Contribuições",
         "publications": "Publicações",
         "contactus": "Contacto",
-        "admin": "Área Administrador"
+        "admin": "Área Administrador",
+        "quizinicial": "Quiz Inicial"
     },
     "statistics": {
         "statistics": "Estatísticas",
@@ -342,7 +343,8 @@
         "password_hint": "Mínimo 8 caracteres, com maiúscula, número e símbolo.",
         "role_student": "Estudante",
         "role_teacher": "Docente",
-        "role_admin": "Administrador"
+        "role_admin": "Administrador",
+        "role_start": "Start"
     },
     "feedback": {
         "metrics_title": "Avalia cada métrica entre 1 (Discordo totalmente) e 5 (Concordo totalmente)",

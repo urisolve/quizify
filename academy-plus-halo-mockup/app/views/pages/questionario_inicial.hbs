@@ -1,0 +1,88 @@
+<div class="container-fluid py-4">
+  <div class="row g-4"> 
+    <form id="quiz-form" method="POST" action="/questionario_inicial/submit" class="row g-4">
+
+      <!-- Dynamic Alert Container Place (Right here) -->
+      <div id="alert-placement" class="col-12 d-none">
+
+      </div>
+
+      <!-- Topic Title Card -->
+      <div class="col-12 mb-0">
+        <section class="card border-0 halo-hero-card overflow-hidden shadow-sm">
+          <div class="card-body p-3">
+            <div class="d-flex align-items-center gap-3">
+
+              <span class="halo-section-icon bg-light-primary text-primary">
+                <i class="ti ti-book"></i>
+              </span>
+              <div>
+                <h2 class="fw-semibold mb-0 fs-4">Questionário Inicial</h2>
+                <p class="mb-0 text-muted small" style="text-align: justify;">Por favor, responde a todas as questões abaixo.</p>
+              </div>
+              
+            </div>
+          </div>
+        </section>
+      </div>
+    
+      <!-- Loop through all questions -->
+      {{#each questions}}
+        <div class="col-12">
+          <section class="card h-100 shadow-sm question-card"> <!-- Added question-card class -->
+            <div class="card-body p-4 d-flex flex-column gap-3">
+              
+              <div class="d-flex align-items-center gap-3 mb-2">
+                <span class="halo-section-icon bg-light-primary text-primary">
+                  <i class="ti ti-question-mark"></i>
+                </span>
+                <p class="fs-5 mb-0" style="text-align: justify;">
+                  {{this.question_text}}
+                </p>
+              </div>
+
+              {{#if this.image}}
+                <img src="{{this.image}}" alt="Question image"
+                  class="img-fluid rounded-3 mb-2 halo-image-zoom-trigger border" 
+                  data-image-zoom="{{this.image}}"
+                  style="max-height: 450px; object-fit: contain;">
+              {{/if}}
+                
+              <!-- CHANGED HERE: Changed id="answers-area" to class="answers-area" -->
+              <div class="answers-area d-grid gap-2">
+                {{#each this.all_answers_shuffled}}
+                  <label class="answer-option btn btn-outline-secondary text-start px-3 py-2 d-flex align-items-center gap-2" style="cursor: pointer;">
+                    <!-- Removed native 'required' to let our robust JS engine handle it cleanly -->
+                    <input type="radio" name="question_{{../id}}" value="{{this}}" hidden>
+                    <span style="pointer-events: none;">{{this}}</span>
+                  </label>
+                {{/each}}
+              </div>
+
+            </div>
+          </section>
+        </div>
+      {{/each}}
+
+      <!-- Submit Actions Box -->
+      <div class="col-12 mt-4">
+        <div class="card border-0 bg-transparent">
+          <div class="card-body p-0 d-flex gap-3 justify-content-end">
+            {{#if isReadOnly}}
+              <button type="button" class="btn btn-secondary w-100 py-2 fw-semibold shadow-sm" disabled>
+                <i class="ti ti-lock me-2"></i>Submissão Desativada (Modo de Visualização)
+              </button>
+            {{else}}
+              <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm">
+                <i class="ti ti-send me-2"></i>Submeter Questionário
+              </button>
+            {{/if}}
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
+</div>
+
+<script src="/js/pages/questionario_inicial.js"></script>

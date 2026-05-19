@@ -26,7 +26,7 @@ async function createUser(req, res) {
     const username = String(req.body.username || '').trim();
     const email    = String(req.body.email || '').trim();
     const password = String(req.body.password || '');
-    const role     = String(req.body.role || 'student');
+    const role     = String(req.body.role || 'start');
 
     if (!username || !email || !password) {
       throw new Error('Username, email and password are required.');
