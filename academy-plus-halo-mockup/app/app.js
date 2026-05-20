@@ -28,7 +28,7 @@ const PORT = process.env.PORT;
 const seedDatabase = require('../db/seed');
 const topicsPath = path.join(__dirname, '../db/insert_topics.sql');
 const subtopicsPath = path.join(__dirname, '../db/insert_subtopics.sql');
-const promptsPath = path.join(__dirname, '../db/insert_prompts.sql');
+const promptsJsonPath = path.join(__dirname, './data/prompts.json');
 //const questionsPath = path.join(__dirname, '../db/insert_questions.sql');
 const usersPath = path.join(__dirname, '../db/insert_users.sql');
 const questionarioinicialPath = path.join(__dirname, '../db/insert_questionarioinicial.sql');
@@ -283,7 +283,7 @@ async function waitForDB(retries = 10, delay = 3000) {
     await initQuestionFeedbackTable();
     await initQuestionsQuestionarioInicialTable();
     console.log('All tables ensured/created.');
-    await seedDatabase([topicsPath, subtopicsPath, usersPath, promptsPath, questionarioinicialPath]); // , docsPath, questionsPath
+    await seedDatabase([topicsPath, subtopicsPath, usersPath, promptsJsonPath, questionarioinicialPath]); // , docsPath, questionsPath
     await syncUserAvatars();
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

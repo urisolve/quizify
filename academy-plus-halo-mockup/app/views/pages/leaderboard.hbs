@@ -36,10 +36,6 @@
                     <th>{{t 'leaderboard.user'}}</th>
                     {{#if isRatingLeaderboard}}
                       <th class="text-end">{{t 'leaderboard.rating'}}</th>
-                      {{#if isAdmin}}
-                        <th class="text-end">{{t 'leaderboard.rd'}}</th>
-                        <th class="text-end">{{t 'leaderboard.confidence'}}</th>
-                      {{/if}}
                     {{else}}
                       <th class="text-end">{{t 'leaderboard.points'}}</th>
                       <th class="text-end">{{t 'leaderboard.accuracy'}}</th>
@@ -78,15 +74,6 @@
                       </td>
                       {{#if ../isRatingLeaderboard}}
                         <td class="text-end fw-semibold">{{rating}}</td>
-                        {{#if ../isAdmin}}
-                          <td class="text-end text-muted">{{rd}}</td>
-                          <td class="text-end fw-semibold">
-                            {{confidence}}%
-                            {{#if provisional}}
-                              <span class="badge bg-warning-subtle text-warning ms-2">{{t 'leaderboard.provisional'}}</span>
-                            {{/if}}
-                          </td>
-                        {{/if}}
                       {{else}}
                         <td class="text-end fw-semibold">{{points}}</td>
                         <td class="text-end fw-semibold">{{accuracy}}%</td>
@@ -144,9 +131,6 @@
                   <div class="text-end">
                     {{#if isRatingLeaderboard}}
                       <div class="fw-semibold text-primary">{{currentUser.rating}} {{t 'leaderboard.rating'}}</div>
-                      {{#if isAdmin}}
-                        <div class="text-muted small">{{t 'leaderboard.rd'}}: {{currentUser.rd}} · {{t 'leaderboard.confidence'}}: {{currentUser.confidence}}%</div>
-                      {{/if}}
                     {{else}}
                       <div class="fw-semibold text-primary">{{currentUser.points}} {{t 'leaderboard.points'}}</div>
                       <div class="text-muted small">{{t 'leaderboard.accuracy'}}: {{currentUser.accuracy}}%</div>

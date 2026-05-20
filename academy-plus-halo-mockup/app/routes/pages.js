@@ -35,6 +35,7 @@ router.post('/questionario_inicial/submit', requireAuthentication, questionarioI
 
 const playgroundController = require('../controllers/pages/playgroundController.js');
 router.get('/playground', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.showPlayground);
+router.post('/playground/prompts/:id', requireAuthentication, requireRole('teacher', 'admin'), playgroundController.updatePrompt);
 
 const pmbController = require('../controllers/pages/pmbController');
 router.post('/playground/create-pmb', requireAuthentication, requireRole('teacher', 'admin'), pmbController.createPmb);

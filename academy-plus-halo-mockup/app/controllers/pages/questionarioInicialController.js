@@ -1,5 +1,7 @@
 const db = require('../../config/db');
 const User = require('../../models/User');
+const Rating = require('../../models/Rating');
+const ratingSystem = require('../../services/ratingSystem');
 
 // Algoritmo Fisher-Yates para baralhar as opções
 function shuffleArray(array) {
@@ -170,15 +172,44 @@ async function submitQuestionario(req, res) {
         }
 
 
-        // 6. Definir mensagem flash e redirecionar para /practice-plus
-        if (req.session) {
-            req.session.flash = {
-                type: 'success',
-                message: 'Quiz complete!'
-            };
+        // 6. Record rating events for each answered question (first-attempt)
+        try {
+            for (const q of questions) {
+                const submittedChoice = userAnswers[`question_${q.id}`];
+                const isCorrect = (submittedChoice === q.correct_answer);
+                // Use rating system to record each answer (attemptNo=1)
+                // timeSeconds/hintsUsed are unknown for this questionnaire; use defaults
+                await ratingSystem.recordAnswerRating({
+                    userId,
+                    question: q,
+                    attemptNo: 1,
+                    success: !!isCorrect,
+                    timeSeconds: 0,
+                });
+            }
+        } catch (rsErr) {
+            console.error('[questionario] rating recording failed:', rsErr);
         }
 
-        res.redirect('/practice-plus');
+        // 7. Refresh user's rating snapshot and update session
+        const ratingSnapshot = await Rating.getUserRatingSnapshot(userId) || await Rating.getOrCreateUserRating(userId);
+        if (req.session && req.session.user) {
+            req.session.user.global_rating = ratingSnapshot.global_rating;
+            req.session.user.global_rd = ratingSnapshot.global_rd;
+            req.session.user.rating_provisional = ratingSnapshot.provisional;
+            req.session.user.rating_placement_matches = ratingSnapshot.placement_matches;
+            req.session.user.rating_events = ratingSnapshot.rated_events;
+        }
+
+        // 8. Render a simple result page showing new rating and score
+        return res.renderPage('questionario_inicial_result', {
+            layout: 'main',
+            headerTitle: 'Resultado do Questionário',
+            user: req.session.user,
+            score: totalScore,
+            maxScore: maxPossibleScore,
+            ratingSnapshot
+        });
 
     } catch (error) {
         console.error('Error submitting questionnaire answers:', error);

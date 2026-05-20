@@ -2,6 +2,144 @@
   "subtopics": [
     {
       "id": 1,
+      "key": "terminologia_circuitos_eletricos",
+      "title": "Terminologia de Circuitos Elétricos",
+      "prompts": [
+        {
+          "tema": "Definições Básicas",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre definições básicas da terminologia de circuitos elétricos. A pergunta deve testar o significado de termos como nó, ramo, malha, corrente e tensão, sem depender de um documento de apoio."
+        },
+        {
+          "tema": "Associação de Termos",
+          "prompt": "Gera uma questão de escolha múltipla em português em que o aluno tenha de associar corretamente um termo de circuitos elétricos à respetiva definição. Usa linguagem simples e foca a terminologia essencial da análise de circuitos."
+        },
+        {
+          "tema": "Termo Correto",
+          "prompt": "Gera uma questão de escolha múltipla em português que peça para identificar qual o termo técnico correto para descrever uma ligação, um percurso fechado ou uma grandeza elétrica. Evita cálculos e foca apenas a nomenclatura."
+        },
+        {
+          "tema": "Linguagem Técnica",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre a linguagem técnica usada em circuitos elétricos. A pergunta deve distinguir entre termos semelhantes e mostrar a diferença entre eles de forma conceptual."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "key": "lei_kirchhoff_malhas",
+      "title": "Lei de Kirchhoff das Malhas",
+      "prompts": [
+        {
+          "tema": "Soma Algébrica das Tensões",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre a Lei de Kirchhoff das Malhas, focando a ideia de soma algébrica das tensões num percurso fechado. Não uses cálculos numéricos; testa apenas o conceito."
+        },
+        {
+          "tema": "Condição de Percurso Fechado",
+          "prompt": "Gera uma questão de escolha múltipla em português que peça ao aluno para reconhecer quando a Lei de Kirchhoff das Malhas se aplica. A pergunta deve relacionar a lei com um percurso fechado no circuito."
+        },
+        {
+          "tema": "Interpretação da KVL",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre a interpretação física da Lei de Kirchhoff das Malhas. A pergunta deve avaliar se o aluno entende que as subidas e quedas de tensão se equilibram numa malha."
+        },
+        {
+          "tema": "Identificação de Afirmação Correta",
+          "prompt": "Gera uma questão de escolha múltipla em português em que o aluno deva escolher a afirmação correta sobre a Lei de Kirchhoff das Malhas. Inclui distratores conceptuais plausíveis e mantém a questão curta."
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "key": "passos_metodo",
+      "title": "Interpretação sequencial dos passos do método",
+      "prompts": [
+        {
+          "tema": "Ordem dos Passos",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre a ordem correta dos passos do método das correntes nas malhas. A pergunta deve exigir que o aluno reconheça a sequência lógica do procedimento."
+        },
+        {
+          "tema": "Passo Seguinte",
+          "prompt": "Gera uma questão de escolha múltipla em português que peça ao aluno para identificar qual é o próximo passo do método depois de selecionar as malhas e definir os sentidos das correntes."
+        },
+        {
+          "tema": "Etapa em Falta",
+          "prompt": "Gera uma questão de escolha múltipla em português em que uma sequência do método aparece incompleta e o aluno tem de escolher o passo em falta. Foca a lógica sequencial e não o cálculo."
+        },
+        {
+          "tema": "Encadeamento Lógico",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre o encadeamento lógico dos passos do método por correntes de malha, desde a leitura do circuito até à interpretação final dos resultados."
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "key": "fontes_corrente",
+      "title": "Tratamento de fontes de corrente",
+      "prompts": [
+        {
+          "tema": "Fonte Entre Malhas",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre o tratamento de uma fonte de corrente colocada entre duas malhas. A pergunta deve avaliar o conceito de supermalha ou de restrição de corrente, sem cálculo numérico."
+        },
+        {
+          "tema": "Restrição de Corrente",
+          "prompt": "Gera uma questão de escolha múltipla em português que peça ao aluno para identificar a consequência de uma fonte de corrente num ramo partilhado por malhas. Foca a restrição imposta pela fonte."
+        },
+        {
+          "tema": "Supermalha",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre o conceito de supermalha. A pergunta deve testar se o aluno sabe quando é necessário contornar uma fonte de corrente entre malhas."
+        },
+        {
+          "tema": "Fonte no Contorno",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre como tratar uma fonte de corrente localizada no contorno de uma malha. A questão deve ser conceptual e clara."
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "key": "corrente_malha_ramo",
+      "title": "Relação entre corrente de malha e corrente nos ramos",
+      "prompts": [
+        {
+          "tema": "Ramo Partilhado",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre a relação entre corrente de malha e corrente num ramo partilhado. A pergunta deve avaliar se o aluno entende que a corrente do ramo pode resultar da diferença entre malhas."
+        },
+        {
+          "tema": "Expressão da Corrente",
+          "prompt": "Gera uma questão de escolha múltipla em português que peça ao aluno para identificar a expressão correta da corrente num ramo a partir das correntes de malha envolvidas. Não uses números, apenas relações conceptuais."
+        },
+        {
+          "tema": "Corrente de Ramo vs. Corrente de Malha",
+          "prompt": "Gera uma questão de escolha múltipla em português que compare corrente de ramo e corrente de malha. O aluno deve reconhecer quando os valores coincidem e quando precisam de ser combinados."
+        },
+        {
+          "tema": "Componentes Partilhados",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre componentes partilhados entre malhas e a forma como isso altera a corrente no ramo. A questão deve ser conceptual e direta."
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "key": "sentidos_correntes",
+      "title": "Interpretação de sentidos de correntes",
+      "prompts": [
+        {
+          "tema": "Sentido Assumido",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre a interpretação do sentido assumido para uma corrente. A pergunta deve focar a convenção de sinais e o significado do resultado positivo ou negativo."
+        },
+        {
+          "tema": "Resultado Negativo",
+          "prompt": "Gera uma questão de escolha múltipla em português que peça ao aluno para interpretar o que significa uma corrente calculada com valor negativo. A questão deve ser conceptual e não numérica."
+        },
+        {
+          "tema": "Direções Opostas",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre correntes com sentidos opostos. O aluno deve reconhecer como o sentido escolhido inicialmente influencia a leitura do resultado."
+        },
+        {
+          "tema": "Leitura Física do Sinal",
+          "prompt": "Gera uma questão de escolha múltipla em português sobre a leitura física do sinal de uma corrente em circuitos. A pergunta deve ajudar a interpretar a direção real da corrente em relação ao sentido de referência."
+        }
+      ]
+    },
+    {
+      "id": 7,
       "key": "interpretacao_circuito",
       "title": "Interpretação de Circuito",
       "prompts": [
@@ -52,7 +190,7 @@
       ]
     },
     {
-      "id": 2,
+      "id": 8,
       "key": "escolha_das_malhas",
       "title": "Escolha das Malhas",
       "prompts": [
@@ -159,7 +297,7 @@
       ]
     },
     {
-      "id": 3,
+      "id": 9,
       "key": "escrita_de_equacoes",
       "title": "Escrita de Equações",
       "prompts": [
@@ -286,7 +424,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 10,
       "key": "calculo_das_correntes",
       "title": "Cálculo das Correntes",
       "prompts": [

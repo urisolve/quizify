@@ -1,4 +1,5 @@
 const db = require('../../config/db');
+const { getPromptsWithSubtopics, updatePromptFields } = require('../../models/Prompts');
 
 async function showPlayground(req, res) {
   try {
@@ -15,12 +16,25 @@ async function showPlayground(req, res) {
         ORDER BY id DESC`
     );
 
+    const promptRows = await getPromptsWithSubtopics();
+    const promptSubtopics = subtopicRows.map((s) => ({ id: s.id, title: s.title }));
+
     res.renderPage('playground', {
       layout: 'main',
       headerTitle: 'Playground',
       user: req.session.user,
       flash,
       subtopics,
+      promptSubtopics,
+      prompts: promptRows.map((row) => ({
+        id: row.id,
+        subtopicId: row.subtopic_id,
+        subtopicTitle: row.subtopic_title,
+        subject: row.subject,
+        prompt: row.prompt,
+        numberQuestions: row.number_questions || 0,
+        lastUpdateAt: row.last_update_at,
+      })),
       reviewBatch: req.session.reviewBatch || null,
       pmbs: pmbRows.map((row) => ({
         id: row.id,
@@ -35,6 +49,38 @@ async function showPlayground(req, res) {
   }
 }
 
+async function updatePrompt(req, res) {
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id) || id <= 0) {
+      throw new Error('Invalid prompt id.');
+    }
+
+    const subject = String(req.body?.subject || '').trim();
+    const prompt = String(req.body?.prompt || '').trim();
+
+    if (!subject || !prompt) {
+      throw new Error('Subject and prompt are required.');
+    }
+
+    await updatePromptFields(id, { subject, prompt });
+
+    req.session.flash = {
+      type: 'success',
+      message: `Prompt #${id} atualizado com sucesso.`,
+    };
+  } catch (err) {
+    console.error('[playground] updatePrompt failed:', err);
+    req.session.flash = {
+      type: 'danger',
+      message: `Falha ao atualizar prompt: ${err.message}`,
+    };
+  }
+
+  return res.redirect('/playground');
+}
+
 module.exports = {
   showPlayground,
+  updatePrompt,
 };

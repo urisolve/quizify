@@ -76,6 +76,26 @@
 
   initQuestionPmbSourceControls();
 
+  function initPromptFilter() {
+    const filter = document.getElementById('promptSubtopicFilter');
+    const items = Array.from(document.querySelectorAll('.prompt-item'));
+    if (!filter || !items.length) return;
+
+    const applyFilter = () => {
+      const selected = filter.value;
+      items.forEach((item) => {
+        const itemSubtopicId = item.dataset.promptSubtopicId || '';
+        const visible = itemSubtopicId === selected;
+        item.classList.toggle('d-none', !visible);
+      });
+    };
+
+    filter.addEventListener('change', applyFilter);
+    applyFilter();
+  }
+
+  initPromptFilter();
+
   window.addEventListener('load', () => {
     const questionOffcanvas = document.getElementById('playground-question-offcanvas');
     if (!questionOffcanvas || questionOffcanvas.dataset.generatedQuestion !== '1') {

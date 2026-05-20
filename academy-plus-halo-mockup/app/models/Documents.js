@@ -58,6 +58,18 @@ async function getRagDocumentById(id) {
   return rows[0] || null;
 }
 
+async function getRagDocumentByFilenameAndType(filename, type_document) {
+  const [rows] = await db.query(
+    `SELECT id, type_document, filename, size_bytes, content, difficulty_level, created_at
+       FROM rag_documents
+      WHERE filename = ? AND type_document = ?
+      ORDER BY id DESC
+      LIMIT 1`,
+    [filename, type_document]
+  );
+  return rows[0] || null;
+}
+
 //Update document details
 async function updateRagDocument(id, updates) {
   const allowed = ['type_document', 'filename', 'content', 'difficulty_level'];
@@ -98,6 +110,7 @@ module.exports = {
   initRagTable,
   addRagDocument,
   getRagDocumentById,
+  getRagDocumentByFilenameAndType,
   updateRagDocument,
   getQuestionsFromSource
 };

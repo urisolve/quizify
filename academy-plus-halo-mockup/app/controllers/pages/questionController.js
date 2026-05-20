@@ -1,4 +1,5 @@
 const db = require('../../config/db');
+const path = require('path');
 const { createQuestion } = require('../../models/Questions');
 const { addQuestionFeedback } = require('../../models/QuestionFeedback');
 const { pickLocale, pickLocaleArray } = require('../../utils/localize');
@@ -11,6 +12,7 @@ const {
   parseDifficultyLevel,
   fallbackImageBySubtopic,
   pmbAssetExists,
+  loadMarkdownGroundingFromDb,
   loadPmbGrounding,
   pickRandomPmbGrounding,
   pickRandomPmbGroundingByDifficulty,
@@ -46,6 +48,40 @@ Constraints:
 - Choose the path that best matches the question. Do NOT mix prefixes.
 - Respond with ONLY the JSON object. No prefix, no suffix, no commentary.
 `.trim();
+
+const THEORY_JSON_SCHEMA_INSTRUCTIONS = `
+Return ONLY a JSON object. Use Portuguese-only content and keep the structure simple.
+
+{
+  "question_text": "pergunta em PT",
+  "correct_answer": "resposta correta em PT",
+  "incorrect_answer": ["errada1", "errada2", "errada3"],
+  "feedback": "feedback em PT",
+  "circuit_image": null
+}
+
+Constraints:
+- "question_text", "correct_answer", and "feedback" should be plain strings in Portuguese.
+- The question should be more theoretical and conceptual, focused on circuit analysis fundamentals.
+- Do not rely on a specific image to formulate the question.
+- The translation to resistors is "Resistências", not "Resistores". Also, avoid writing "resistores" in the question text or answers instead use "resistências".
+- "incorrect_answer" should be a flat array of at least 3 plain-text distractors in Portuguese.
+- All strings must be plain text, no JSON, no HTML.
+- The answers should be supported by the topic context, but do not need to depend 100% on the source document.
+- "feedback" must be a SHORT pedagogical HINT that nudges the student toward the right reasoning. It MUST NOT contain the correct answer, the numerical result, or a step-by-step solution.
+- "circuit_image" should be null when no image is needed.
+- Respond with ONLY the JSON object. No prefix, no suffix, no commentary.
+`.trim();
+
+function getQuestionSystemInstructions(subtopicId) {
+  return subtopicId >= 1 && subtopicId <= 6
+    ? THEORY_JSON_SCHEMA_INSTRUCTIONS
+    : JSON_SCHEMA_INSTRUCTIONS;
+}
+
+function isTheorySubtopic(subtopicId) {
+  return subtopicId >= 1 && subtopicId <= 6;
+}
 
 function dupBilingual(value) {
   return [value, value];
@@ -91,42 +127,53 @@ async function createQuestions(req, res) {
       : 'random_any';
 
     const requestedDifficulty = parseDifficultyLevel(req.body?.pmbDifficultyLevel);
-    if ((sourceMode === 'random_by_level' || sourceMode === 'specific_pmb') && requestedDifficulty == null) {
+    if (!isTheorySubtopic(subtopicId) && (sourceMode === 'random_by_level' || sourceMode === 'specific_pmb') && requestedDifficulty == null) {
       throw new Error('Invalid PMB difficulty filter selected.');
     }
 
     const requestedPmbId = parseInt(req.body?.pmbId, 10);
-    let pmb;
+    let rag;
+    let ragSource;
+    let ragDocumentId = null;
 
-    if (sourceMode === 'specific_pmb') {
-      if (!Number.isInteger(requestedPmbId) || requestedPmbId <= 0) {
-        throw new Error('Select a PMB for the chosen source mode.');
-      }
-
-      pmb = await loadPmbGrounding(requestedPmbId);
-      if (!pmb) {
-        throw new Error(`PMB ${requestedPmbId} not found or has no content.`);
-      }
-      if (requestedDifficulty != null && pmb.difficultyLevel !== requestedDifficulty) {
-        throw new Error(`PMB ${requestedPmbId} does not match difficulty level ${requestedDifficulty}.`);
-      }
-    } else if (sourceMode === 'random_by_level') {
-      pmb = await pickRandomPmbGroundingByDifficulty(requestedDifficulty);
-      if (!pmb) {
-        throw new Error(`No PMB documents available for difficulty level ${requestedDifficulty} — create one in the Playground first.`);
-      }
+    if (isTheorySubtopic(subtopicId)) {
+      ragSource = await loadMarkdownGroundingFromDb('dataset_teorico.md', 'theory');
+      rag = await buildRagPayload(ragSource.markdownContent, ragSource.name);
     } else {
-      pmb = await pickRandomPmbGrounding();
-      if (!pmb) {
-        throw new Error('No PMB documents available — create one in the Playground first.');
-      }
-    }
+      let pmb;
 
-    const rag = await buildRagPayload(pmb.markdownContent, `pmb_${pmb.ragDocumentId}.md`);
+      if (sourceMode === 'specific_pmb') {
+        if (!Number.isInteger(requestedPmbId) || requestedPmbId <= 0) {
+          throw new Error('Select a PMB for the chosen source mode.');
+        }
+
+        pmb = await loadPmbGrounding(requestedPmbId);
+        if (!pmb) {
+          throw new Error(`PMB ${requestedPmbId} not found or has no content.`);
+        }
+        if (requestedDifficulty != null && pmb.difficultyLevel !== requestedDifficulty) {
+          throw new Error(`PMB ${requestedPmbId} does not match difficulty level ${requestedDifficulty}.`);
+        }
+      } else if (sourceMode === 'random_by_level') {
+        pmb = await pickRandomPmbGroundingByDifficulty(requestedDifficulty);
+        if (!pmb) {
+          throw new Error(`No PMB documents available for difficulty level ${requestedDifficulty} — create one in the Playground first.`);
+        }
+      } else {
+        pmb = await pickRandomPmbGrounding();
+        if (!pmb) {
+          throw new Error('No PMB documents available — create one in the Playground first.');
+        }
+      }
+
+      ragSource = pmb;
+      ragDocumentId = pmb.ragDocumentId;
+      rag = await buildRagPayload(pmb.markdownContent, `pmb_${pmb.ragDocumentId}.md`);
+    }
 
     const haloPayload = {
       prompt: `${userPrompt}\n`,
-      system: JSON_SCHEMA_INSTRUCTIONS,
+      system: getQuestionSystemInstructions(subtopicId),
       messages: [],
       model,
       requestId: null,
@@ -134,26 +181,30 @@ async function createQuestions(req, res) {
     };
 
     rawText = await collectHaloRagResponse(haloPayload, req.headers.cookie || '');
-    const question = normalizeQuestionShape(extractJsonObject(rawText), pmb.ragDocumentId);
+    const question = normalizeQuestionShape(extractJsonObject(rawText), ragDocumentId);
 
-    if (question.circuit_image) {
+    if (subtopicId >= 7 && question.circuit_image && ragDocumentId != null) {
       const relPath = question.circuit_image.replace(/^\/pmb-asset\/\d+\//, '');
-      const exists = await pmbAssetExists(pmb.ragDocumentId, relPath);
+      const exists = await pmbAssetExists(ragDocumentId, relPath);
       if (!exists) {
-        question.circuit_image = fallbackImageBySubtopic(subtopicId, pmb.ragDocumentId);
+        question.circuit_image = fallbackImageBySubtopic(subtopicId, ragDocumentId);
       }
     }
 
-    if (!question.circuit_image) {
-      question.circuit_image = fallbackImageBySubtopic(subtopicId, pmb.ragDocumentId);
+    if (subtopicId >= 7 && !question.circuit_image && ragDocumentId != null) {
+      question.circuit_image = fallbackImageBySubtopic(subtopicId, ragDocumentId);
     }
 
-    validateQuestionShape(question, pmb.ragDocumentId);
+    if (subtopicId >= 1 && subtopicId <= 6) {
+      question.circuit_image = null;
+    }
+
+    validateQuestionShape(question, ragDocumentId);
 
     const elapsedMs = Date.now() - t0;
     const newQuestionId = await createQuestion({
       subtopic_id: subtopicId,
-      rag_document_id: pmb.ragDocumentId,
+      rag_document_id: ragDocumentId,
       prompt_id: promptInfo.promptId,
       question_type: 'EM',
       question_text: dupBilingual(question.question_text),
@@ -201,8 +252,8 @@ async function createQuestions(req, res) {
         promptTheme: promptInfo.subsubtopic,
         promptSubtopic: subtopicRows[0].title,
         model,
-        ragDocumentId: pmb.ragDocumentId,
-        pmbDifficultyLevel: pmb.difficultyLevel,
+        ragDocumentId,
+        pmbDifficultyLevel: isTheorySubtopic(subtopicId) ? null : ragSource.difficultyLevel,
         elapsedSec: (elapsedMs / 1000).toFixed(1),
       },
     };

@@ -3,6 +3,9 @@ dotenv.config();
 
 const db = require('../../config/db');
 const JSZip = require('jszip');
+const fs = require('fs').promises;
+const path = require('path');
+const { getRagDocumentByFilenameAndType, addRagDocument } = require('../../models/Documents');
 
 const HALO_URL = process.env.HALO_URL || 'http://cloud.microlumin.com';
 const HALO_PORT = process.env.HALO_PORT || 2020;
@@ -90,6 +93,60 @@ async function collectHaloRagResponse(payload, cookie = '') {
 
   if (streamError) throw streamError;
   return collected;
+}
+
+async function loadMarkdownGrounding(filePath) {
+  const markdownContent = await fs.readFile(filePath, 'utf8');
+  if (!markdownContent.trim()) {
+    throw new Error(`Grounding document is empty: ${path.basename(filePath)}`);
+  }
+
+  return {
+    markdownContent,
+    name: path.basename(filePath),
+  };
+}
+
+async function loadMarkdownGroundingFromDb(filename, type_document = 'theory') {
+  const document = await getRagDocumentByFilenameAndType(filename, type_document);
+  if (document && document.content) {
+    const markdownContent = Buffer.isBuffer(document.content)
+      ? document.content.toString('utf8')
+      : String(document.content);
+
+    if (!markdownContent.trim()) {
+      throw new Error(`Grounding document is empty: ${filename}`);
+    }
+
+    return {
+      markdownContent,
+      name: document.filename || filename,
+    };
+  }
+
+  // Fallback: try loading from local app/data and insert into DB for future use
+  try {
+    const localPath = path.join(__dirname, '../../data', filename);
+    const raw = await fs.readFile(localPath, 'utf8');
+    if (!raw || !raw.trim()) {
+      throw new Error(`Local grounding file is empty: ${localPath}`);
+    }
+
+    // insert into DB
+    try {
+      await addRagDocument({ type_document, filename, content: raw, creation_time_ms: Date.now() });
+      console.log(`[rag] Seeded ${filename} into rag_documents from ${localPath}`);
+    } catch (insErr) {
+      console.warn(`[rag] Failed to insert ${filename} into DB:`, insErr.message);
+    }
+
+    return {
+      markdownContent: raw,
+      name: filename,
+    };
+  } catch (fsErr) {
+    throw new Error(`Grounding document not found in database: ${filename}`);
+  }
 }
 
 function extractJsonObject(rawText) {
@@ -272,4 +329,6 @@ module.exports = {
   pickRandomPmbGrounding,
   pickRandomPmbGroundingByDifficulty,
   buildPmbAssetUrl,
+  loadMarkdownGrounding,
+  loadMarkdownGroundingFromDb,
 };
