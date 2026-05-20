@@ -1,5 +1,5 @@
 const db = require('../../config/db');
-const { initPromptsTable } = require('../../models/Prompts');
+const { initPromptsTable, getPrompts } = require('../../models/Prompts');
 
 async function showPlayground(req, res) {
   try {
@@ -16,7 +16,8 @@ async function showPlayground(req, res) {
         ORDER BY id DESC`
     );
 
-    const promptRows = await initPromptsTable();
+    await initPromptsTable();
+    const promptRows = await getPrompts();
     const promptSubtopics = subtopicRows.map((s) => ({ id: s.id, title: s.title }));
 
     res.renderPage('playground', {

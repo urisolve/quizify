@@ -24,7 +24,31 @@ async function initPromptsTable() {
   }
 }
 
+// Fetch all prompts from database
+async function getPrompts() {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        p.id,
+        p.subtopic_id,
+        s.title as subtopic_title,
+        p.subject,
+        p.prompt,
+        p.number_questions,
+        p.last_update_at
+      FROM prompts p
+      LEFT JOIN subtopics s ON p.subtopic_id = s.id
+      ORDER BY p.id DESC
+    `);
+    return rows || [];
+  } catch (err) {
+    console.error('Error fetching prompts:', err);
+    return [];
+  }
+}
+
 // Export
 module.exports = {
-  initPromptsTable
+  initPromptsTable,
+  getPrompts
 };
