@@ -1,5 +1,5 @@
 const db = require('../../config/db');
-const { initPromptsTable, getPrompts } = require('../../models/Prompts');
+const { initPromptsTable, getPrompts, updatePromptFields } = require('../../models/Prompts');
 
 async function showPlayground(req, res) {
   try {

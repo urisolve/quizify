@@ -47,8 +47,24 @@ async function getPrompts() {
   }
 }
 
+async function updatePromptFields(id, updates) {
+  const allowedFields = ['subject', 'prompt'];
+  const fields = Object.keys(updates).filter((field) => allowedFields.includes(field));
+
+  if (fields.length === 0) {
+    return;
+  }
+
+  const setClause = fields.map((field) => `${field} = ?`).join(', ');
+  const values = fields.map((field) => updates[field]);
+  values.push(id);
+
+  await db.query(`UPDATE prompts SET ${setClause} WHERE id = ?`, values);
+}
+
 // Export
 module.exports = {
   initPromptsTable,
-  getPrompts
+  getPrompts,
+  updatePromptFields
 };
