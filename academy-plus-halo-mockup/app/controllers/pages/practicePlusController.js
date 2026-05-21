@@ -1,6 +1,17 @@
 const db = require('../../config/db');
 const {getTopics, getSubtopics, getUserSubtopicProgress} = require('../../models/practicePlusModel');
 
+const SUBTOPIC_PROGRESS_LIMIT = 500;
+
+function toProgressPercent(value) {
+  const safeValue = Math.max(0, Number(value) || 0);
+  if (safeValue >= SUBTOPIC_PROGRESS_LIMIT) {
+    return 100;
+  }
+
+  return Math.floor((safeValue / SUBTOPIC_PROGRESS_LIMIT) * 100);
+}
+
 async function practicePlusPage(req, res) {
   try {
     delete req.session.queryComplete;
@@ -15,21 +26,28 @@ async function practicePlusPage(req, res) {
 
     // Map subtopic_id to progress
     const subtopicProgressMap = {};
-    subtopicProgressRows.forEach(row => { subtopicProgressMap[row.subtopic_id] = row.progress; });
+    subtopicProgressRows.forEach(row => {
+      const rawProgress = Math.max(0, Math.min(Number(row.progress) || 0, SUBTOPIC_PROGRESS_LIMIT));
+      subtopicProgressMap[row.subtopic_id] = rawProgress;
+    });
 
     // Calculate topic progress as average of its subtopics' progress
     const topicsWithSubs = topics.map(topic => {
       const topicSubtopics = subtopics.filter(st => st.topic_id === topic.id);
       const subtopicProgresses = topicSubtopics.map(st => subtopicProgressMap[st.id] || 0);
-      const topicProgress = topicSubtopics.length
+      const topicProgressXp = topicSubtopics.length
         ? Math.round(subtopicProgresses.reduce((a, b) => a + b, 0) / topicSubtopics.length)
         : 0;
       return {
         ...topic,
-        progress: topicProgress,
+        progressXp: topicProgressXp,
+        progress: toProgressPercent(topicProgressXp),
         subtopics: topicSubtopics.map(st => ({
           ...st,
-          progress: subtopicProgressMap[st.id] || 0
+          progressXp: subtopicProgressMap[st.id] || 0,
+          progress: toProgressPercent(subtopicProgressMap[st.id] || 0),
+          isCompleted: (subtopicProgressMap[st.id] || 0) >= SUBTOPIC_PROGRESS_LIMIT,
+          progressLimitXp: SUBTOPIC_PROGRESS_LIMIT
         }))
       };
     });
@@ -40,7 +58,7 @@ async function practicePlusPage(req, res) {
       : 0;
 
     // First Incomplete Topic Index
-    const firstIncompleteIndex = topicsWithSubs.findIndex(t => t.progress < 100);
+    const firstIncompleteIndex = topicsWithSubs.findIndex(t => t.progressXp < SUBTOPIC_PROGRESS_LIMIT);
     const defaultTopicIndex = firstIncompleteIndex !== -1 ? firstIncompleteIndex : 0;
     const activeTopic = topicsWithSubs[defaultTopicIndex] || topicsWithSubs[0] || null;
 
@@ -51,6 +69,7 @@ async function practicePlusPage(req, res) {
       flash,
       topicsJson: JSON.stringify(topicsWithSubs),
       generalProgress: totalProgress,
+      progressLimitXp: SUBTOPIC_PROGRESS_LIMIT,
       userAvatar: req.session.user?.avatar_url || req.session.user?.avatar || null,
       userLevel: req.session.user?.level || 1,
       defaultTopicIndex,
