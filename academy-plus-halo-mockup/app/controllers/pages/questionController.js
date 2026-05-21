@@ -98,7 +98,7 @@ function shuffle(array) {
 async function createQuestions(req, res) {
   let rawText = '';
   const t0 = Date.now();
-  const ALLOWED_MODELS = ['gpt-oss:20b', 'llama3.3:70b', 'lcm-full:latest'];
+  const ALLOWED_MODELS = ['gpt-oss:20b', 'llama3.3:70b', 'lcm-full:latest', 'deepseek-r1:8b', 'llama3.1:8b', 'llama3.2:3b'];
 
   try {
     const model = ALLOWED_MODELS.includes(req.body?.model) ? req.body.model : null;
