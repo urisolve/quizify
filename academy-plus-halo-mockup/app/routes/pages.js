@@ -88,6 +88,6 @@ const contributorsController = require('../controllers/pages/contributorsControl
 router.get('/contributors', contributorsController);
 
 const chatbotController = require('../controllers/pages/chatbotController');
-router.get('/chatbot', chatbotController);
+router.get('/chatbot', requireAuthentication, requireRole('admin'), chatbotController);
 
 module.exports = router;

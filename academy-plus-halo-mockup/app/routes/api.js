@@ -42,10 +42,11 @@ router.get('/leaderboard', leaderboardController.getLeaderboard);
 router.get('/leaderboard/position', requireAuthentication, leaderboardController.getUserPosition);
 
 const chatbotControllerAPI = require('../controllers/api/chatbotControllerAPI');
+const { requireRole } = require('../middleware/authMiddleware');
 
-router.post('/chatbot/stream', chatbotControllerAPI.handleStream);
-router.post('/chatbot/stop', chatbotControllerAPI.stopStream);
-router.get('/chatbot/models', chatbotControllerAPI.handleModels);
+router.post('/chatbot/stream', requireAuthentication, requireRole('admin'), chatbotControllerAPI.handleStream);
+router.post('/chatbot/stop', requireAuthentication, requireRole('admin'), chatbotControllerAPI.stopStream);
+router.get('/chatbot/models', requireAuthentication, requireRole('admin'), chatbotControllerAPI.handleModels);
 
 // Get System Info
 const systemControllerAPI = require('../controllers/api/systemControllerAPI');

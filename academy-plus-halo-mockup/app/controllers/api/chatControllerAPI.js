@@ -128,7 +128,7 @@ exports.handleStream = (req, res) => {
   controllers.set(req.sessionID, controller);
 
   const randomValue = Math.random();
-  const maxModels = 3; // Maximum number of models to use
+  const maxModels = 6; // Maximum number of models to use
   let selectedModels = [];
 
   if (randomValue < SPLIT_PROBABILITY) {
