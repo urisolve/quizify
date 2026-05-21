@@ -156,8 +156,16 @@ async function getRandomQuestionBySubtopic(subtopicId, limit, userId = null) {
 
   const [rows] = await db.query(
     `SELECT q.id
-      FROM questions q
+       FROM questions q
       WHERE q.subtopic_id = ?
+        AND (
+          q.id NOT IN (SELECT DISTINCT question_id FROM question_feedback)
+          OR q.id IN (
+            SELECT question_id FROM question_feedback
+            GROUP BY question_id
+            HAVING (AVG(m1) + AVG(m2)) / 2 > 2.5
+          )
+        )
         ${passedFilter}
       ORDER BY RAND()
       LIMIT ?`,
