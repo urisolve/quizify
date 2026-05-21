@@ -39,7 +39,7 @@ router.post('/playground/prompts/:id', requireAuthentication, requireRole('teach
 
 const pmbController = require('../controllers/pages/pmbController');
 router.post('/playground/create-pmb', requireAuthentication, requireRole('teacher', 'admin'), pmbController.createPmb);
-router.get('/pmb-asset/:id/*', requireAuthentication, requireRole('teacher', 'admin'), pmbController.servePmbAsset);
+router.get('/pmb-asset/:id/*', requireAuthentication, requireRole('student','teacher', 'admin'), pmbController.servePmbAsset);
 router.get('/playground/pmb/review', requireAuthentication, requireRole('teacher', 'admin'), pmbController.showPmbReview);
 router.post('/playground/pmb/:id/delete', requireAuthentication, requireRole('admin'), pmbController.deletePmb);
 
