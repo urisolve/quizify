@@ -50,27 +50,64 @@ Constraints:
 `.trim();
 
 const THEORY_JSON_SCHEMA_INSTRUCTIONS = `
-Return ONLY a JSON object. Use Portuguese-only content and keep the structure simple.
+Return ONLY a valid JSON object. Use European Portuguese only.
 
 {
-  "question_text": "pergunta em PT",
-  "correct_answer": "resposta correta em PT",
+  "question_text": "pergunta em PT-PT",
+  "correct_answer": "resposta correta em PT-PT",
   "incorrect_answer": ["errada1", "errada2", "errada3"],
-  "feedback": "feedback em PT",
+  "feedback": "dica pedagógica curta em PT-PT",
   "circuit_image": null
 }
 
 Constraints:
-- "question_text", "correct_answer", and "feedback" should be plain strings in Portuguese.
-- The question should be more theoretical and conceptual, focused on circuit analysis fundamentals.
-- Do not rely on a specific image to formulate the question.
-- The translation to resistors is "Resistências", not "Resistores". Also, avoid writing "resistores" in the question text or answers instead use "resistências".
-- "incorrect_answer" should be a flat array of at least 3 plain-text distractors in Portuguese.
-- All strings must be plain text, no JSON, no HTML.
-- The answers should be supported by the topic context, but do not need to depend 100% on the source document.
-- "feedback" must be a SHORT pedagogical HINT that nudges the student toward the right reasoning. It MUST NOT contain the correct answer, the numerical result, or a step-by-step solution.
-- "circuit_image" should be null when no image is needed.
-- Respond with ONLY the JSON object. No prefix, no suffix, no commentary.
+- All content must be written in European Portuguese.
+- Use only plain text strings.
+- No markdown, HTML, LaTeX, or nested JSON.
+- The question must be conceptual and theory-focused.
+- Avoid direct definition-copying from the source text.
+- Prefer reasoning-oriented questions over memorization.
+- Focus on circuit analysis fundamentals and conceptual interpretation.
+- Avoid long numerical calculations.
+
+Question design:
+- The question should target ONE cognitive skill:
+  - conceptual interpretation
+  - physical meaning
+  - sign convention reasoning
+  - error detection
+  - comparison between concepts
+  - sequential reasoning
+  - cause-effect reasoning
+
+- The correct answer must be uniquely correct.
+- Questions must be suitable for single-choice multiple-choice format.
+- Avoid ambiguous wording.
+
+Distractors:
+- "incorrect_answer" must contain at least 3 plausible distractors.
+- Distractors should reflect common student misconceptions.
+- Avoid obviously incorrect or absurd answers.
+
+Terminology:
+- Avoid Brazilian Portuguese terminology.
+- Use "resistências" instead of "resistores".
+
+Feedback:
+- "feedback" must be a SHORT pedagogical hint.
+- It must guide the reasoning process without revealing the answer.
+- Do not include the correct answer.
+- Do not include step-by-step solutions.
+- Avoid generic hints.
+
+Output:
+- Return ONLY the JSON object.
+- No explanations.
+- No code fences.
+- No extra text.
+
+"circuit_image":
+- Use null.
 `.trim();
 
 function getQuestionSystemInstructions(subtopicId) {
