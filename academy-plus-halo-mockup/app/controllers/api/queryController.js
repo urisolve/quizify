@@ -10,6 +10,8 @@ const getWeekStart = require('../../utils/getWeekStart');
 const { pickLocale } = require('../../utils/localize');
 const finalizeQuizStats = require('../../utils/finalizeQuizStats');
 
+const SUBTOPIC_PROGRESS_LIMIT = 1200;
+
 exports.submitAnswer = async (req, res) => {
   const { answer } = req.body;
   const userId = req.session.user?.id;
@@ -241,14 +243,14 @@ exports.submitAnswer = async (req, res) => {
     if (query.type === 'subtopic' && query.subtopicId) {
 
       // --- Score-based partial progress ---
-      // Read current progress, add this quiz's score, cap at 100.
+      // Read current progress, add this quiz's score, cap at the configured limit.
       const [[progressRow]] = await getUserSubtopicProgressById(userId, query.subtopicId);
       const currentProgress = progressRow?.progress || 0;
-      const newProgress = Math.min(currentProgress + query.score, 100);
+      const newProgress = Math.min(currentProgress + query.score, SUBTOPIC_PROGRESS_LIMIT);
       await setUserSubtopicProgress(userId, query.subtopicId, newProgress);
 
       // --- BADGE LOGIC ---
-      // Award the topic badge only when the whole topic reaches 100%.
+      // Award the topic badge only when the whole topic reaches the configured limit.
       // Get topic_id for this subtopic
       const [[subtopic]] = await getSubtopicById(query.subtopicId);
       if (subtopic && subtopic.topic_id) {
@@ -259,7 +261,7 @@ exports.submitAnswer = async (req, res) => {
         const [[topicBadge]] = await getTopicBadge(subtopic.topic_id);
         const topicHasBadge = topicBadge && topicBadge.badge != null;
 
-        if (topicCompletionAfter >= 100 && topicHasBadge) {
+        if (topicCompletionAfter >= SUBTOPIC_PROGRESS_LIMIT && topicHasBadge) {
           await checkAndAwardTopicBadge(userId, subtopic.topic_id);
         }
       }
