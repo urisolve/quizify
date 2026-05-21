@@ -10,7 +10,7 @@ const getWeekStart = require('../../utils/getWeekStart');
 const { pickLocale } = require('../../utils/localize');
 const finalizeQuizStats = require('../../utils/finalizeQuizStats');
 
-const SUBTOPIC_PROGRESS_LIMIT = 1200;
+const SUBTOPIC_PROGRESS_LIMIT = 150;
 
 exports.submitAnswer = async (req, res) => {
   const { answer } = req.body;

@@ -2,7 +2,7 @@ const practicePlusModel = require('../../models/practicePlusModel');
 const { checkAndAwardTopicBadge } = require('../pages/practicePlusController');
 const db = require('../../config/db');
 
-const SUBTOPIC_PROGRESS_LIMIT = 1200;
+const SUBTOPIC_PROGRESS_LIMIT = 150;
 
 exports.updateSubtopicProgress = async (req, res) => {
   const { subtopicId } = req.body;

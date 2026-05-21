@@ -1,7 +1,7 @@
 const db = require('../../config/db');
 const {getTopics, getSubtopics, getUserSubtopicProgress} = require('../../models/practicePlusModel');
 
-const SUBTOPIC_PROGRESS_LIMIT = 500;
+const SUBTOPIC_PROGRESS_LIMIT = 150;
 
 function toProgressPercent(value) {
   const safeValue = Math.max(0, Number(value) || 0);
